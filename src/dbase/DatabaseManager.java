@@ -1,12 +1,13 @@
 package dbase;
 
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
@@ -19,8 +20,8 @@ public class DatabaseManager {
 	public Connection getConnection() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			conn = DriverManager.getConnection("jdbc:sqlite:D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\dbase\\theDBase.sqlite");
-			JOptionPane.showMessageDialog(null, "Connected!");
+			conn = DriverManager.getConnection("jdbc:sqlite:D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\dbase\\theDBase.sqlite");
+//			JOptionPane.showMessageDialog(null, "Connected!");
 			return conn;
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(null, "Error: "+ex);
@@ -47,17 +48,44 @@ public class DatabaseManager {
 		return false;
 	}
 	
-	public boolean selectRecord(String table, String column, String where){
+	public Map<String, String> selectRecord(String table, String column, Map <String, String> where) throws SQLException{
 		dbConn = this.getConnection();
+		Map<String,String> toReturn = new HashMap<String, String>();
+		String query = "select "+column+" from "+table;
+		String queryadd = " WHERE";
+		String queryOpp = " AND";
+
+		if(!where.isEmpty()){
+			query=query+queryadd;
+			for(String key : where.keySet()) {
+				query=query + " " + key + "=\""+where.get(key)+"\"";
+				query=query+queryOpp;
+			}
+			query = query.replaceAll(" \\S*$", "");
+		}
+		System.out.println("selectRecord query2 "+query);
+		PreparedStatement pst = conn.prepareStatement(query);
+	
+		ResultSet rs = pst.executeQuery();		
+		ResultSetMetaData rsmd = rs.getMetaData();
+		int columnsNumber = rsmd.getColumnCount();   
 		
-		
-		System.out.println("select record");
-		return false;
+		while(rs.next()) {			
+			for(int i = 1 ; i <= columnsNumber; i++){
+				if(rsmd.getColumnLabel(i).compareTo("salt") == 0 || rsmd.getColumnLabel(i).compareTo("password") == 0|| rsmd.getColumnLabel(i).compareTo("cost") == 0){
+				} else {
+					if(i%3==0)
+						System.out.println();
+					toReturn.put(rsmd.getColumnLabel(i),rs.getString(i));
+					System.out.print("selectRecord "+rsmd.getColumnLabel(i)+" - " + rs.getString(i) + " "); //Print one element of a row
+				}
+			}
+//			System.out.println("\n");//Move to the next line to print the next row.          
+		}
+		return toReturn;
 	}
 	
 	public boolean selectRecordWithSQL(String query) throws SQLException{
-		ArrayList<String> resultArray = new ArrayList<String>();
-		
 		dbConn = this.getConnection();
 		PreparedStatement pst = dbConn.prepareStatement(query);
 		ResultSet rs = pst.executeQuery();
@@ -65,24 +93,18 @@ public class DatabaseManager {
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int columnsNumber = rsmd.getColumnCount();   
 		
-//		System.out.println("select with SQL record: " + query + " / " + columnsNumber);
-//		if(!rs.next())
-//			return false;
-		
-		while(rs.next()) {
-			resultArray.add(rs.toString());
-			
+		while(rs.next()) {			
 			for(int i = 1 ; i <= columnsNumber; i++){
 				if(rsmd.getColumnLabel(i).compareTo("salt") == 0 || rsmd.getColumnLabel(i).compareTo("password") == 0){
 				} else {
-			      System.out.print(rsmd.getColumnLabel(i)+" - " + rs.getString(i) + " "); //Print one element of a row
+					if(i%3==0)
+						System.out.println();
+					
+					System.out.print(rsmd.getColumnLabel(i)+" - " + rs.getString(i) + " "); //Print one element of a row
 				}
 			}
-
-			  System.out.println();//Move to the next line to print the next row.           
-
+			System.out.println("\n");//Move to the next line to print the next row.          
 		}
-//		System.out.println("TRUE!");
 		return true;
 	}
 }
