@@ -48,6 +48,12 @@ public class DatabaseManager {
 		return false;
 	}
 	
+	public ResultSet selectRecord(String query) throws SQLException{
+		dbConn = this.getConnection();
+		PreparedStatement pst = dbConn.prepareStatement(query);		
+		return pst.executeQuery();		
+	}
+	
 	public Map<String, String> selectRecord(String table, String column, Map <String, String> where) throws SQLException{
 		dbConn = this.getConnection();
 		Map<String,String> toReturn = new HashMap<String, String>();
@@ -63,8 +69,8 @@ public class DatabaseManager {
 			}
 			query = query.replaceAll(" \\S*$", "");
 		}
-		System.out.println("selectRecord query2 "+query);
-		PreparedStatement pst = conn.prepareStatement(query);
+//		System.out.println("selectRecord query2 "+query);
+		PreparedStatement pst = dbConn.prepareStatement(query);
 	
 		ResultSet rs = pst.executeQuery();		
 		ResultSetMetaData rsmd = rs.getMetaData();
@@ -77,7 +83,7 @@ public class DatabaseManager {
 					if(i%3==0)
 						System.out.println();
 					toReturn.put(rsmd.getColumnLabel(i),rs.getString(i));
-					System.out.print("selectRecord "+rsmd.getColumnLabel(i)+" - " + rs.getString(i) + " "); //Print one element of a row
+//					System.out.print("selectRecord "+rsmd.getColumnLabel(i)+" - " + rs.getString(i) + " "); //Print one element of a row
 				}
 			}
 //			System.out.println("\n");//Move to the next line to print the next row.          
@@ -106,5 +112,15 @@ public class DatabaseManager {
 			System.out.println("\n");//Move to the next line to print the next row.          
 		}
 		return true;
+	}
+
+
+	public void close() {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
