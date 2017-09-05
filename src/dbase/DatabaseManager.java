@@ -1,6 +1,7 @@
 package dbase;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.sql.DriverManager;
@@ -52,6 +53,24 @@ public class DatabaseManager {
 		dbConn = this.getConnection();
 		PreparedStatement pst = dbConn.prepareStatement(query);		
 		return pst.executeQuery();		
+	}	
+	
+	public ArrayList<String> selectRecordArrayList(String query) throws SQLException{
+		dbConn = this.getConnection();
+		ArrayList<String> resultList = new ArrayList<String>();
+		PreparedStatement pst = dbConn.prepareStatement(query);		
+		ResultSet rs = pst.executeQuery();
+		ResultSetMetaData rsmd = rs.getMetaData();
+		int columnsNumber = rsmd.getColumnCount();
+		while (rs.next()){
+			for(int i = 1 ; i <= columnsNumber; i++){
+				if(rsmd.getColumnLabel(i).compareTo("service_name") == 0){
+					resultList.add(rs.getString(i));
+//					System.out.println("selectRecord "+rsmd.getColumnLabel(i)+" - " + rs.getString(i) + " "); //Print one element of a row
+				}
+			}
+		}
+		return resultList;
 	}
 	
 	public Map<String, String> selectRecord(String table, String column, Map <String, String> where) throws SQLException{

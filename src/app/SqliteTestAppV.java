@@ -1,9 +1,6 @@
 package app;
 
 import java.awt.EventQueue;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +8,6 @@ import javax.swing.JFrame;
 
 import dbase.DatabaseManager;
 import dbase.UserManager;
-import temp.UtillTemp;
 import java.awt.Color;
 import java.awt.Toolkit;
 import javax.swing.JLabel;
@@ -36,13 +32,9 @@ public class SqliteTestAppV {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-//		UtillTemp ut;
 		DM = new DatabaseManager();
 		UM = new UserManager();
 		try {
-//			ut = new UtillTemp();
-//			ut.saltPassword("SomePass1234#");
-
 //			DM.selectRecordWithSQL("Select * from users where nick=\"admin\" ");
 			Map<String, String> where = new HashMap<String, String>();
 			where.put("service_number", "AAS0002");
@@ -128,6 +120,7 @@ public class SqliteTestAppV {
 	public void zaloguj() {
 		try {
 			String username_str = username.getText();
+			@SuppressWarnings("deprecation")
 			String pass = password.getText();
 //			System.out.println("logowanie "+username_str + " "+pass);
 
