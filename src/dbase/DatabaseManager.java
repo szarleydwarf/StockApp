@@ -64,10 +64,10 @@ public class DatabaseManager {
 		int columnsNumber = rsmd.getColumnCount();
 		while (rs.next()){
 			for(int i = 1 ; i <= columnsNumber; i++){
-				if(rsmd.getColumnLabel(i).compareTo("service_name") == 0){
+//				if(rsmd.getColumnLabel(i).compareTo("service_name") == 0){
 					resultList.add(rs.getString(i));
 //					System.out.println("selectRecord "+rsmd.getColumnLabel(i)+" - " + rs.getString(i) + " "); //Print one element of a row
-				}
+//				}
 			}
 		}
 		return resultList;

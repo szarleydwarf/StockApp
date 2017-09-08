@@ -41,6 +41,8 @@ public class WystawRachunek {
 	private JFrame frmNowyRachunek;
 	private DatabaseManager DM;
 	private JTextField textField;
+	
+	private int paddingLength = 30;
 	/**
 	 * Launch the application.
 	 */
@@ -75,8 +77,16 @@ public class WystawRachunek {
 		
 		frmNowyRachunek.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png"));
 		frmNowyRachunek.setTitle("Nowy Rachunek - HCT");
-		frmNowyRachunek.setBounds(100, 100, 713, 426);
+		frmNowyRachunek.setBounds(100, 100, 763, 426);
 		frmNowyRachunek.getContentPane().setLayout(null);
+		
+		JScrollPane scrollPaneChosen = new JScrollPane();
+		scrollPaneChosen.setBounds(450, 60, 225, 178);
+		frmNowyRachunek.getContentPane().add(scrollPaneChosen);
+		
+		JList listChosen = new JList();
+		scrollPaneChosen.setViewportView(listChosen);
+		
 		
 		JLabel labelSaleList = new JLabel("Us\u0142uga / Towar");
 		labelSaleList.setVerticalAlignment(SwingConstants.TOP);
@@ -88,13 +98,13 @@ public class WystawRachunek {
 		lblWystawRachunek.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		frmNowyRachunek.getContentPane().add(lblWystawRachunek);
 		
-		String query = "SELECT * FROM services";
+		String query = "SELECT service_name, price FROM services";
 		DefaultListModel<String> model = new DefaultListModel<>();
 	
-		ArrayList<String> alist = DM.selectRecordArrayList(query);
+		ArrayList<String> listOfServices = DM.selectRecordArrayList(query);
 		
-		for(int i = 0; i < alist.size(); i++) {
-			String tempString = alist.get(i);
+		for(int i = 0; i < listOfServices.size(); i+=2) {
+			String tempString = listOfServices.get(i);
 			model.addElement(tempString);
 //			System.out.println("ST: "+alist.get(i));
 		}
@@ -119,12 +129,27 @@ public class WystawRachunek {
 		TitledBorder border = BorderFactory.createTitledBorder(b, "WYBRANE");
 		lblWybrane.setBorder(border);
 		lblWybrane.setVerticalAlignment(SwingConstants.TOP);
-		lblWybrane.setBounds(439, 11, 216, 239);
+		lblWybrane.setBounds(439, 11, 248, 239);
 		frmNowyRachunek.getContentPane().add(lblWybrane);
 		
 		JButton btnNewButton = new JButton("+");
+		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		DefaultListModel<String> model2Add = new DefaultListModel<>();
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				char ch = '_';
+				String element2model = (String) listServices.getSelectedValue();
+				
+				int index = listOfServices.indexOf(element2model);
+				String tempString = listOfServices.get(index+1);
+				
+				element2model = paddString(element2model, paddingLength, ch);
+				
+				
+				
+				element2model += " "+tempString;
+				model2Add.addElement(element2model);
+				listChosen.setModel(model2Add);
 			}
 		});
 		btnNewButton.setBounds(379, 46, 50, 24);
@@ -142,6 +167,7 @@ public class WystawRachunek {
 		scrollPaneItemList.setViewportView(listItems);
 		
 		JButton button = new JButton("+");
+		button.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		button.setBounds(379, 94, 50, 24);
 		frmNowyRachunek.getContentPane().add(button);
 		
@@ -164,13 +190,8 @@ public class WystawRachunek {
 		
 		JLabel lblCena = new JLabel("Cena");
 		lblCena.setVerticalAlignment(SwingConstants.TOP);
-		lblCena.setBounds(599, 40, 43, 19);
+		lblCena.setBounds(632, 40, 43, 19);
 		frmNowyRachunek.getContentPane().add(lblCena);
-		
-		JLabel label = new JLabel("1, ");
-		label.setVerticalAlignment(SwingConstants.TOP);
-		label.setBounds(450, 70, 192, 169);
-		frmNowyRachunek.getContentPane().add(label);
 		
 		JButton btnNewButton_1 = new JButton("Policz = ");
 		btnNewButton_1.setForeground(new Color(0, 0, 0));
@@ -201,6 +222,12 @@ public class WystawRachunek {
 		btnPrint.setBounds(439, 344, 248, 32);
 		frmNowyRachunek.getContentPane().add(btnPrint);
 		
+
+		JButton buttonSubb = new JButton("-");
+		buttonSubb.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+		buttonSubb.setBounds(687, 32, 50, 24);
+		frmNowyRachunek.getContentPane().add(buttonSubb);
+		
 		
 		frmNowyRachunek.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
@@ -213,5 +240,18 @@ public class WystawRachunek {
 		        }
 		    }
 		});
+	}
+	
+	public String paddString(String string2Padd, int stringLength, char paddingChar){
+		if(stringLength <= 0)
+			return string2Padd;
+		
+		StringBuilder sb = new StringBuilder(string2Padd);
+		stringLength = stringLength - sb.length() - 1;
+		while(stringLength-- >= 0){
+			sb.append(paddingChar);
+		}
+		return sb.toString();
+		
 	}
 }
