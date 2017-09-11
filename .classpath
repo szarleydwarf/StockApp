@@ -26,5 +26,6 @@
 	<classpathentry kind="lib" path="D:/Game_Dev/sqlite-jdbc-master/sqlite_lib/sqlite-jdbc-3.20.0.jar"/>
 	<classpathentry kind="lib" path="D:/Game_Dev/sqlite-jdbc-master/sqlite_lib/sqlite-jdbc4-3.8.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
+	<classpathentry kind="lib" path="D:/Game_Dev/pdfbox-2.0.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

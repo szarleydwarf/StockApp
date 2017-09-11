@@ -3,6 +3,7 @@ package app;
 import java.awt.EventQueue;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -12,6 +13,7 @@ import javax.swing.JScrollPane;
 import java.awt.Toolkit;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -25,6 +27,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
+import utillity.StockPrinter;
 
 import java.awt.Color;
 import javax.swing.ListSelectionModel;
@@ -45,9 +48,16 @@ public class WystawRachunek {
 	
 	private DefaultListModel<String> model2Add;
 	
+	private ButtonGroup radioGroup;
+	private JRadioButton rbPercent, rbMoney;
+	
 	private String carManufacturer, servicePrice, productPrice ;
 	private int paddingLength = 24;
 	private double sum = 0;
+	private boolean moneyDiscount = true;
+	private DecimalFormat df;
+	
+	private StockPrinter sPrinter;
 	/**
 	 * Launch the application.
 	 */
@@ -83,6 +93,7 @@ public class WystawRachunek {
 	 * @throws Exception 
 	 */
 	private void initialize() throws Exception {
+		df = new DecimalFormat("#.##"); 
 		frmNowyRachunek = new JFrame();
 		
 		frmNowyRachunek.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png"));
@@ -131,23 +142,41 @@ public class WystawRachunek {
 		labelZnizka.setBounds(23, 298, 109, 36);
 		frmNowyRachunek.getContentPane().add(labelZnizka);
 		
-		JRadioButton rbPercent = new JRadioButton("%");
+		rbPercent = new JRadioButton("%", false);
 		rbPercent.setBounds(134, 298, 37, 23);
 		frmNowyRachunek.getContentPane().add(rbPercent);
 		
-		JRadioButton rbMoney = new JRadioButton("\u20AC");
+		rbMoney = new JRadioButton("\u20AC", true);
 		rbMoney.setBounds(173, 298, 37, 23);
 		frmNowyRachunek.getContentPane().add(rbMoney);
+		
+		radioGroup = new ButtonGroup();
+		radioGroup.add(rbMoney);
+		radioGroup.add(rbPercent);
+		
+		rbMoney.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				moneyDiscount = true;
+			}
+		});
+		rbPercent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				moneyDiscount = false;
+			}
+		});
 		
 		JLabel lblCena = new JLabel("Cena");
 		lblCena.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCena.setBounds(598, 152, 77, 19);
 		frmNowyRachunek.getContentPane().add(lblCena);
-		
-		
-		
-		
+				
 		JButton btnPrint = new JButton("Drukuj rachunek");
+		btnPrint.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				sPrinter = new StockPrinter();
+				sPrinter.printDoc();
+			}
+		});
 		btnPrint.setForeground(Color.BLACK);
 		btnPrint.setBackground(new Color(178, 34, 34));
 		btnPrint.setBounds(439, 498, 248, 32);
@@ -190,6 +219,7 @@ public class WystawRachunek {
 		btnCalculate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(listChosen.getModel().getSize() != 0){
+					double tempNum=0;
 					sum = 0;
 					DefaultListModel md = (DefaultListModel) listChosen.getModel();
 					if(md.size() > 0){
@@ -197,9 +227,22 @@ public class WystawRachunek {
 							String tempSt = md.getElementAt(i).toString();
 							String subSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
 							sum += Double.parseDouble(subSt);
-							lblTotal.setText("€ "+sum);
+							
 						}
 					}
+					
+					if(!textFieldDiscount.getText().equals(""))
+						tempNum = Double.parseDouble(textFieldDiscount.getText());
+					
+					if(moneyDiscount){
+						sum -= tempNum;
+					} else if(!moneyDiscount){
+						sum -= (sum * (tempNum/100));
+					} else {
+						sum = sum;
+					}
+					
+					lblTotal.setText("€ "+df.format(sum));
 				}else{
 					System.out.println("Nothing to show");
 				}
