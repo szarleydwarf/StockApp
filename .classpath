@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="D:/Game_Dev/sqlite-jdbc-master/sqlite_lib/sqlite-jdbc-3.7.2.jar"/>
 	<classpathentry kind="lib" path="D:/Game_Dev/sqlite-jdbc-master/sqlite_lib/sqlite-jdbc-3.7.2-javadoc.jar"/>
 	<classpathentry kind="lib" path="D:/Game_Dev/sqlite-jdbc-master/sqlite_lib/sqlite-jdbc-3.7.15-M1.jar"/>
@@ -26,6 +35,15 @@
 	<classpathentry kind="lib" path="D:/Game_Dev/sqlite-jdbc-master/sqlite_lib/sqlite-jdbc-3.20.0.jar"/>
 	<classpathentry kind="lib" path="D:/Game_Dev/sqlite-jdbc-master/sqlite_lib/sqlite-jdbc4-3.8.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
-	<classpathentry kind="lib" path="D:/Game_Dev/pdfbox-2.0.7.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="D:/Game_Dev/apachePDF/fontbox-2.0.7.jar"/>
+	<classpathentry kind="lib" path="D:/Game_Dev/apachePDF/pdfbox-2.0.7.jar"/>
+	<classpathentry kind="lib" path="D:/Game_Dev/apachePDF/pdfbox-tools-2.0.7.jar"/>
+	<classpathentry kind="lib" path="D:/Game_Dev/apachePDF/preflight-2.0.7.jar"/>
+	<classpathentry kind="lib" path="D:/Game_Dev/apachePDF/xmpbox-2.0.7.jar"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

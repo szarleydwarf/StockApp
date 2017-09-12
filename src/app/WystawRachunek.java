@@ -1,50 +1,40 @@
 package app;
 
+import java.awt.Color;
 import java.awt.EventQueue;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-
+import java.awt.Font;
 import java.awt.Toolkit;
-import java.net.URL;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.Image;
-
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
 import utillity.StockPrinter;
-
-import java.awt.Color;
-import javax.swing.ListSelectionModel;
-import javax.swing.JScrollBar;
-import javax.swing.SwingConstants;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
-import javax.swing.JRadioButton;
 
 public class WystawRachunek {
 
 	private JFrame frmNowyRachunek;
 	private DatabaseManager DM;
 	private JTextField textFieldDiscount;
-	private JList listChosen, listItems, listServices;
+	private JList<String> listChosen, listItems, listServices;
 	
 	private DefaultListModel<String> model2Add;
 	
@@ -105,9 +95,9 @@ public class WystawRachunek {
 		scrollPaneChosen.setBounds(450, 172, 225, 178);
 		frmNowyRachunek.getContentPane().add(scrollPaneChosen);
 		
-		listChosen = new JList();
-		listServices = new JList();
-		listItems = new JList();
+		listChosen = new JList<String>();
+		listServices = new JList<String>();
+		listItems = new JList<String>();
 		model2Add = new DefaultListModel<>();
 
 		scrollPaneChosen.setViewportView(listChosen);
@@ -174,7 +164,12 @@ public class WystawRachunek {
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				sPrinter = new StockPrinter();
-				sPrinter.printDoc();
+				try {
+					sPrinter.printDoc();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		btnPrint.setForeground(Color.BLACK);
@@ -194,17 +189,17 @@ public class WystawRachunek {
 		populateCarList();
 
 		
-		frmNowyRachunek.addWindowListener(new java.awt.event.WindowAdapter() {
-		    @Override
-		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		        if (JOptionPane.showConfirmDialog(frmNowyRachunek, 
-		            "Are you sure to close this window?", "Really Closing?", 
-		            JOptionPane.YES_NO_OPTION,
-		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-		        	frmNowyRachunek.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		        }
-		    }
-		});
+//		frmNowyRachunek.addWindowListener(new java.awt.event.WindowAdapter() {
+//		    @Override
+//		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+//		        if (JOptionPane.showConfirmDialog(frmNowyRachunek, 
+//		            "Are you sure to close this window?", "Really Closing?", 
+//		            JOptionPane.YES_NO_OPTION,
+//		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+//		        	frmNowyRachunek.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		        }
+//		    }
+//		});
 	}
 	
 	private void sumCosts() {
