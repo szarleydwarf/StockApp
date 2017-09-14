@@ -42,12 +42,14 @@ public class WystawRachunek {
 	private JRadioButton rbPercent, rbMoney;
 	
 	private String carManufacturer, servicePrice, productPrice ;
-	private int paddingLength = 24;
+	private int paddingLength = 22;
 	private double sum = 0;
 	private boolean moneyDiscount = true;
 	private DecimalFormat df;
 	
 	private StockPrinter sPrinter;
+	private JTextField textFieldProdQ;
+	private JTextField textFieldServQ;
 	/**
 	 * Launch the application.
 	 */
@@ -88,7 +90,7 @@ public class WystawRachunek {
 		
 		frmNowyRachunek.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png"));
 		frmNowyRachunek.setTitle("Nowy Rachunek - HCT");
-		frmNowyRachunek.setBounds(100, 100, 763, 606);
+		frmNowyRachunek.setBounds(100, 100, 769, 606);
 		frmNowyRachunek.getContentPane().setLayout(null);
 		
 		JScrollPane scrollPaneChosen = new JScrollPane();
@@ -102,6 +104,15 @@ public class WystawRachunek {
 
 		scrollPaneChosen.setViewportView(listChosen);
 		
+		textFieldProdQ = new JTextField();
+		textFieldProdQ.setColumns(10);
+		textFieldProdQ.setBounds(325, 231, 44, 32);
+		frmNowyRachunek.getContentPane().add(textFieldProdQ);
+		
+		textFieldServQ = new JTextField();
+		textFieldServQ.setColumns(10);
+		textFieldServQ.setBounds(325, 160, 44, 32);
+		frmNowyRachunek.getContentPane().add(textFieldServQ);
 		
 		JLabel labelSaleList = new JLabel("Us\u0142uga / Towar");
 		labelSaleList.setHorizontalAlignment(SwingConstants.CENTER);
@@ -109,7 +120,7 @@ public class WystawRachunek {
 		frmNowyRachunek.getContentPane().add(labelSaleList);
 		
 		JLabel lblWystawRachunek = new JLabel("Wybierz us\u0142ugi/produkty");
-		lblWystawRachunek.setBounds(71, 105, 214, 19);
+		lblWystawRachunek.setBounds(71, 105, 194, 19);
 		lblWystawRachunek.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		frmNowyRachunek.getContentPane().add(lblWystawRachunek);
 		
@@ -124,7 +135,7 @@ public class WystawRachunek {
 
 		
 		textFieldDiscount = new JTextField();
-		textFieldDiscount.setBounds(262, 298, 96, 32);
+		textFieldDiscount.setBounds(239, 300, 77, 32);
 		frmNowyRachunek.getContentPane().add(textFieldDiscount);
 		textFieldDiscount.setColumns(10);
 		
@@ -157,7 +168,7 @@ public class WystawRachunek {
 		
 		JLabel lblCena = new JLabel("Cena");
 		lblCena.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCena.setBounds(598, 152, 77, 19);
+		lblCena.setBounds(585, 152, 50, 19);
 		frmNowyRachunek.getContentPane().add(lblCena);
 				
 		JButton btnPrint = new JButton("Drukuj rachunek");
@@ -179,15 +190,39 @@ public class WystawRachunek {
 		
 
 		JButton btnSubb = new JButton("-");
+		btnSubb.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(!listChosen.isSelectionEmpty()) {
+					 DefaultListModel md = (DefaultListModel) listChosen.getModel();
+					 int selectedIndex = listChosen.getSelectedIndex();
+					 if(selectedIndex != -1) {
+						 md.remove(selectedIndex);
+					 }
+				}
+			}
+		});
 		btnSubb.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
 		btnSubb.setBounds(687, 144, 50, 24);
 		frmNowyRachunek.getContentPane().add(btnSubb);
 		
-		sumCosts();
+		JButton btnClearAll = new JButton("Clear All");
+		btnClearAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				 DefaultListModel md = (DefaultListModel) listChosen.getModel();
+					md.removeAllElements();
+			}
+		});
+		btnClearAll.setBackground(new Color(255, 182, 193));
+		btnClearAll.setForeground(Color.RED);
+		btnClearAll.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnClearAll.setBounds(628, 373, 109, 24);
+		frmNowyRachunek.getContentPane().add(btnClearAll);
+		
 		populateServices();
 		populateItems();
 		populateCarList();
 
+		sumCosts();
 		
 //		frmNowyRachunek.addWindowListener(new java.awt.event.WindowAdapter() {
 //		    @Override
@@ -221,8 +256,16 @@ public class WystawRachunek {
 						for(int i = 0; i < md.size(); i++){
 							String tempSt = md.getElementAt(i).toString();
 							String subSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
-							sum += Double.parseDouble(subSt);
-							
+							subSt = subSt.substring(0, subSt.lastIndexOf("x"));
+							String quant = tempSt.substring(tempSt.lastIndexOf("x")+1);
+							double q = 0;
+							if(!quant.isEmpty())
+								q = Double.parseDouble(quant);
+							if(q == 0){
+								q = 1;
+							}
+						
+							sum += (Double.parseDouble(subSt)*q);	
 						}
 					}
 					
@@ -247,6 +290,11 @@ public class WystawRachunek {
 		btnCalculate.setBackground(new Color(220, 20, 60));
 		btnCalculate.setBounds(304, 447, 120, 32);
 		frmNowyRachunek.getContentPane().add(btnCalculate);
+		
+		JLabel lblQty = new JLabel("Qty");
+		lblQty.setHorizontalAlignment(SwingConstants.CENTER);
+		lblQty.setBounds(628, 152, 37, 19);
+		frmNowyRachunek.getContentPane().add(lblQty);
 		
 	}
 
@@ -296,6 +344,12 @@ public class WystawRachunek {
 		btnAddCustomer.setBounds(379, 16, 50, 24);
 //		lblCarManufacturer.setText(carManufacturer);
 		frmNowyRachunek.getContentPane().add(btnAddCustomer);
+		
+		
+		JLabel labelQuantity = new JLabel("Quantity");
+		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		labelQuantity.setBounds(320, 105, 61, 19);
+		frmNowyRachunek.getContentPane().add(labelQuantity);
 	}
 
 	private void populateItems() throws Exception {
@@ -307,14 +361,13 @@ public class WystawRachunek {
 		for(int i = 0; i < listOfItems.size(); i+=2) {
 			String tempString = listOfItems.get(i);
 			modelItems.addElement(tempString);
-//			System.out.println("ST: "+alist.get(i));
 		}
 		JLabel lblWybierzPrzedmiot = new JLabel("Wybierz produkt");
 		lblWybierzPrzedmiot.setBounds(23, 223, 109, 36);
 		frmNowyRachunek.getContentPane().add(lblWybierzPrzedmiot);
 		
 		JScrollPane scrollPaneItemList = new JScrollPane();
-		scrollPaneItemList.setBounds(164, 223, 194, 60);
+		scrollPaneItemList.setBounds(123, 223, 194, 60);
 		frmNowyRachunek.getContentPane().add(scrollPaneItemList);
 		
 		scrollPaneItemList.setViewportView(listItems);
@@ -324,17 +377,23 @@ public class WystawRachunek {
 		btnAddItem.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnAddItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				char ch = '_';
-				String element2model = (String) listItems.getSelectedValue();
-				
-				int index = listOfItems.indexOf(element2model);
-				String tempString = listOfItems.get(index+1);
-				productPrice = tempString;
-				element2model = paddString(element2model, paddingLength, ch);
-				
-				element2model += " €"+tempString;
-				model2Add.addElement(element2model);
-				listChosen.setModel(model2Add);}
+				if(!listItems.isSelectionEmpty()) {
+					char ch = '_';
+					String element2model = (String) listItems.getSelectedValue();
+					
+					int index = listOfItems.indexOf(element2model);
+					String tempString = listOfItems.get(index+1);
+					productPrice = tempString;
+					element2model = paddString(element2model, paddingLength, ch);
+					
+					element2model += " €"+tempString;
+					
+					String productQuantity = textFieldProdQ.getText(); 
+					element2model+="x"+productQuantity;
+					
+					model2Add.addElement(element2model);
+					listChosen.setModel(model2Add);}
+			}
 		});
 		btnAddItem.setBounds(379, 228, 50, 24);
 		frmNowyRachunek.getContentPane().add(btnAddItem);
@@ -357,7 +416,7 @@ public class WystawRachunek {
 		frmNowyRachunek.getContentPane().add(lblChoseServiceitem);
 		
 		JScrollPane scrollPaneServiceList = new JScrollPane();
-		scrollPaneServiceList.setBounds(164, 152, 194, 60);
+		scrollPaneServiceList.setBounds(123, 152, 194, 60);
 		frmNowyRachunek.getContentPane().add(scrollPaneServiceList);
 		
 		scrollPaneServiceList.setViewportView(listServices);
@@ -369,17 +428,23 @@ public class WystawRachunek {
 		
 		btnAddService.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				char ch = '_';
-				String element2model = (String) listServices.getSelectedValue();
-				
-				int index = listOfServices.indexOf(element2model);
-				String tempString = listOfServices.get(index+1);
-				servicePrice = tempString;
-				element2model = paddString(element2model, paddingLength, ch);
-				
-				element2model += " €"+tempString;
-				model2Add.addElement(element2model);
-				listChosen.setModel(model2Add);
+				if(!listServices.isSelectionEmpty()) {
+					char ch = '_';
+					String element2model = (String) listServices.getSelectedValue();
+					
+					int index = listOfServices.indexOf(element2model);
+					String tempString = listOfServices.get(index+1);
+					servicePrice = tempString;
+					element2model = paddString(element2model, paddingLength, ch);
+					
+					element2model += " €"+tempString;
+					
+					String productQuantity = textFieldServQ.getText(); 
+					element2model+="x"+productQuantity;
+					
+					model2Add.addElement(element2model);
+					listChosen.setModel(model2Add);
+				}
 			}
 		});
 		btnAddService.setBounds(379, 157, 50, 24);
