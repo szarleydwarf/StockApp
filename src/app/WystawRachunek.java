@@ -238,6 +238,7 @@ public class WystawRachunek {
 							sum += Double.parseDouble(subSt);
 							
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -281,6 +282,8 @@ public class WystawRachunek {
 							
 >>>>>>> parent of 3fa68d2... 14/9/17
 >>>>>>> lol
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
 						}
