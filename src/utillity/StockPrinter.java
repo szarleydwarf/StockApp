@@ -1,6 +1,5 @@
 package utillity;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -17,14 +16,8 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 public class StockPrinter implements Printable {
 	private final String savePath = "D:/@Development/__TEMP/", imagePath = "D:/@Development/EclipseJavaProjects/sqliteTestApp/StockApp/resources/img/Logo HCT 245x84.png";
-	private String docName = "lol.pdf";
+	private String docName = "lol1.pdf";
 	private String docPath = "";
-	private PDPageContentStream contentStream ;
-	
-	
-	public StockPrinter(){
-		
-	}
 	
 	public void printDoc() throws IOException{
 //		System.out.println("Printing");
@@ -35,60 +28,19 @@ public class StockPrinter implements Printable {
 		PDDocument doc = new PDDocument();
 		PDPage page = new PDPage();
 		doc.addPage(page);
-		contentStream = new PDPageContentStream(doc, page);
+		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
 		PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, doc);
-				
-		contentStream.drawImage(pdImage, 215,  675);
-		contentStream.setNonStrokingColor(Color.GRAY);
-		contentStream.addRect(15, 480, 580, 50);
-		contentStream.fill();
 		
-		fillCompanyDetails();
-
-		// table of services/products done
-		contentStream.setNonStrokingColor(Color.WHITE);
-		contentStream.beginText();
-		contentStream.setFont(PDType1Font.COURIER_BOLD, 20);
-		contentStream.newLineAtOffset(25f, 500);
-		contentStream.setLeading(20.5f);
-		contentStream.showText("No.    Description       Quantity     Price");
-		contentStream.newLine();
-		contentStream.newLine();
-		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.setFont(PDType1Font.COURIER, 18);
-		
-		for(int i = 0; i < 5; i++){
-			contentStream.showText((i+1)+"       CarWash              1              €7");
-			contentStream.newLine();			
-		}
-		
-		contentStream.showText("              TOTAL                            €7");
-		
-		
-		contentStream.endText();
-		//table of services/products done
-	
-		contentStream.close();
-		
-		
-		//TODO:
-		// docName change to the date with customer name and number eg today/total
-		docPath = savePath+docName;
-		doc.save(docPath);
-		doc.close();
-	}
-
-	private void fillCompanyDetails() throws IOException {
 		Calendar today = Calendar.getInstance();
 		SimpleDateFormat df= new SimpleDateFormat("dd/MM/yyyy");
 		
 		String date = df.format(today.getTime());
-
+		System.out.println(page.getArtBox());
 		
-		contentStream.setNonStrokingColor(Color.BLACK);
+		contentStream.drawImage(pdImage, 200,  675);
 		contentStream.beginText();
 		contentStream.setFont(PDType1Font.COURIER, 18);
-		contentStream.newLineAtOffset(25f,  740);
+		contentStream.newLineAtOffset(7.5f,  740);
 		contentStream.setLeading(20.5f);
 		
 		String text = "HCT",
@@ -117,6 +69,16 @@ public class StockPrinter implements Printable {
 		contentStream.showText(text8);
 		
 		contentStream.endText();
+
+	
+		contentStream.close();
+		
+		
+		//TODO:
+		// docName change to the date with customer name and number eg today/total
+		docPath = savePath+docName;
+		doc.save(docPath);
+		doc.close();
 	}
 
 	@Override
