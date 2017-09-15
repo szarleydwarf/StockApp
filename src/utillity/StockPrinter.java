@@ -20,6 +20,7 @@ public class StockPrinter implements Printable {
 	private String docName = "lol1.pdf";
 	private String docPath = "";
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -38,6 +39,8 @@ public class StockPrinter implements Printable {
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
 >>>>>>> lol
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 	
 	public StockPrinter(ArrayList<ArrayList<String>> servicesList) {
 		this.servicesList = servicesList;
@@ -54,6 +57,7 @@ public class StockPrinter implements Printable {
 		doc.addPage(page);
 		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
 		PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, doc);
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -102,6 +106,8 @@ public class StockPrinter implements Printable {
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
 >>>>>>> lol
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 		
 		Calendar today = Calendar.getInstance();
 		SimpleDateFormat df= new SimpleDateFormat("dd/MM/yyyy");

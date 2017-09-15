@@ -237,6 +237,7 @@ public class WystawRachunek {
 							String subSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
 							sum += Double.parseDouble(subSt);
 							
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -280,6 +281,8 @@ public class WystawRachunek {
 							
 >>>>>>> parent of 3fa68d2... 14/9/17
 >>>>>>> lol
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 						}
 					}
 
