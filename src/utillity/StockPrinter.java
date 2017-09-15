@@ -20,6 +20,7 @@ public class StockPrinter implements Printable {
 	private String docName = "lol1.pdf";
 	private String docPath = "";
 <<<<<<< HEAD
+<<<<<<< HEAD
 	private PDPageContentStream contentStream ;
 	
 	private ArrayList<ArrayList<String>> servicesList;
@@ -27,6 +28,8 @@ public class StockPrinter implements Printable {
 	public StockPrinter(){
 		
 	}
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
 	
@@ -45,6 +48,7 @@ public class StockPrinter implements Printable {
 		doc.addPage(page);
 		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
 		PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, doc);
+<<<<<<< HEAD
 <<<<<<< HEAD
 				
 		contentStream.drawImage(pdImage, 215,  675);
@@ -82,6 +86,8 @@ public class StockPrinter implements Printable {
 		//table of services/products done
 	
 		contentStream.close();
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
 		
