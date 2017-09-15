@@ -7,6 +7,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -21,11 +22,16 @@ public class StockPrinter implements Printable {
 	private String docPath = "";
 	private PDPageContentStream contentStream ;
 	
+	private ArrayList<ArrayList<String>> servicesList;
 	
 	public StockPrinter(){
 		
 	}
 	
+	public StockPrinter(ArrayList<ArrayList<String>> servicesList) {
+		this.servicesList = servicesList;
+	}
+
 	public void printDoc() throws IOException{
 //		System.out.println("Printing");
 		generatePDF();
@@ -57,8 +63,12 @@ public class StockPrinter implements Printable {
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.setFont(PDType1Font.COURIER, 18);
 		
-		for(int i = 0; i < 5; i++){
-			contentStream.showText((i+1)+"       CarWash              1              €7");
+		for(int i = 0; i < this.servicesList.size(); i++){
+			ArrayList<String> tList = this.servicesList.get(i);
+			contentStream.showText((i+1)+"    ");
+			for(int j = 0; j < tList.size(); j++){
+				contentStream.showText(tList.get(j)+"    ");
+			}
 			contentStream.newLine();			
 		}
 		

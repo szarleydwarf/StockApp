@@ -46,6 +46,8 @@ public class WystawRachunek {
 	private double sum = 0;
 	private boolean moneyDiscount = true;
 	private DecimalFormat df;
+	private ArrayList<String>  serviceElements;
+	private ArrayList<ArrayList<String>> servicesList;
 	
 	private StockPrinter sPrinter;
 	private JTextField textFieldProdQ;
@@ -86,6 +88,8 @@ public class WystawRachunek {
 	 */
 	private void initialize() throws Exception {
 		df = new DecimalFormat("#.##"); 
+		servicesList = new ArrayList<ArrayList<String>> ();
+		serviceElements = new ArrayList<String> ();
 		frmNowyRachunek = new JFrame();
 		
 		frmNowyRachunek.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png"));
@@ -174,12 +178,18 @@ public class WystawRachunek {
 		JButton btnPrint = new JButton("Drukuj rachunek");
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sPrinter = new StockPrinter();
-				try {
-					sPrinter.printDoc();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(listChosen.getModel().getSize() != 0 && sum >= 0) {
+	//				System.out.println("Sum: "+sum);
+					//opis/ilosc/cena/total
+					sPrinter = new StockPrinter(servicesList);
+					try {
+						sPrinter.printDoc();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					JOptionPane.showMessageDialog(frmNowyRachunek, "Nie wybrałeś żadnego towaru/usługi.");
 				}
 			}
 		});
@@ -245,9 +255,12 @@ public class WystawRachunek {
 		lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTotal.setBounds(450, 447, 205, 32);
 		frmNowyRachunek.getContentPane().add(lblTotal);
-
+//servicesList, serviceElements
 		btnCalculate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String description  = "";
+				String priceSt  = "";
+				String quant  = "";
 				if(listChosen.getModel().getSize() != 0){
 					double tempNum=0;
 					sum = 0;
@@ -255,19 +268,34 @@ public class WystawRachunek {
 					if(md.size() > 0){
 						for(int i = 0; i < md.size(); i++){
 							String tempSt = md.getElementAt(i).toString();
-							String subSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
-							subSt = subSt.substring(0, subSt.lastIndexOf("x"));
-							String quant = tempSt.substring(tempSt.lastIndexOf("x")+1);
+							int index = tempSt.indexOf("_");
+							if(index == -1){
+								index = tempSt.indexOf("€");
+							}
+							description = tempSt.substring(0, index);
+							
+							priceSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
+							priceSt = priceSt.substring(0, priceSt.lastIndexOf("x"));
+							quant = tempSt.substring(tempSt.lastIndexOf("x")+1);
 							double q = 0;
 							if(!quant.isEmpty())
 								q = Double.parseDouble(quant);
+							else
+								quant = "1";
+							
 							if(q == 0){
 								q = 1;
-							}
-						
-							sum += (Double.parseDouble(subSt)*q);	
+							}	
+							
+							sum += (Double.parseDouble(priceSt)*q);
+							serviceElements.add(description);
+							serviceElements.add(priceSt);
+							serviceElements.add(quant);
 						}
 					}
+
+					serviceElements.add(Double.toString(sum));
+					servicesList.add(serviceElements);
 					
 					if(!textFieldDiscount.getText().equals(""))
 						tempNum = Double.parseDouble(textFieldDiscount.getText());
@@ -279,10 +307,17 @@ public class WystawRachunek {
 					} else {
 						sum = sum;
 					}
+					servicesList.add(serviceElements);
 					
-					lblTotal.setText("€ "+df.format(sum));
 				}else{
-					System.out.println("Nothing to show");
+					sum = 0;
+				}
+				lblTotal.setText("€ "+df.format(sum));
+				
+				
+				for(int i=0;i<servicesList.size();i++){
+					servicesList.get(i);
+					System.out.println(servicesList.get(i));
 				}
 			}
 		});
@@ -296,60 +331,6 @@ public class WystawRachunek {
 		lblQty.setBounds(628, 152, 37, 19);
 		frmNowyRachunek.getContentPane().add(lblQty);
 		
-	}
-
-	private void populateCarList() throws Exception {
-		String queryCars = "SELECT manufacturer FROM manufacturers ORDER BY manufacturer ASC";
-		carManufacturer = "Car manufacturer";
-		DefaultListModel<String> modelCars = new DefaultListModel<>();
-	
-		ArrayList<String> listOfCars = DM.selectRecordArrayList(queryCars);
-		
-		for(int i = 0; i < listOfCars.size(); i+=2) {
-			String tempString = listOfCars.get(i);
-			modelCars.addElement(tempString);
-//			System.out.println("ST: "+alist.get(i));
-		}
-		JLabel labelClient = new JLabel("Klient");
-		labelClient.setBounds(23, 11, 109, 36);
-		frmNowyRachunek.getContentPane().add(labelClient);
-		
-		JScrollPane scrollPaneCarList = new JScrollPane();
-		scrollPaneCarList.setBounds(164, 11, 194, 78);
-		frmNowyRachunek.getContentPane().add(scrollPaneCarList);
-
-		JLabel lblCarManufacturer = new JLabel("Car manufacturer");
-		lblCarManufacturer.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
-		lblCarManufacturer.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCarManufacturer.setBounds(439, 16, 242, 73);
-	
-		frmNowyRachunek.getContentPane().add(lblCarManufacturer);
-		
-
-				
-		JList listCars = new JList();
-		listCars.setModel(modelCars);
-		scrollPaneCarList.setViewportView(listCars);
-
-		JButton btnAddCustomer = new JButton("+");
-		btnAddCustomer.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				char ch = '_';
-				 carManufacturer = (String) listCars.getSelectedValue();
-//				System.out.println(carManufacturer);
-				lblCarManufacturer.setText(carManufacturer);
-				}
-		});
-		btnAddCustomer.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnAddCustomer.setBounds(379, 16, 50, 24);
-//		lblCarManufacturer.setText(carManufacturer);
-		frmNowyRachunek.getContentPane().add(btnAddCustomer);
-		
-		
-		JLabel labelQuantity = new JLabel("Quantity");
-		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		labelQuantity.setBounds(320, 105, 61, 19);
-		frmNowyRachunek.getContentPane().add(labelQuantity);
 	}
 
 	private void populateItems() throws Exception {
@@ -449,6 +430,60 @@ public class WystawRachunek {
 		});
 		btnAddService.setBounds(379, 157, 50, 24);
 		frmNowyRachunek.getContentPane().add(btnAddService);
+	}
+	
+	private void populateCarList() throws Exception {
+		String queryCars = "SELECT manufacturer FROM manufacturers ORDER BY manufacturer ASC";
+		carManufacturer = "Car manufacturer";
+		DefaultListModel<String> modelCars = new DefaultListModel<>();
+	
+		ArrayList<String> listOfCars = DM.selectRecordArrayList(queryCars);
+		
+		for(int i = 0; i < listOfCars.size(); i+=2) {
+			String tempString = listOfCars.get(i);
+			modelCars.addElement(tempString);
+//			System.out.println("ST: "+alist.get(i));
+		}
+		JLabel labelClient = new JLabel("Klient");
+		labelClient.setBounds(23, 11, 109, 36);
+		frmNowyRachunek.getContentPane().add(labelClient);
+		
+		JScrollPane scrollPaneCarList = new JScrollPane();
+		scrollPaneCarList.setBounds(164, 11, 194, 78);
+		frmNowyRachunek.getContentPane().add(scrollPaneCarList);
+
+		JLabel lblCarManufacturer = new JLabel("Car manufacturer");
+		lblCarManufacturer.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+		lblCarManufacturer.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCarManufacturer.setBounds(439, 16, 242, 73);
+	
+		frmNowyRachunek.getContentPane().add(lblCarManufacturer);
+		
+
+				
+		JList listCars = new JList();
+		listCars.setModel(modelCars);
+		scrollPaneCarList.setViewportView(listCars);
+
+		JButton btnAddCustomer = new JButton("+");
+		btnAddCustomer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				char ch = '_';
+				 carManufacturer = (String) listCars.getSelectedValue();
+//				System.out.println(carManufacturer);
+				lblCarManufacturer.setText(carManufacturer);
+				}
+		});
+		btnAddCustomer.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnAddCustomer.setBounds(379, 16, 50, 24);
+//		lblCarManufacturer.setText(carManufacturer);
+		frmNowyRachunek.getContentPane().add(btnAddCustomer);
+		
+		
+		JLabel labelQuantity = new JLabel("Quantity");
+		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		labelQuantity.setBounds(320, 105, 61, 19);
+		frmNowyRachunek.getContentPane().add(labelQuantity);
 	}
 
 	public String paddString(String string2Padd, int stringLength, char paddingChar){
