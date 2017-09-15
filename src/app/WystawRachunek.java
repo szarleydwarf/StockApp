@@ -235,6 +235,7 @@ public class WystawRachunek {
 							String tempSt = md.getElementAt(i).toString();
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 							int index = tempSt.indexOf("_");
 							if(index == -1){
 								index = tempSt.indexOf("€");
@@ -258,6 +259,11 @@ public class WystawRachunek {
 							serviceElements.add(description);
 							serviceElements.add(priceSt);
 							serviceElements.add(quant);
+=======
+							String subSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
+							sum += Double.parseDouble(subSt);
+							
+>>>>>>> parent of 3fa68d2... 14/9/17
 =======
 							String subSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
 							sum += Double.parseDouble(subSt);
