@@ -23,6 +23,7 @@ public class StockPrinter implements Printable {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -47,6 +48,8 @@ public class StockPrinter implements Printable {
 >>>>>>> parent of 3fa68d2... 14/9/17
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 	
 	public StockPrinter(ArrayList<ArrayList<String>> servicesList) {
 		this.servicesList = servicesList;
@@ -63,6 +66,7 @@ public class StockPrinter implements Printable {
 		doc.addPage(page);
 		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
 		PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, doc);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -114,6 +118,8 @@ public class StockPrinter implements Printable {
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
 >>>>>>> lol
+=======
+>>>>>>> parent of 3fa68d2... 14/9/17
 =======
 >>>>>>> parent of 3fa68d2... 14/9/17
 =======
