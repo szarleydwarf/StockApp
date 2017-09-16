@@ -280,10 +280,11 @@ public class WystawRachunek {
 						sum = sum;
 					}
 					
-					lblTotal.setText("€ "+df.format(sum));
 				}else{
+					sum = 0;
 					System.out.println("Nothing to show");
 				}
+				lblTotal.setText("€ "+df.format(sum));
 			}
 		});
 		btnCalculate.setForeground(new Color(0, 0, 0));
