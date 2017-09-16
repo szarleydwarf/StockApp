@@ -6,6 +6,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -23,10 +24,13 @@ public class StockPrinter implements Printable {
 	private String docName = "lol.pdf";
 	private String docPath = "";
 	private PDPageContentStream contentStream ;
-	
+	private DecimalFormat df;
+
 	private DefaultListModel md;
 	private double sum = 0, discount = 0;
 	private boolean applyDiscount = false;
+	private int invNo = 1;
+	private String carManufacturer = "NONE";
 	
 	private Helper helper;
 	
@@ -34,11 +38,15 @@ public class StockPrinter implements Printable {
 		helper = new Helper();
 	}
 	
-	public void printDoc(JList<String> list, double discount, boolean applyDiscount) throws IOException{
+	public void printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, int invoiceNum) throws IOException{
+		this.df = new DecimalFormat("#.##"); 
 		this.md = (DefaultListModel)list.getModel();
 		this.discount = discount;
 		this.applyDiscount = applyDiscount;
-		System.out.println("Printing "+discount+" "+applyDiscount);
+		this.carManufacturer = carManufacturer;
+		this.invNo = invoiceNum;
+		
+//		System.out.println("Printing "+discount+" "+applyDiscount);
 		generatePDF();
 	}
 
@@ -57,26 +65,36 @@ public class StockPrinter implements Printable {
 		fillCompanyDetails();
 
 		// table of services/products done
-		contentStream.setNonStrokingColor(Color.WHITE);
 		contentStream.beginText();
-		contentStream.setFont(PDType1Font.COURIER_BOLD, 20);
-		contentStream.newLineAtOffset(25f, 500);
 		contentStream.setLeading(20.5f);
-		contentStream.showText("No.    Description       Quantity     Price");
+		contentStream.setFont(PDType1Font.COURIER_BOLD, 20);
+		
+		contentStream.setNonStrokingColor(Color.BLACK);
+		contentStream.newLineAtOffset(25f, 560);
+		contentStream.showText("Invoice no."+invNo+" for "+carManufacturer);
+		contentStream.newLine();
+		contentStream.newLine();
+		contentStream.newLine();
+//		
+		contentStream.setNonStrokingColor(Color.WHITE);
+		contentStream.showText("No.    Description         Price    Quantity");
 		contentStream.newLine();
 		contentStream.newLine();
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.setFont(PDType1Font.COURIER, 18);
 		
-		for(int i = 0; i < 5; i++){
-			contentStream.showText((i+1)+"       CarWash              1              €7");
-			contentStream.newLine();			
-		}
-		
+		if(md.size() > 0){
+			for(int i = 0; i < md.size(); i++){
+				String tempSt = md.getElementAt(i).toString();
+				contentStream.showText((i+1)+"    -   "+tempSt+"");
+				contentStream.newLine();			
+			}
+		}		
+
 		contentStream.newLine();	
 		contentStream.newLine();	
 		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
-		contentStream.showText("                         TOTAL            € "+this.sum);
+		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
 		
 		
 		contentStream.endText();

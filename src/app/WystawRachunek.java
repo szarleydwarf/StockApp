@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class WystawRachunek {
 	private ButtonGroup radioGroup;
 	
 	private String carManufacturer, servicePrice, productPrice ;
-	private int paddingLength = 22;
+	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
 	private boolean applyDiscount = true;
 	private DecimalFormat df;
@@ -176,9 +177,20 @@ public class WystawRachunek {
 		JButton btnPrint = new JButton("Drukuj rachunek");
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				String query = "SELECT invoice_number from invoices ORDER BY invoice_number DESC LIMIT 1";
+				ResultSet rs;
+				try {
+					rs = DM.selectRecord(query);
+					invoiceNum = rs.getInt(1);
+					System.out.println("invNum "+invoiceNum);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				
 				sPrinter = new StockPrinter();
 				try {
-					sPrinter.printDoc(listChosen, discount, applyDiscount);
+					invoiceNum += 1;
+					sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, invoiceNum);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -312,7 +324,7 @@ public class WystawRachunek {
 		btnAddCustomer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				char ch = '_';
-				 carManufacturer = (String) listCars.getSelectedValue();
+				carManufacturer = (String) listCars.getSelectedValue();
 //				System.out.println(carManufacturer);
 				lblCarManufacturer.setText(carManufacturer);
 				}
