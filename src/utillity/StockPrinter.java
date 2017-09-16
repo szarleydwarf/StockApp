@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -21,13 +24,21 @@ public class StockPrinter implements Printable {
 	private String docPath = "";
 	private PDPageContentStream contentStream ;
 	
+	private DefaultListModel md;
+	private double sum = 0, discount = 0;
+	private boolean applyDiscount = false;
+	
+	private Helper helper;
 	
 	public StockPrinter(){
-		
+		helper = new Helper();
 	}
 	
-	public void printDoc() throws IOException{
-//		System.out.println("Printing");
+	public void printDoc(JList<String> list, double discount, boolean applyDiscount) throws IOException{
+		this.md = (DefaultListModel)list.getModel();
+		this.discount = discount;
+		this.applyDiscount = applyDiscount;
+		System.out.println("Printing "+discount+" "+applyDiscount);
 		generatePDF();
 	}
 
@@ -62,7 +73,10 @@ public class StockPrinter implements Printable {
 			contentStream.newLine();			
 		}
 		
-		contentStream.showText("              TOTAL                            €7");
+		contentStream.newLine();	
+		contentStream.newLine();	
+		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
+		contentStream.showText("                         TOTAL            € "+this.sum);
 		
 		
 		contentStream.endText();

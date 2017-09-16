@@ -27,29 +27,31 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
+import utillity.Helper;
 import utillity.StockPrinter;
 
 public class WystawRachunek {
 
 	private JFrame frmNowyRachunek;
-	private DatabaseManager DM;
-	private JTextField textFieldDiscount;
+	private JTextField textFieldProdQ;
+	private JTextField textFieldServQ;private JTextField textFieldDiscount;
 	private JList<String> listChosen, listItems, listServices;
+	private JRadioButton rbPercent, rbMoney;
 	
 	private DefaultListModel<String> model2Add;
-	
+	private StockPrinter sPrinter;
 	private ButtonGroup radioGroup;
-	private JRadioButton rbPercent, rbMoney;
 	
 	private String carManufacturer, servicePrice, productPrice ;
 	private int paddingLength = 22;
-	private double sum = 0;
-	private boolean moneyDiscount = true;
+	private double discount = 0;
+	private boolean applyDiscount = true;
 	private DecimalFormat df;
 	
-	private StockPrinter sPrinter;
-	private JTextField textFieldProdQ;
-	private JTextField textFieldServQ;
+	private Helper helper;
+	private DatabaseManager DM;
+		
+
 	/**
 	 * Launch the application.
 	 */
@@ -72,10 +74,10 @@ public class WystawRachunek {
 	 */
 	public WystawRachunek() throws SQLException {
 		DM = new DatabaseManager();
+		helper = new Helper();
 		try {
 			initialize();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -157,12 +159,12 @@ public class WystawRachunek {
 		
 		rbMoney.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				moneyDiscount = true;
+				applyDiscount = true;
 			}
 		});
 		rbPercent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				moneyDiscount = false;
+				applyDiscount = false;
 			}
 		});
 		
@@ -176,9 +178,8 @@ public class WystawRachunek {
 			public void actionPerformed(ActionEvent arg0) {
 				sPrinter = new StockPrinter();
 				try {
-					sPrinter.printDoc();
+					sPrinter.printDoc(listChosen, discount, applyDiscount);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -248,43 +249,18 @@ public class WystawRachunek {
 
 		btnCalculate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				double sos = 0;
 				if(listChosen.getModel().getSize() != 0){
-					double tempNum=0;
-					sum = 0;
 					DefaultListModel md = (DefaultListModel) listChosen.getModel();
-					if(md.size() > 0){
-						for(int i = 0; i < md.size(); i++){
-							String tempSt = md.getElementAt(i).toString();
-							String subSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
-							subSt = subSt.substring(0, subSt.lastIndexOf("x"));
-							String quant = tempSt.substring(tempSt.lastIndexOf("x")+1);
-							double q = 0;
-							if(!quant.isEmpty())
-								q = Double.parseDouble(quant);
-							if(q == 0){
-								q = 1;
-							}
-						
-							sum += (Double.parseDouble(subSt)*q);	
-						}
-					}
-					
 					if(!textFieldDiscount.getText().equals(""))
-						tempNum = Double.parseDouble(textFieldDiscount.getText());
+						discount = Double.parseDouble(textFieldDiscount.getText());
 					
-					if(moneyDiscount){
-						sum -= tempNum;
-					} else if(!moneyDiscount){
-						sum -= (sum * (tempNum/100));
-					} else {
-						sum = sum;
-					}
-					
+					sos = helper.getSum(md, discount, applyDiscount);
 				}else{
-					sum = 0;
-					System.out.println("Nothing to show");
+//					sum = 0;
+					sos = 0;
 				}
-				lblTotal.setText("€ "+df.format(sum));
+				lblTotal.setText("€ "+df.format(sos));
 			}
 		});
 		btnCalculate.setForeground(new Color(0, 0, 0));
