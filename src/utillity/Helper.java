@@ -1,5 +1,8 @@
 package utillity;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import javax.swing.DefaultListModel;
 
 public class Helper {
@@ -29,5 +32,43 @@ public class Helper {
 			sum = sum;
 		}
 		return sum;
+	}
+	
+	public String paddStringRight(String string2Padd, int stringLength, char paddingChar){
+		if(stringLength <= 0)
+			return string2Padd;
+		
+		StringBuilder sb = new StringBuilder(string2Padd);
+		stringLength = stringLength - sb.length() - 1;
+		while(stringLength-- >= 0){
+			sb.append(paddingChar);
+		}
+		return sb.toString();
+		
+	}
+	
+	public String paddStringLeft(String string2Padd, int stringLength, char paddingChar){
+		if(stringLength-string2Padd.length() <= 0)
+			return string2Padd;
+		
+		StringBuilder sb = new StringBuilder();
+		
+		
+//		stringLength = sb.length() + string2Padd.length();
+		while(sb.length() <= stringLength){
+			sb.append(paddingChar);
+		}
+		sb.append(string2Padd);
+		return sb.toString();
+		
+	}
+
+	
+	public String getFormatedDate(){
+		Calendar today = Calendar.getInstance();
+		SimpleDateFormat df= new SimpleDateFormat("dd-MM-yyyy");
+		
+		return df.format(today.getTime());
+
 	}
 }

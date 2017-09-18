@@ -38,12 +38,13 @@ public class WystawRachunek {
 	private JTextField textFieldServQ;private JTextField textFieldDiscount;
 	private JList<String> listChosen, listItems, listServices;
 	private JRadioButton rbPercent, rbMoney;
+	private JTextField textFieldRegistration;
 	
 	private DefaultListModel<String> model2Add;
 	private StockPrinter sPrinter;
 	private ButtonGroup radioGroup;
 	
-	private String carManufacturer, servicePrice, productPrice ;
+	private String carManufacturer, registration, servicePrice, productPrice ;
 	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
 	private boolean applyDiscount = true;
@@ -182,7 +183,7 @@ public class WystawRachunek {
 				try {
 					rs = DM.selectRecord(query);
 					invoiceNum = rs.getInt(1);
-					System.out.println("invNum "+invoiceNum);
+//					System.out.println("invNum "+invoiceNum);
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
@@ -190,7 +191,8 @@ public class WystawRachunek {
 				sPrinter = new StockPrinter();
 				try {
 					invoiceNum += 1;
-					sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, invoiceNum);
+					registration = textFieldRegistration.getText();
+					sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -285,6 +287,16 @@ public class WystawRachunek {
 		lblQty.setBounds(628, 152, 37, 19);
 		frmNowyRachunek.getContentPane().add(lblQty);
 		
+		textFieldRegistration = new JTextField();
+		textFieldRegistration.setBounds(548, 72, 127, 28);
+		frmNowyRachunek.getContentPane().add(textFieldRegistration);
+		textFieldRegistration.setColumns(10);
+		
+		JLabel lblRegistration = new JLabel("Registration");
+		lblRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblRegistration.setBounds(439, 75, 84, 28);
+		frmNowyRachunek.getContentPane().add(lblRegistration);
+		
 	}
 
 	private void populateCarList() throws Exception {
@@ -310,7 +322,7 @@ public class WystawRachunek {
 		JLabel lblCarManufacturer = new JLabel("Car manufacturer");
 		lblCarManufacturer.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
 		lblCarManufacturer.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCarManufacturer.setBounds(439, 16, 242, 73);
+		lblCarManufacturer.setBounds(439, 16, 242, 45);
 	
 		frmNowyRachunek.getContentPane().add(lblCarManufacturer);
 		
@@ -367,13 +379,13 @@ public class WystawRachunek {
 		btnAddItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(!listItems.isSelectionEmpty()) {
-					char ch = '_';
+					char ch = ' ';
 					String element2model = (String) listItems.getSelectedValue();
 					
 					int index = listOfItems.indexOf(element2model);
 					String tempString = listOfItems.get(index+1);
 					productPrice = tempString;
-					element2model = paddString(element2model, paddingLength, ch);
+					element2model = helper.paddStringRight(element2model, paddingLength, ch);
 					
 					element2model += " €"+tempString;
 					
@@ -418,13 +430,13 @@ public class WystawRachunek {
 		btnAddService.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(!listServices.isSelectionEmpty()) {
-					char ch = '_';
+					char ch = ' ';
 					String element2model = (String) listServices.getSelectedValue();
 					
 					int index = listOfServices.indexOf(element2model);
 					String tempString = listOfServices.get(index+1);
 					servicePrice = tempString;
-					element2model = paddString(element2model, paddingLength, ch);
+					element2model = helper.paddStringRight(element2model, paddingLength, ch);
 					
 					element2model += " €"+tempString;
 					
@@ -438,18 +450,5 @@ public class WystawRachunek {
 		});
 		btnAddService.setBounds(379, 157, 50, 24);
 		frmNowyRachunek.getContentPane().add(btnAddService);
-	}
-
-	public String paddString(String string2Padd, int stringLength, char paddingChar){
-		if(stringLength <= 0)
-			return string2Padd;
-		
-		StringBuilder sb = new StringBuilder(string2Padd);
-		stringLength = stringLength - sb.length() - 1;
-		while(stringLength-- >= 0){
-			sb.append(paddingChar);
-		}
-		return sb.toString();
-		
 	}
 }
