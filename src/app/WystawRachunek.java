@@ -192,8 +192,14 @@ public class WystawRachunek {
 				try {
 					invoiceNum += 1;
 					registration = textFieldRegistration.getText();
-					sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
+					double sum = helper.getSum((DefaultListModel) listChosen.getModel(), discount, applyDiscount);
+					System.out.println("SUM "+sum);
+					if(sum>0)
+						sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
 				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -232,6 +238,21 @@ public class WystawRachunek {
 		btnClearAll.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnClearAll.setBounds(628, 373, 109, 24);
 		frmNowyRachunek.getContentPane().add(btnClearAll);
+		
+		JLabel lblQty = new JLabel("Qty");
+		lblQty.setHorizontalAlignment(SwingConstants.CENTER);
+		lblQty.setBounds(628, 152, 37, 19);
+		frmNowyRachunek.getContentPane().add(lblQty);
+		
+		textFieldRegistration = new JTextField();
+		textFieldRegistration.setBounds(548, 72, 127, 28);
+		frmNowyRachunek.getContentPane().add(textFieldRegistration);
+		textFieldRegistration.setColumns(10);
+		
+		JLabel lblRegistration = new JLabel("Registration");
+		lblRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblRegistration.setBounds(439, 75, 84, 28);
+		frmNowyRachunek.getContentPane().add(lblRegistration);
 		
 		populateServices();
 		populateItems();
@@ -281,22 +302,6 @@ public class WystawRachunek {
 		btnCalculate.setBackground(new Color(220, 20, 60));
 		btnCalculate.setBounds(304, 447, 120, 32);
 		frmNowyRachunek.getContentPane().add(btnCalculate);
-		
-		JLabel lblQty = new JLabel("Qty");
-		lblQty.setHorizontalAlignment(SwingConstants.CENTER);
-		lblQty.setBounds(628, 152, 37, 19);
-		frmNowyRachunek.getContentPane().add(lblQty);
-		
-		textFieldRegistration = new JTextField();
-		textFieldRegistration.setBounds(548, 72, 127, 28);
-		frmNowyRachunek.getContentPane().add(textFieldRegistration);
-		textFieldRegistration.setColumns(10);
-		
-		JLabel lblRegistration = new JLabel("Registration");
-		lblRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblRegistration.setBounds(439, 75, 84, 28);
-		frmNowyRachunek.getContentPane().add(lblRegistration);
-		
 	}
 
 	private void populateCarList() throws Exception {

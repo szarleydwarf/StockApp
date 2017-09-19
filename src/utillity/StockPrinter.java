@@ -6,32 +6,39 @@ import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
+import javax.print.PrintException;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Sides;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.printing.PDFPageable;
 
 
 public class StockPrinter implements Printable {
 	private final String imagePath = "D:/@Development/EclipseJavaProjects/sqliteTestApp/StockApp/resources/img/Logo HCT 245x84.png";
+	private final String printerName = "Canon MP620 series Printer WS";
 	
 	private String savePath = "D:/@Development/__TEMP/", accPath = "";
 	private String ext = ".pdf", docNameCopy = "AC_";
@@ -57,7 +64,7 @@ public class StockPrinter implements Printable {
 		helper.createFolderIfNotExist(accPath);
 	}
 	
-	public void printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws IOException{
+	public void printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		this.df = new DecimalFormat("#.##"); 
 		this.md = (DefaultListModel)list.getModel();
 		this.discount = discount;
@@ -70,7 +77,9 @@ public class StockPrinter implements Printable {
 		this.date = helper.getFormatedDate();
 //		System.out.println("Printing "+discount+" "+applyDiscount);
 		generatePDF();
-		printPDF(docPath);
+
+//		printPDF(docPath);
+
 		createAccountancCopy();
 	}
 
@@ -186,7 +195,7 @@ public class StockPrinter implements Printable {
 				text6 = "hctballinamore@gmail.com",
 				text7 = "hct-ireland.business.site",
 				text8 = "FB @hct.irl";
-		contentStream.showText(text + "                                        " + date);
+		contentStream.showText(text + "                                     " + date);
 		contentStream.newLine();
 		contentStream.setFont(PDType1Font.COURIER, 12);
 		contentStream.showText(text2);
@@ -227,56 +236,28 @@ public class StockPrinter implements Printable {
 		customerCopyDoc.close();
 	}
 
-	private void printPDF(String docPath) throws IOException{
-		FileInputStream psStream = null;
-        try {
-            psStream = new FileInputStream(docPath);
-            } catch (FileNotFoundException ffne) {
-              ffne.printStackTrace();
-            }
-            if (psStream == null) {
-                return;
-            }
-        DocFlavor psInFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-        Doc myDoc = new SimpleDoc(psStream, psInFormat, null);  
-        PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
-        PrintService[] services = PrintServiceLookup.lookupPrintServices(psInFormat, aset);
-         
-        // this step is necessary because I have several printers configured
-        PrintService myPrinter = null;
-        for (int i = 0; i < services.length; i++){
-            String svcName = services[i].toString();           
-            System.out.println("service found: "+svcName);
-            if (svcName.contains("Canon MP620")){
-                myPrinter = services[i];
-                System.out.println("my printer found: "+svcName);
-                break;
-            }
-        }
-         
-        if (myPrinter != null) {    
-        	
-        	 Desktop desktop = Desktop.getDesktop();
-        	    try {
-                    System.out.println("Trying to print dektop "+docPath);
-        	           desktop.print(new File(docPath));
-        	    } catch (IOException e) {
-        	        e.printStackTrace();
-        	    }
-        	    
-            DocPrintJob job = myPrinter.createPrintJob();
-            System.out.println("JOB");
-            try {
-                System.out.println("Trying to print: ");
-                job.print(myDoc, aset);
-             
-            } catch (Exception pe) {pe.printStackTrace();}
-        } else {
-            System.out.println("no printer services found");
-        }
-        psStream.close();
+	private void printPDF(String docPath) throws IOException, Exception{
+        PDDocument document = PDDocument.load(new File(docPath));
+
+        PrintService myPrintService = findPrintService(this.printerName);
+
+        PrinterJob job = PrinterJob.getPrinterJob();
+        job.setPageable(new PDFPageable(document));
+        job.setPrintService(myPrintService);
+        job.print();
+        
+        document.close();
    }
 	
+	private static PrintService findPrintService(String printerName) {
+        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+        for (PrintService printService : printServices) {
+            if (printService.getName().trim().equals(printerName)) {
+                return printService;
+            }
+        }
+        return null;
+    }
 	
 	@Override
 	public int print(Graphics graphic, PageFormat pf, int pageNumber) throws PrinterException {
