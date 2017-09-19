@@ -1,5 +1,6 @@
 package utillity;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -70,5 +71,15 @@ public class Helper {
 		
 		return df.format(today.getTime());
 
+	}
+	
+	public boolean createFolderIfNotExist (String path) {
+//		System.out.println("Folder path: "+path);
+		
+		File dir = new File(path);
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+		return false;
 	}
 }
