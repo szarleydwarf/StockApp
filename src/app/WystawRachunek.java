@@ -39,12 +39,14 @@ public class WystawRachunek {
 	private JList<String> listChosen, listItems, listServices;
 	private JRadioButton rbPercent, rbMoney;
 	private JTextField textFieldRegistration;
+	private JLabel lblTotal;
 	
 	private DefaultListModel<String> model2Add;
 	private StockPrinter sPrinter;
 	private ButtonGroup radioGroup;
 	
 	private String carManufacturer, registration, servicePrice, productPrice ;
+	private final String lblTotalSt = "TOTAL";
 	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
 	private boolean applyDiscount = true;
@@ -192,10 +194,10 @@ public class WystawRachunek {
 				try {
 					invoiceNum += 1;
 					registration = textFieldRegistration.getText();
-					double sum = helper.getSum((DefaultListModel) listChosen.getModel(), discount, applyDiscount);
-					System.out.println("SUM "+sum);
-					if(sum>0)
+					if(!lblTotal.getText().equals(lblTotalSt))
 						sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
+					else
+						JOptionPane.showMessageDialog(frmNowyRachunek, "Nie przeliczyles wyniku");
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
@@ -276,7 +278,7 @@ public class WystawRachunek {
 	private void sumCosts() {
 		JButton btnCalculate = new JButton("Policz = ");
 		
-		JLabel lblTotal = new JLabel("TOTAL");
+		lblTotal = new JLabel(lblTotalSt);
 		lblTotal.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
 		lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTotal.setBounds(450, 447, 205, 32);
@@ -292,7 +294,6 @@ public class WystawRachunek {
 					
 					sos = helper.getSum(md, discount, applyDiscount);
 				}else{
-//					sum = 0;
 					sos = 0;
 				}
 				lblTotal.setText("€ "+df.format(sos));
