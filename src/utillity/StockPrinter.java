@@ -11,7 +11,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.print.Doc;
@@ -23,9 +25,11 @@ import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.Sides;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -34,9 +38,12 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.printing.PDFPageable;
+import org.apache.xmpbox.type.Attribute;
+
+import dbase.DatabaseManager;
 
 
-public class StockPrinter implements Printable {
+public class StockPrinter  { //implements Printable
 	private final String imagePath = "D:/@Development/EclipseJavaProjects/sqliteTestApp/StockApp/resources/img/Logo HCT 245x84.png";
 	private final String printerName = "Canon MP620 series Printer WS";
 	
@@ -54,14 +61,18 @@ public class StockPrinter implements Printable {
 	private String carManufacturer = "NONE", carRegistration = "00AA0000", invSt = "Invoice", noSt = "No.", date;
 	
 	private Helper helper;
+	private DatabaseManager DM;
+	private ArrayList<String> stockServicesNumber;
 	
 	public StockPrinter(){
+		DM = new DatabaseManager();
 		helper = new Helper();
 		String fDate = helper.getFormatedDate();
 		savePath = savePath.concat(fDate);
 		helper.createFolderIfNotExist(savePath);
 		accPath = savePath + "/accountacy copy";
 		helper.createFolderIfNotExist(accPath);
+		this.stockServicesNumber = new ArrayList<String>();
 	}
 	
 	public void printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
@@ -78,11 +89,33 @@ public class StockPrinter implements Printable {
 //		System.out.println("Printing "+discount+" "+applyDiscount);
 		generatePDF();
 
-//		printPDF(docPath);
+		printPDF(docPath);
 
 		createAccountancCopy();
+		saveEntryToDatabase();
 	}
 
+
+	private void saveEntryToDatabase() throws SQLException {
+		String servNo = "", itemNo = "";
+		for(String s : stockServicesNumber){
+			if(s.contains("AAA")){
+				itemNo += s+",";
+			}else if(s.contains("AAS")){
+				servNo += s+",";
+			}
+		}
+		itemNo = itemNo.substring(0, itemNo.lastIndexOf(","));
+		servNo = servNo.substring(0, servNo.lastIndexOf(","));
+		String query = "INSERT INTO \"invoices\"  VALUES ("+this.invNo+",'"+this.carManufacturer+"','"+servNo+"','"+itemNo +"',"+sum    +");";
+		
+		boolean succes = DM.addNewRecord(query);
+		if(succes){
+			JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
+		}else{
+			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
+		}
+	}
 
 	private void generatePDF()  throws IOException{
 		PDDocument customerCopyDoc = new PDDocument();
@@ -105,8 +138,8 @@ public class StockPrinter implements Printable {
 	private void addLogo(PDDocument customerCopyDoc) throws IOException {
 		PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, customerCopyDoc);
 		
-		contentStream.drawImage(pdImage, 215,  675);
-		contentStream.setNonStrokingColor(Color.GRAY);
+		contentStream.drawImage(pdImage, 210,  675);
+		contentStream.setNonStrokingColor(Color.darkGray);
 		contentStream.addRect(15, 420, 580, 50);
 		contentStream.fill();
 
@@ -128,6 +161,8 @@ public class StockPrinter implements Printable {
 			for(int i = 0; i < md.size(); i++){
 				String tempSt = md.getElementAt(i).toString();
 				String description = tempSt.substring(0, tempSt.lastIndexOf("€"));
+				
+				createItemList(description);
 				
 				String priceSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
 				priceSt = priceSt.substring(0, priceSt.lastIndexOf("x"));
@@ -154,6 +189,24 @@ public class StockPrinter implements Printable {
 		
 		contentStream.endText();
 
+	}
+
+	private void createItemList(String description) {
+		String des = description.trim();
+		String query = "SELECT service_number FROM services WHERE service_name=\""+des+"\" union all SELECT stock_number FROM stock WHERE item_name=\""+des+"\"";
+
+		try {
+			ArrayList<String> t = DM.selectRecordArrayList(query);
+			for(String ts : t){
+				//TODO
+				//add some counter for quantity?
+				if(!stockServicesNumber.contains(ts)){
+					this.stockServicesNumber.add(ts);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void populateInvNumManufacturer() throws IOException {
@@ -240,11 +293,13 @@ public class StockPrinter implements Printable {
         PDDocument document = PDDocument.load(new File(docPath));
 
         PrintService myPrintService = findPrintService(this.printerName);
-
+        PrintServiceAttributeSet set = myPrintService.getAttributes();
+                
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
-        job.print();
+        
+//        job.print();
         
         document.close();
    }
@@ -258,12 +313,11 @@ public class StockPrinter implements Printable {
         }
         return null;
     }
-	
-	@Override
-	public int print(Graphics graphic, PageFormat pf, int pageNumber) throws PrinterException {
-		if(pageNumber > 0) {
-			return NO_SUCH_PAGE;
-		}
-		return PAGE_EXISTS;
-	}
+
+//	@Override
+//	public int print(Graphics arg0, PageFormat arg1, int arg2) throws PrinterException {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+
 }

@@ -31,28 +31,42 @@ public class DatabaseManager {
 	}
 	
 	
-	public boolean addNewRecord(){
+	public boolean addNewRecord(String query) throws SQLException{
 		dbConn = this.getConnection();
-		System.out.println("adding new record");
+		System.out.println("adding new record\n"+query);
+		PreparedStatement pst = dbConn.prepareStatement(query);	
+		int inserted = pst.executeUpdate();
+		
+		if(inserted != 0)
+			return true;
+		pst.close();
 		return false;
 	}
 	
-	public boolean deleteRecord(String table, String where){
+	public boolean deleteRecord(String table, String where) throws SQLException{
 		dbConn = this.getConnection();
 		System.out.println("deleting record");
+		dbConn.close();
+
 		return false;
 	}
 	
-	public boolean editRecord(String table, String newValue, String where){
+	public boolean editRecord(String table, String newValue, String where) throws SQLException{
 		dbConn = this.getConnection();
 		System.out.println("editing record");
+		dbConn.close();
+
 		return false;
 	}
 	
 	public ResultSet selectRecord(String query) throws SQLException{
 		dbConn = this.getConnection();
 		PreparedStatement pst = dbConn.prepareStatement(query);		
-		return pst.executeQuery();		
+
+		ResultSet rs = pst.executeQuery();
+		pst.close();
+
+		return rs;
 	}	
 	
 	public ArrayList<String> selectRecordArrayList(String query) throws SQLException{
@@ -70,6 +84,7 @@ public class DatabaseManager {
 //				}
 			}
 		}
+		pst.close();
 		return resultList;
 	}
 	
@@ -107,6 +122,7 @@ public class DatabaseManager {
 			}
 //			System.out.println("\n");//Move to the next line to print the next row.          
 		}
+		pst.close();
 		return toReturn;
 	}
 	
@@ -130,6 +146,7 @@ public class DatabaseManager {
 			}
 			System.out.println("\n");//Move to the next line to print the next row.          
 		}
+		pst.close();
 		return true;
 	}
 
@@ -138,7 +155,6 @@ public class DatabaseManager {
 		try {
 			conn.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
