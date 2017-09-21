@@ -5,15 +5,21 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import dbase.DatabaseManager;
+
 import java.awt.Toolkit;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class MainView {
 
 	private JFrame frmHctMagazyn;
-
+	
+	private DatabaseManager DM;
+	private int invoiceNum;
 	/**
 	 * Launch the application.
 	 */
@@ -37,9 +43,13 @@ public class MainView {
 	 * Create the application.
 	 */
 	public MainView() {
+		DM = new DatabaseManager();
 		initialize();
 	}
 
+	public int getInvoiceNum(){
+		return this.invoiceNum;
+	}
 	/**
 	 * Initialize the contents of the frame.
 	 */

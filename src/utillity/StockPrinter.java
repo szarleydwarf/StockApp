@@ -55,6 +55,7 @@ public class StockPrinter  { //implements Printable
 
 	private DefaultListModel md;
 	private double sum = 0, discount = 0;
+	private long timeout = 50000;
 	private boolean applyDiscount = false;
 	private int invNo = 1, stringLengthF = 3, stringLengthB = 12;
 	private char paddingChar = ' ';
@@ -105,8 +106,15 @@ public class StockPrinter  { //implements Printable
 				servNo += s+",";
 			}
 		}
-		itemNo = itemNo.substring(0, itemNo.lastIndexOf(","));
-		servNo = servNo.substring(0, servNo.lastIndexOf(","));
+		if(!itemNo.isEmpty())
+			itemNo = itemNo.substring(0, itemNo.lastIndexOf(","));
+		if(!servNo.isEmpty())
+			servNo = servNo.substring(0, servNo.lastIndexOf(","));
+		
+		int i = 0;
+		while(i<timeout){
+			i++;
+		}
 		String query = "INSERT INTO \"invoices\"  VALUES ("+this.invNo+",'"+this.carManufacturer+"','"+servNo+"','"+itemNo +"',"+sum    +");";
 		
 		boolean succes = DM.addNewRecord(query);
@@ -130,7 +138,6 @@ public class StockPrinter  { //implements Printable
 
 		contentStream.close();
 		docPath = savePath+"/"+date+" "+invNo+ext;
-//		System.out.println("save gen "+savePath+"\n"+docPath);
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
@@ -204,7 +211,7 @@ public class StockPrinter  { //implements Printable
 					this.stockServicesNumber.add(ts);
 				}
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -313,11 +320,4 @@ public class StockPrinter  { //implements Printable
         }
         return null;
     }
-
-//	@Override
-//	public int print(Graphics arg0, PageFormat arg1, int arg2) throws PrinterException {
-//		// TODO Auto-generated method stub
-//		return 0;
-//	}
-
 }

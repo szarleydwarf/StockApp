@@ -53,8 +53,7 @@ public class WystawRachunek {
 	private DecimalFormat df;
 	
 	private Helper helper;
-	private DatabaseManager DM;
-		
+	private DatabaseManager DM;	
 
 	/**
 	 * Launch the application.
@@ -79,6 +78,21 @@ public class WystawRachunek {
 	public WystawRachunek() throws SQLException {
 		DM = new DatabaseManager();
 		helper = new Helper();
+		
+		String query = "SELECT invoice_number from invoices ORDER BY invoice_number DESC LIMIT 1";
+		ResultSet rs;
+		try {
+			rs = DM.selectRecord(query);
+			if(!rs.equals(null))
+				invoiceNum = rs.getInt(1);
+			else
+				invoiceNum = 1;
+
+//			System.out.println("invNum "+invoiceNum);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+
 		try {
 			initialize();
 		} catch (Exception e) {
@@ -180,15 +194,6 @@ public class WystawRachunek {
 		JButton btnPrint = new JButton("Drukuj rachunek");
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String query = "SELECT invoice_number from invoices ORDER BY invoice_number DESC LIMIT 1";
-				ResultSet rs;
-				try {
-					rs = DM.selectRecord(query);
-					invoiceNum = rs.getInt(1);
-//					System.out.println("invNum "+invoiceNum);
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
 				
 				sPrinter = new StockPrinter();
 				try {
@@ -201,7 +206,6 @@ public class WystawRachunek {
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
