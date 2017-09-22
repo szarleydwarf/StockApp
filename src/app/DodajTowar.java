@@ -5,7 +5,10 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,7 +33,17 @@ public class DodajTowar {
 	private JTextField tfQnt;
 	private JTextField tfStockNo;
 	
-	private String stockNum;
+	private Pattern patern, dPattern;
+	private Matcher match, dMatch;
+	
+	private final String pattern = "^-?\\d+$", decimalPattern = "^-?([0-9]*)\\.([0-9]*)+$";
+	private String stockNum, productName="", cost="", price="", qnt="";
+	private boolean varEmpty = true;
+	private double dCost, dPrice;
+	private int iQnt;
+
+	private DecimalFormat df;
+
 	private Helper helper;
 
 	/**
@@ -55,7 +68,10 @@ public class DodajTowar {
 	public DodajTowar() {
 		helper = new Helper();
 		dm = new DatabaseManager();
-		
+		this.df = new DecimalFormat("#.##"); 
+		this.patern = Pattern.compile(pattern);
+		this.dPattern = Pattern.compile(decimalPattern);
+
 		String query = "SELECT stock_number FROM stock ORDER BY stock_number DESC LIMIT 1";
 		ArrayList<String> stNoList = dm.selectRecordArrayList(query);
 		
@@ -151,10 +167,69 @@ public class DodajTowar {
 		btnZapisz.setBounds(441, 249, 89, 23);
 		frame.getContentPane().add(btnZapisz);
 	
-		zapiszNowyProdukt();
+		btnZapisz.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				varEmpty = getVariableForQuery();
+				if(!varEmpty)
+					zapiszNowyProdukt();
+			}
+		});		
 
 	}
 	
+	private boolean getVariableForQuery() {
+		this.productName = this.textFieldProductName.getText();
+		if(this.productName.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Wpisz nazwe produktu");
+			return true;
+		}
+		
+		this.cost = this.tfCost.getText();
+		if(this.cost.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Wpisz koszt");
+			return true;
+		} else {
+			this.dMatch = this.dPattern.matcher(cost);
+			if(this.dMatch.find())
+				this.dCost = Double.parseDouble(df.format(Double.parseDouble(cost)));
+			else{
+				JOptionPane.showMessageDialog(null, "Niepoprawny format kosztu");
+				return true;
+			}
+		}
+		
+		this.price = this.tfPrice.getText();
+		if(this.price.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Wpisz cene");
+			return true;
+		}else {
+			this.dMatch = this.dPattern.matcher(price);
+			if(this.dMatch.find())
+				this.dPrice = Double.parseDouble(df.format(Double.parseDouble(price)));
+			else{
+				JOptionPane.showMessageDialog(null, "Niepoprawny format ceny");
+				return true;
+			}
+		}
+		
+		this.qnt = this.tfQnt.getText();
+		if(this.qnt.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Wpisz ilosc");
+			return true;
+		}else {
+			this.match = this.patern.matcher(qnt);
+			if(this.match.find())
+				this.iQnt = Integer.parseInt(qnt);
+			else{
+				JOptionPane.showMessageDialog(null, "Niepoprawny format ilosci");
+				return true;
+			}
+		}
+		
+		return false;	
+	}
+
 	private void displayStockNumber() {
 		JLabel lblStockNo = new JLabel("Numer magazynowy");
 		lblStockNo.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
@@ -172,17 +247,13 @@ public class DodajTowar {
 	}
 
 	private void zapiszNowyProdukt() {
-		System.out.println("zapisz nowy");
-		
-		btnZapisz.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				boolean saved = true;// dm.addNewRecord("INSERT INTO \"stock\"  VALUES ('"+stockNum+"','Dunlop 225/50 R18',75.86,152.12,4);");
-				System.out.println("zapisuje");
-				if(saved)
-					JOptionPane.showMessageDialog(null, "Dodano nowy towar");
-				else
-					JOptionPane.showMessageDialog(null, "Błąd zapisu");
-			}
-		});		
+			boolean saved = dm.addNewRecord("INSERT INTO \"stock\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
+		System.out.println("zapisuje");
+		if(saved){
+			JOptionPane.showMessageDialog(null, "Dodano nowy towar");
+			this.frame.dispose();
+		} else
+			JOptionPane.showMessageDialog(null, "Błąd zapisu");
+
 	}
 }
