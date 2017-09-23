@@ -5,46 +5,36 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import dbase.DatabaseManager;
 import utillity.Helper;
-
-import javax.swing.JTextField;
 
 public class DodajTowar {
 
 	private JFrame frame;
 	private JButton btnZapisz;
 
-	private DatabaseManager dm = null;
 	private JTextField textFieldProductName;
 	private JTextField tfCost;
 	private JTextField tfPrice;
 	private JTextField tfQnt;
 	private JTextField tfStockNo;
 	
-	private Pattern patern, dPattern;
-	private Matcher match, dMatch;
-	
-	private final String pattern = "^-?\\d+$", decimalPattern = "^-?([0-9]*)\\.([0-9]*)+$";
 	private String stockNum, productName="", cost="", price="", qnt="";
 	private boolean varEmpty = true;
-	private double dCost, dPrice;
-	private int iQnt;
-
-	private DecimalFormat df;
+	private double dCost = 0, dPrice = 0;
+	private int iQnt = 0;
 
 	private Helper helper;
+	private DatabaseManager dm = null;
 
 	/**
 	 * Launch the application.
@@ -68,40 +58,21 @@ public class DodajTowar {
 	public DodajTowar() {
 		helper = new Helper();
 		dm = new DatabaseManager();
-		this.df = new DecimalFormat("#.##"); 
-		this.patern = Pattern.compile(pattern);
-		this.dPattern = Pattern.compile(decimalPattern);
 
 		String query = "SELECT stock_number FROM stock ORDER BY stock_number DESC LIMIT 1";
 		ArrayList<String> stNoList = dm.selectRecordArrayList(query);
 		
-		System.out.println("Array "+stNoList.get(0));
 		if(!stNoList.get(0).isEmpty())
 			stockNum = stNoList.get(0);
 		else
 			stockNum = "AAA0000";
 		
-		getIntFromStNo();
-		System.out.println("after "+stockNum);
+		helper.getIntFromStNo(stockNum, 'A');
 		
 		initialize();
 	}
 
-	private void getIntFromStNo() {
-		/*				String priceSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
-				priceSt = priceSt.substring(0, priceSt.lastIndexOf("x"));
-				String quant = tempSt.substring(tempSt.lastIndexOf("x")+1);*/
-		String stL = stockNum.substring(0, stockNum.lastIndexOf("A")+1);
-		System.out.println("stL "+stL);
-		int stN = Integer.parseInt(stockNum.replaceAll("[\\D]", ""));//((int)stockNum.lastIndexOf("A")+1);
-		System.out.println("stN "+stN);
-		stN++;
-		String temp = helper.paddStringLeft(Integer.toString(stN), 2, '0');
-		System.out.println("temp "+temp);
-		temp = stL + temp;
-		System.out.println("temp2 "+temp);
-		stockNum = temp;
-	}
+
 
 	/**
 	 * Initialize the contents of the frame.
@@ -186,47 +157,23 @@ public class DodajTowar {
 		}
 		
 		this.cost = this.tfCost.getText();
-		if(this.cost.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Wpisz koszt");
+		if(this.dCost == 0){
+			this.dCost = this.helper.checkDouble("Wpisz koszt",  "Niepoprawny format kosztu", this.cost);
 			return true;
-		} else {
-			this.dMatch = this.dPattern.matcher(cost);
-			if(this.dMatch.find())
-				this.dCost = Double.parseDouble(df.format(Double.parseDouble(cost)));
-			else{
-				JOptionPane.showMessageDialog(null, "Niepoprawny format kosztu");
-				return true;
-			}
 		}
-		
+	
 		this.price = this.tfPrice.getText();
-		if(this.price.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Wpisz cene");
+		if(this.dPrice == 0) {
+			this.dPrice = helper.checkDouble("Wpisz cene", "Niepoprawny format ceny", this.price);
 			return true;
-		}else {
-			this.dMatch = this.dPattern.matcher(price);
-			if(this.dMatch.find())
-				this.dPrice = Double.parseDouble(df.format(Double.parseDouble(price)));
-			else{
-				JOptionPane.showMessageDialog(null, "Niepoprawny format ceny");
-				return true;
-			}
 		}
-		
+	
 		this.qnt = this.tfQnt.getText();
-		if(this.qnt.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Wpisz ilosc");
+		if(this.iQnt == 0){
+			this.iQnt = this.helper.checkInteger("Wpisz ilość","Niepoprawny format ilosci", this.qnt);
 			return true;
-		}else {
-			this.match = this.patern.matcher(qnt);
-			if(this.match.find())
-				this.iQnt = Integer.parseInt(qnt);
-			else{
-				JOptionPane.showMessageDialog(null, "Niepoprawny format ilosci");
-				return true;
-			}
 		}
-		
+	
 		return false;	
 	}
 
@@ -247,8 +194,8 @@ public class DodajTowar {
 	}
 
 	private void zapiszNowyProdukt() {
-			boolean saved = dm.addNewRecord("INSERT INTO \"stock\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
-		System.out.println("zapisuje");
+		boolean saved = dm.addNewRecord("INSERT INTO \"stock\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
+//		System.out.println("zapisuje "+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt);
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");
 			this.frame.dispose();
