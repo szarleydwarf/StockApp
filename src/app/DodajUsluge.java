@@ -29,7 +29,7 @@ public class DodajUsluge {
 	private JTextField tfCost;
 	private JTextField tfPrice;
 
-	private String serviceNum, serviceName="", cost="", price="", qnt="";
+	private String serviceNum, serviceName="", cost="", price="";
 	private boolean varEmpty = true;
 	private double dCost = 0, dPrice = 0;
 	private int iQnt = 0;
@@ -81,9 +81,19 @@ public class DodajUsluge {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 528, 321);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(frame, 
+		            "Are you sure to close this window?", "Really Closing?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        }
+		    }
+		});
 		JLabel lblDodajNowUsug = new JLabel("Dodaj now\u0105 us\u0142ug\u0119");
 		lblDodajNowUsug.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDodajNowUsug.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));

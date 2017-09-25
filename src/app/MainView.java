@@ -54,11 +54,11 @@ public class MainView {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frmHctMagazyn = new JFrame();
+		if(this.frmHctMagazyn == null)
+			frmHctMagazyn = new JFrame();
 		frmHctMagazyn.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png"));
 		frmHctMagazyn.setTitle("HCT MAGAZYN");
 		frmHctMagazyn.setBounds(100, 100, 650, 280);
-//		frmHctMagazyn.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frmHctMagazyn.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frmHctMagazyn.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
@@ -67,7 +67,6 @@ public class MainView {
 		            "Are you sure to close this window?", "Really Closing?", 
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-//		            System.exit(0);
 		        	frmHctMagazyn.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		            SqliteTestAppV.main(null);
 		        }

@@ -35,6 +35,7 @@ public class DodajTowar {
 
 	private Helper helper;
 	private DatabaseManager dm = null;
+	
 
 	/**
 	 * Launch the application.
@@ -81,8 +82,19 @@ public class DodajTowar {
 		
 		frame = new JFrame();
 		frame.setBounds(100, 100, 556, 328);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(frame, 
+		            "Are you sure to close this window?", "Really Closing?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        }
+		    }
+		});
 		JLabel lblTitle = new JLabel("Dodaj nowy produkt");
 		lblTitle.setBounds(150, 11, 245, 26);
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
