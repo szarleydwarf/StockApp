@@ -13,6 +13,8 @@ import java.sql.Statement;
 
 import javax.swing.JOptionPane;
 
+import hct_speciale.Item;
+
 public class DatabaseManager {
 	private Connection conn = null;
 	private PreparedStatement pst = null;
@@ -102,6 +104,83 @@ public class DatabaseManager {
 		return false;
 	}
 	
+	public Item getOneItem(String query){
+		conn = this.connect();
+		Item item = null;
+		String qr = " LIMIT 1";
+		if(!query.contains(qr.toLowerCase()) && !query.contains(qr))
+			query+=qr;
+		
+		try {
+			PreparedStatement pst = conn.prepareStatement(query);		
+			ResultSet rs = pst.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+			while (rs.next()){
+				item = createItem(rs, columnsNumber);// 
+				item.print();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try{
+				rs.close();
+				pst.close();
+			} catch (Exception e){}
+		}
+		return item;
+	}
+	
+	private Item createItem(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {
+		String  stNum = "", itName = "";
+		double cost = 0, price = 0;
+		for(int i = 1 ; i <= columnsNumber; i++){			
+			if(!rs.getString(i).isEmpty()) {
+				switch(i){
+				case 1:
+					stNum = rs.getString(i);
+					break;
+				case 2:
+					itName = rs.getString(i);
+					break;
+				case 3:
+					cost = Double.parseDouble(rs.getString(i));
+					break;
+				case 4:
+					price = Double.parseDouble(rs.getString(i));
+					break;
+				}
+			}
+		}
+		return new Item(stNum, itName, cost, price);
+	}
+	public ArrayList<Item> getItemsList(String query){
+		conn = this.connect();
+		ArrayList<Item> list = new ArrayList<Item>();
+		
+		try {
+			PreparedStatement pst = conn.prepareStatement(query);		
+			
+			ResultSet rs = pst.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+			while (rs.next()){
+				Item i = createItem(rs, columnsNumber);
+//				i.print();
+				list.add(i);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try{
+				rs.close();
+				pst.close();
+			} catch (Exception e){
+				
+			}
+		}
+		return list;
+	}
 	public ResultSet selectRecord(String query) throws SQLException{
 		conn = this.connect();
 		PreparedStatement pst = conn.prepareStatement(query);		
@@ -218,7 +297,6 @@ public class DatabaseManager {
 				System.out.println("\n");//Move to the next line to print the next row.          
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try{

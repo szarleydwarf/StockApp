@@ -55,5 +55,7 @@ public class Item {
 		this.price = price;
 	}
 	
-	
+	public void print(){
+		System.out.println(stockNumber+ " "+this.name+" "+this.cost+" "+this.price);
+	}
 }
