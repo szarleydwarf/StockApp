@@ -13,5 +13,12 @@ public class StockItem extends Item{
 	public void setQnt(int qnt) {
 		this.qnt = qnt;
 	}
-
+	public void print(){
+		System.out.println(getStockNumber()+ " "+this.getName()+" "+this.getCost()+" "+this.getPrice()+" "+this.qnt);
+	}
+	
+	@Override
+	public String toString(){
+		return getStockNumber()+ " "+this.getName()+" "+this.getCost()+" "+this.getPrice()+" "+this.qnt;
+	}
 }

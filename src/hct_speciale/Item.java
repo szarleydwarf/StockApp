@@ -58,4 +58,9 @@ public class Item {
 	public void print(){
 		System.out.println(stockNumber+ " "+this.name+" "+this.cost+" "+this.price);
 	}
+	
+	@Override
+	public String toString(){
+		return this.stockNumber+ " "+this.name+" "+this.cost+" "+this.price;
+	}
 }

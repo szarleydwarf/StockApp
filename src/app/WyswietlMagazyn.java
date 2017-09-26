@@ -15,6 +15,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
 import utillity.Helper;
 
 import javax.swing.BorderFactory;
@@ -63,14 +64,14 @@ public class WyswietlMagazyn {
 	}
 
 	private void populateList() {
-		String query = "SELECT item_name, cost, price,quantity from stock ORDER BY item_name ASC";
+		String query = "SELECT * from stock ORDER BY item_name ASC";//item_name, cost, price,quantity
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
-		ArrayList<String> listOfItems = DM.selectRecordArrayList(query);
+		ArrayList<Item> listOfItems = DM.getItemsList(query);
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
-			String tempString = listOfItems.get(i);
-			modelItems.addElement(tempString);
+			Item item = listOfItems.get(i);
+			modelItems.addElement(item.toString());
 //			System.out.println(tempString);
 		}
 		JList<String> list = new JList<String>();

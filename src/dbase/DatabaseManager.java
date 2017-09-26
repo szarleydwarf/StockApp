@@ -14,6 +14,7 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 import hct_speciale.Item;
+import hct_speciale.StockItem;
 
 public class DatabaseManager {
 	private Connection conn = null;
@@ -131,7 +132,7 @@ public class DatabaseManager {
 		return item;
 	}
 	
-	private Item createItem(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {
+	private Item createService(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {
 		String  stNum = "", itName = "";
 		double cost = 0, price = 0;
 		for(int i = 1 ; i <= columnsNumber; i++){			
@@ -157,7 +158,13 @@ public class DatabaseManager {
 	public ArrayList<Item> getItemsList(String query){
 		conn = this.connect();
 		ArrayList<Item> list = new ArrayList<Item>();
-		
+		boolean isItem = false;
+		if(query.contains("stock")){
+			isItem = true;
+		} else if(query.contains("services")){
+			isItem = false;
+		}
+		System.out.println(query);
 		try {
 			PreparedStatement pst = conn.prepareStatement(query);		
 			
@@ -165,7 +172,11 @@ public class DatabaseManager {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnsNumber = rsmd.getColumnCount();
 			while (rs.next()){
-				Item i = createItem(rs, columnsNumber);
+				Item i = null;
+				if(isItem)
+					i = createItem(rs, columnsNumber);
+				else if(!isItem)
+					i = createService(rs, columnsNumber);
 //				i.print();
 				list.add(i);
 			}
@@ -181,6 +192,34 @@ public class DatabaseManager {
 		}
 		return list;
 	}
+	private StockItem createItem(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {
+		String  stNum = "", itName = "";
+		double cost = 0, price = 0;
+		int qnt = 0;
+		for(int i = 1 ; i <= columnsNumber; i++){
+			System.out.println(i + " "+ rs.getString(i));
+			if(!rs.getString(i).isEmpty()) {
+				switch(i){
+				case 1:
+					stNum = rs.getString(i);
+					break;
+				case 2:
+					itName = rs.getString(i);
+					break;
+				case 3:
+					cost = Double.parseDouble(rs.getString(i));
+					break;
+				case 4:
+					price = Double.parseDouble(rs.getString(i));
+					break;
+				case 5:
+					qnt = Integer.parseInt(rs.getString(i));
+					break;
+				}
+			}
+		}
+		return new StockItem(stNum, itName, cost, price, qnt);
+		}
 	public ResultSet selectRecord(String query) throws SQLException{
 		conn = this.connect();
 		PreparedStatement pst = conn.prepareStatement(query);		
