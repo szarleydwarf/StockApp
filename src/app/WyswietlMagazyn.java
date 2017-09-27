@@ -25,6 +25,8 @@ import java.awt.Color;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 
 public class WyswietlMagazyn {
 
@@ -75,6 +77,8 @@ public class WyswietlMagazyn {
 //			System.out.println(tempString);
 		}
 		JList<String> list = new JList<String>();
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
 		scrollPane.setViewportView(list);
 		list.setModel(modelItems);
 	}
@@ -84,7 +88,7 @@ public class WyswietlMagazyn {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 540, 600);
+		frame.setBounds(100, 100, 587, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -98,7 +102,7 @@ public class WyswietlMagazyn {
 		btnNewButton.setBackground(new Color(255, 255, 153));
 		btnNewButton.setForeground(new Color(0, 153, 255));
 		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnNewButton.setBounds(425, 15, 89, 23);
+		btnNewButton.setBounds(314, 46, 89, 23);
 		frame.getContentPane().add(btnNewButton);
 		
 		Border b = BorderFactory.createLineBorder(Color.BLUE);
@@ -108,19 +112,19 @@ public class WyswietlMagazyn {
 		label.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		label.setBorder(border);
 		label.setVerticalAlignment(SwingConstants.TOP);
-		label.setBounds(10, 89, 370, 461);
+		label.setBounds(10, 89, 527, 461);
 		
 		label.setVerticalAlignment(SwingConstants.TOP);
 		frame.getContentPane().add(label);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(21, 138, 345, 400);
+		scrollPane.setBounds(21, 138, 421, 400);
 		frame.getContentPane().add(scrollPane);
 				
 		JLabel lblPrice = new JLabel("Cena");
 		lblPrice.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		lblPrice.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPrice.setBounds(254, 117, 50, 19);
+		lblPrice.setBounds(282, 117, 50, 19);
 		frame.getContentPane().add(lblPrice);
 		
 		JLabel lblItem = new JLabel("Towar");
@@ -132,13 +136,13 @@ public class WyswietlMagazyn {
 		JLabel lblQty = new JLabel("Qty");
 		lblQty.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		lblQty.setHorizontalAlignment(SwingConstants.CENTER);
-		lblQty.setBounds(314, 117, 37, 19);
+		lblQty.setBounds(378, 117, 37, 19);
 		frame.getContentPane().add(lblQty);
 		
 		JLabel lblCost = new JLabel("Koszt");
 		lblCost.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		lblCost.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCost.setBounds(183, 117, 50, 19);
+		lblCost.setBounds(197, 117, 50, 19);
 		frame.getContentPane().add(lblCost);
 		
 		textField = new JTextField();
@@ -157,7 +161,7 @@ public class WyswietlMagazyn {
 		btnEdit.setForeground(new Color(255, 255, 255));
 		btnEdit.setBackground(new Color(255, 102, 102));
 		btnEdit.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnEdit.setBounds(390, 116, 124, 24);
+		btnEdit.setBounds(413, 45, 124, 24);
 		frame.getContentPane().add(btnEdit);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override

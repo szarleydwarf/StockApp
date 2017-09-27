@@ -23,25 +23,17 @@ public class StockItem extends Item{
 	public String toString(){
 		String toReturn = "";
 		int paddLng = getStringLength();
-		if(this.getName().contains(this.getHelper().PIRELLI_ST))
-			paddLng+=3;
-		toReturn = getHelper().paddStringRight(this.getName(), paddLng , getPaddingChar());		
-		
-		toReturn += this.getCost();
-		System.out.println("1: "+paddLng+" / "+toReturn.length()+" / "+this.getName());	
-		paddLng = getHelper().getLength(Double.toString(this.getCost()).length(), toReturn.length(), 3, 12, 18);
-	
-		toReturn = this.getHelper().paddStringRight(toReturn, paddLng, getPaddingChar());
+		toReturn = super.toString();
 
-		
-		toReturn += this.getPrice();
-		paddLng = getHelper().getLength(Double.toString(this.getPrice()).length(), toReturn.length(), 3, 12, 18);
-//System.out.println("2: "+paddLng+" / "+toReturn.length()+" / ");
-		
+		if(toReturn.length() < 95)
+			paddLng = 95;
+		else
+			paddLng = toReturn.length()+10;
+
 		toReturn = this.getHelper().paddStringRight(toReturn, paddLng, getPaddingChar());
+//		System.out.println("2: paddL "+paddLng+" retL "+toReturn.length()+"\n");
 		toReturn += this.qnt;
-//		
-//System.out.println("3: "+paddLng+" / "+toReturn.length()+" / ");
+		
 		return toReturn;
 	}
 }

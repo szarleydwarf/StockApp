@@ -9,7 +9,7 @@ public class Item {
 	private char paddingChar = ' ';
 	private double cost;
 	private double price;
-	private int stringLength = 38;
+	private int stringLength = 42;
 	
 	private Helper helper;
 	
@@ -77,11 +77,22 @@ public class Item {
 	@Override
 	public String toString(){
 		String toReturn = "";
-		toReturn = helper.paddStringRight(this.name, stringLength/3, paddingChar);
-		System.out.println(toReturn);
-		toReturn += this.helper.paddStringRight(toReturn, stringLength/2, paddingChar);
-		System.out.println(toReturn);
-		toReturn = this.name+" "+this.cost+" "+this.price;
+		int paddLng = getStringLength();
+		toReturn = this.getName();
+		if(toReturn.contains(this.getHelper().PIRELLI_ST))
+			paddLng+=3;
+		
+		toReturn = this.getHelper().paddStringRight(toReturn, paddLng, getPaddingChar());
+		
+		toReturn += this.getCost();
+		if(Double.toString(this.getCost()).length() > 3)
+			paddLng = paddLng + (paddLng/2);
+		else
+			paddLng = paddLng + (paddLng/2) + 4;
+		
+		toReturn = this.getHelper().paddStringRight(toReturn, paddLng, getPaddingChar());
+		
+		toReturn += this.getPrice();
 		return toReturn;
 	}
 
