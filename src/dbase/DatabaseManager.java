@@ -164,7 +164,7 @@ public class DatabaseManager {
 		} else if(query.contains("services")){
 			isItem = false;
 		}
-		System.out.println(query);
+//		System.out.println(query);
 		try {
 			PreparedStatement pst = conn.prepareStatement(query);		
 			
@@ -197,7 +197,7 @@ public class DatabaseManager {
 		double cost = 0, price = 0;
 		int qnt = 0;
 		for(int i = 1 ; i <= columnsNumber; i++){
-			System.out.println(i + " "+ rs.getString(i));
+//			System.out.println(i + " "+ rs.getString(i));
 			if(!rs.getString(i).isEmpty()) {
 				switch(i){
 				case 1:

@@ -1,20 +1,35 @@
 package hct_speciale;
 
+import utillity.Helper;
+
 public class Item {
 	
 	private String stockNumber;
 	private String name;
+	private char paddingChar = ' ';
 	private double cost;
 	private double price;
+	private int stringLength = 38;
 	
+	private Helper helper;
 	
 	public Item(String p_stock_number, String p_name, double p_cost, double p_price){
 		this.stockNumber = p_stock_number;
 		this.name = p_name;
 		this.cost = p_cost;
 		this.price = p_price;
+		
+		this.helper = new Helper();
 	}
 
+
+	public int getStringLength() {
+		return stringLength;
+	}
+
+	public Helper getHelper() {
+		return helper;
+	}
 
 	public String getStockNumber() {
 		return stockNumber;
@@ -61,6 +76,17 @@ public class Item {
 	
 	@Override
 	public String toString(){
-		return this.stockNumber+ " "+this.name+" "+this.cost+" "+this.price;
+		String toReturn = "";
+		toReturn = helper.paddStringRight(this.name, stringLength/3, paddingChar);
+		System.out.println(toReturn);
+		toReturn += this.helper.paddStringRight(toReturn, stringLength/2, paddingChar);
+		System.out.println(toReturn);
+		toReturn = this.name+" "+this.cost+" "+this.price;
+		return toReturn;
+	}
+
+
+	public char getPaddingChar() {
+		return paddingChar;
 	}
 }
