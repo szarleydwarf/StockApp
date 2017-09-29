@@ -6,12 +6,14 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
 
 import java.awt.Toolkit;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
 public class MainView {
@@ -44,6 +46,10 @@ public class MainView {
 	 */
 	public MainView() {
 		DM = new DatabaseManager();
+		ArrayList<Item> list = DM.getItemsList("SELECT * From services ");
+//		for(int i = 0; i < list.size();i++)
+//			list.get(i).print();
+		
 		initialize();
 	}
 

@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import dbase.DatabaseManager;
 
 public class Helper {
+	public final String PIRELLI_ST = "Pirelli";
+	
 	public double getSum(DefaultListModel md, double discount, boolean applyDiscount){
 		double sum = 0;
 		if(md.size() > 0){
@@ -141,6 +143,13 @@ System.out.println("no "+number);
 		String temp = paddStringLeft(Integer.toString(stN), 2, '0');
 		temp = stL + temp;
 		return temp;
+	}
+
+	public int getLength(int testLength, int stLength, int min, int addMin, int addMax) {
+		if(testLength <= min)
+			return stLength+addMax;
+		else 
+			return stLength+addMin;
 	}
 
 }
