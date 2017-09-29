@@ -335,9 +335,7 @@ public class WystawRachunek {
 		lblCarManufacturer.setBounds(439, 16, 242, 45);
 	
 		frmNowyRachunek.getContentPane().add(lblCarManufacturer);
-		
-
-				
+			
 		JList listCars = new JList();
 		listCars.setModel(modelCars);
 		scrollPaneCarList.setViewportView(listCars);

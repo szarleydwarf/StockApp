@@ -46,7 +46,7 @@ public class MainView {
 	 */
 	public MainView() {
 		DM = new DatabaseManager();
-		ArrayList<Item> list = DM.getItemsList("SELECT * From services ");
+//		ArrayList<Item> list = DM.getItemsList("SELECT * From services ");
 //		for(int i = 0; i < list.size();i++)
 //			list.get(i).print();
 		
@@ -83,6 +83,7 @@ public class MainView {
 		JButton stockBtn = new JButton("Wyswietl magazyn");
 		stockBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				frmHctMagazyn.dispose();
 				WyswietlMagazyn.main(null);
 			}
 		});
@@ -92,6 +93,7 @@ public class MainView {
 		JButton servicesBtn = new JButton("Wyswietl uslugi");
 		servicesBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				frmHctMagazyn.dispose();
 				WyswietlListeUslug.main(null);
 			}
 		});
@@ -101,6 +103,7 @@ public class MainView {
 		JButton invoiceBtn = new JButton("Wyswietl rachunki");
 		invoiceBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				frmHctMagazyn.dispose();
 				WyswietlRachunki.main(null);
 			}
 		});
@@ -110,6 +113,7 @@ public class MainView {
 		JButton nowyRachunekBtn = new JButton("Wystaw rachunek");
 		nowyRachunekBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				frmHctMagazyn.dispose();
 				WystawRachunek.main(null);
 			}
 		});
@@ -119,6 +123,7 @@ public class MainView {
 		JButton nowyTowarBtn = new JButton("Dodaj towar");
 		nowyTowarBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				frmHctMagazyn.dispose();
 				DodajTowar.main(null);
 			}
 		});
@@ -128,6 +133,7 @@ public class MainView {
 		JButton nowaUslugaBtn = new JButton("Dodaj usluge");
 		nowaUslugaBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				frmHctMagazyn.dispose();
 				DodajUsluge.main(null);
 			}
 		});

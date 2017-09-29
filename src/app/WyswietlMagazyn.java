@@ -36,7 +36,8 @@ public class WyswietlMagazyn {
 
 	private JFrame frame;
 	private JScrollPane scrollPane ;
-
+	JList<String> list ;
+	
 	private Helper helper;
 	private DatabaseManager DM;	
 	private JTextField tfSearch;
@@ -64,7 +65,8 @@ public class WyswietlMagazyn {
 	public WyswietlMagazyn() {
 		DM = new DatabaseManager();
 		helper = new Helper();
-		
+		list = new JList<String>();
+
 		initialize();
 		populateList();
 		
@@ -81,7 +83,6 @@ public class WyswietlMagazyn {
 			modelItems.addElement(item.toString());
 //			System.out.println(tempString);
 		}
-		JList<String> list = new JList<String>();
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		scrollPane.setViewportView(list);
@@ -176,22 +177,7 @@ public class WyswietlMagazyn {
 		JButton btnSearch = new JButton("Szukaj");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String query = "SELECT * FROM stock ";
-				if(!tfSearch.getText().equals(tfSearchText))
-					query += " WHERE item_name LIKE '%"+tfSearch.getText()+"%' ORDER BY price ASC";
-				DefaultListModel<String> modelItems = new DefaultListModel<>();
-				
-				ArrayList<Item> listOfItems = DM.getItemsList(query);
-				
-				for(int i = 0; i < listOfItems.size(); i++) {
-					Item item = listOfItems.get(i);
-					modelItems.addElement(item.toString());
-				}
-				JList<String> list = new JList<String>();
-				list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-				list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-				scrollPane.setViewportView(list);
-				list.setModel(modelItems);
+				searchInDatabase();
 			}
 		});
 		btnSearch.setForeground(new Color(255, 255, 204));
@@ -201,6 +187,11 @@ public class WyswietlMagazyn {
 		frame.getContentPane().add(btnSearch);
 		
 		JButton btnEdit = new JButton("Edytuj zaznaczone");
+		btnEdit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editRecordInDatabase();
+			}
+		});
 		btnEdit.setForeground(new Color(255, 255, 255));
 		btnEdit.setBackground(new Color(255, 102, 102));
 		btnEdit.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
@@ -214,8 +205,38 @@ public class WyswietlMagazyn {
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        	MainView.main(null);
 		        }
 		    }
 		});
+	}
+	
+	private void editRecordInDatabase() {
+		if(!list.isSelectionEmpty()){
+			String selected = (String) list.getSelectedValue();
+			EdytujTowar.main(selected);
+
+		} else if(list.isSelectionEmpty()){
+		
+		}
+	}
+
+	private void searchInDatabase() {
+		String query = "SELECT * FROM stock ";
+		if(!tfSearch.getText().equals(tfSearchText))
+			query += " WHERE item_name LIKE '%"+tfSearch.getText()+"%' ORDER BY price ASC";
+		DefaultListModel<String> modelItems = new DefaultListModel<>();
+		
+		ArrayList<Item> listOfItems = DM.getItemsList(query);
+		
+		for(int i = 0; i < listOfItems.size(); i++) {
+			Item item = listOfItems.get(i);
+			modelItems.addElement(item.toString());
+		}
+//		list = new JList<String>();
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		scrollPane.setViewportView(list);
+		list.setModel(modelItems);
 	}
 }
