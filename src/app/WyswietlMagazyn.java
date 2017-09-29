@@ -27,6 +27,10 @@ import javax.swing.JList;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ActionEvent;
 
 public class WyswietlMagazyn {
 
@@ -35,7 +39,8 @@ public class WyswietlMagazyn {
 
 	private Helper helper;
 	private DatabaseManager DM;	
-	private JTextField textField;
+	private JTextField tfSearch;
+	private final String tfSearchText = "wpisz szukaną nazwę";
 
 	/**
 	 * Launch the application.
@@ -78,7 +83,7 @@ public class WyswietlMagazyn {
 		}
 		JList<String> list = new JList<String>();
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		scrollPane.setViewportView(list);
 		list.setModel(modelItems);
 	}
@@ -99,6 +104,11 @@ public class WyswietlMagazyn {
 		frame.getContentPane().add(lblTitle);
 		
 		JButton btnNewButton = new JButton("Od\u015Bwie\u017C");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				populateList();
+			}
+		});
 		btnNewButton.setBackground(new Color(255, 255, 153));
 		btnNewButton.setForeground(new Color(0, 153, 255));
 		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
@@ -145,12 +155,45 @@ public class WyswietlMagazyn {
 		lblCost.setBounds(197, 117, 50, 19);
 		frame.getContentPane().add(lblCost);
 		
-		textField = new JTextField();
-		textField.setBounds(21, 46, 195, 24);
-		frame.getContentPane().add(textField);
-		textField.setColumns(10);
+		tfSearch = new JTextField();
+		tfSearch.setHorizontalAlignment(SwingConstants.CENTER);
+		tfSearch.setText(tfSearchText );
+		tfSearch.setBounds(21, 46, 195, 24);
+		frame.getContentPane().add(tfSearch);
+		tfSearch.setColumns(10);
+		
+		tfSearch.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	            tfSearch.setText("");
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+			}
+		});
+		
 		
 		JButton btnSearch = new JButton("Szukaj");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String query = "SELECT * FROM stock ";
+				if(!tfSearch.getText().equals(tfSearchText))
+					query += " WHERE item_name LIKE '%"+tfSearch.getText()+"%' ORDER BY price ASC";
+				DefaultListModel<String> modelItems = new DefaultListModel<>();
+				
+				ArrayList<Item> listOfItems = DM.getItemsList(query);
+				
+				for(int i = 0; i < listOfItems.size(); i++) {
+					Item item = listOfItems.get(i);
+					modelItems.addElement(item.toString());
+				}
+				JList<String> list = new JList<String>();
+				list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+				list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				scrollPane.setViewportView(list);
+				list.setModel(modelItems);
+			}
+		});
 		btnSearch.setForeground(new Color(255, 255, 204));
 		btnSearch.setBackground(new Color(0, 153, 255));
 		btnSearch.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
