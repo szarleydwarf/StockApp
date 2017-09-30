@@ -5,11 +5,15 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.SwingConstants;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
 import hct_speciale.StockItem;
+import utillity.FinalVariables;
 
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -23,18 +27,19 @@ public class EdytujTowar {
 	private JTextField tfCost;
 	private JTextField tfPrice;
 	private JTextField tfQnt;
-	private String valuesToEdit;
-
 	private StockItem item;
+
+//	private StockItem stItem;
 	private DatabaseManager dm;
+	private FinalVariables fv;
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String selected) {
+	public static void main(Item i) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					EdytujTowar window = new EdytujTowar(selected);
+					EdytujTowar window = new EdytujTowar(i);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -46,24 +51,30 @@ public class EdytujTowar {
 	/**
 	 * Create the application.
 	 */
-	public EdytujTowar(String toEdit) {
-		this.valuesToEdit = toEdit;
-		getItemFromString();
-		
+	public EdytujTowar(Item i) {
+		this.item = (StockItem) i;
+		this.item.print();
+		this.fv = new FinalVariables();
 		initialize();
+		populateTextFields();
 	}
 
-	private void getItemFromString() {
-		String name = this.valuesToEdit.substring(0, this.valuesToEdit.indexOf("  "));
-		String temp =  this.valuesToEdit.substring(this.valuesToEdit.indexOf("  "),valuesToEdit.indexOf("."));
-		System.out.println("1 "+temp);
-		temp =  this.valuesToEdit.substring(this.valuesToEdit.indexOf(".")+1,this.valuesToEdit.indexOf("  "));
-		System.out.println("2 "+temp);
+	private void populateTextFields() {
+		if(!this.item.getStockNumber().isEmpty())
+			this.tfStockNum.setText(this.item.getStockNumber());
 		
-//		double price = Double.parseDouble(temp);
-//		System.out.println(name + " "+price);
+		if(!this.item.getName().isEmpty())
+			this.tfName.setText(this.item.getName());
 		
-//		item = new StockItem(valuesToEdit, valuesToEdit, 0, 0, 0);
+		if(!Double.toString(this.item.getCost()).isEmpty())
+			this.tfCost.setText(Double.toString(this.item.getCost()));
+		
+		if(!Double.toString(this.item.getPrice()).isEmpty())
+			this.tfPrice.setText(Double.toString(this.item.getPrice()));
+		
+		if(!Integer.toString(this.item.getQnt()).isEmpty())
+			this.tfQnt.setText(Integer.toString(this.item.getQnt()));
+		
 		
 	}
 
@@ -73,7 +84,18 @@ public class EdytujTowar {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 579, 193);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(frame, 
+		            fv.CLOSE_WINDOW, fv.CLOSE_WINDOW, 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		        	MainView.main(null);
+		        }
+		    }
+		});
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblTitle = new JLabel("Edycja przedmiotu");
@@ -83,7 +105,9 @@ public class EdytujTowar {
 		frame.getContentPane().add(lblTitle);
 		
 		tfStockNum = new JTextField();
-		tfStockNum.setBounds(10, 68, 100, 24);
+		tfStockNum.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		tfStockNum.setHorizontalAlignment(SwingConstants.RIGHT);
+		tfStockNum.setBounds(10, 68, 86, 24);
 		frame.getContentPane().add(tfStockNum);
 		tfStockNum.setColumns(10);
 		
@@ -94,42 +118,48 @@ public class EdytujTowar {
 		
 		tfName = new JTextField();
 		tfName.setColumns(10);
-		tfName.setBounds(120, 68, 100, 24);
+		tfName.setBounds(106, 68, 234, 24);
 		frame.getContentPane().add(tfName);
 		
 		JLabel lblName = new JLabel("Nazwa");
 		lblName.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblName.setBounds(120, 49, 86, 14);
+		lblName.setBounds(106, 49, 86, 14);
 		frame.getContentPane().add(lblName);
 		
 		tfCost = new JTextField();
+		tfCost.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		tfCost.setHorizontalAlignment(SwingConstants.RIGHT);
 		tfCost.setColumns(10);
-		tfCost.setBounds(228, 68, 100, 24);
+		tfCost.setBounds(350, 68, 60, 24);
 		frame.getContentPane().add(tfCost);
 		
 		JLabel lblCost = new JLabel("Koszt");
 		lblCost.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblCost.setBounds(228, 49, 86, 14);
+		lblCost.setBounds(350, 49, 60, 14);
 		frame.getContentPane().add(lblCost);
 		
 		tfPrice = new JTextField();
+		tfPrice.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		tfPrice.setHorizontalAlignment(SwingConstants.RIGHT);
 		tfPrice.setColumns(10);
-		tfPrice.setBounds(338, 67, 100, 24);
+		tfPrice.setBounds(418, 68, 60, 24);
 		frame.getContentPane().add(tfPrice);
 		
 		JLabel lblPrice = new JLabel("Cena");
 		lblPrice.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblPrice.setBounds(338, 48, 86, 14);
+		lblPrice.setBounds(418, 49, 60, 14);
 		frame.getContentPane().add(lblPrice);
 		
 		tfQnt = new JTextField();
+		tfQnt.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		tfQnt.setHorizontalAlignment(SwingConstants.RIGHT);
 		tfQnt.setColumns(10);
-		tfQnt.setBounds(448, 68, 100, 24);
+		tfQnt.setBounds(488, 68, 60, 24);
 		frame.getContentPane().add(tfQnt);
 		
 		JLabel lblQnt = new JLabel("Ilo\u015B\u0107");
 		lblQnt.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblQnt.setBounds(448, 49, 86, 14);
+		lblQnt.setBounds(488, 49, 60, 14);
 		frame.getContentPane().add(lblQnt);
 		
 		JButton btnNewButton = new JButton("Zapisz");

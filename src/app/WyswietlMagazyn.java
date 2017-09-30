@@ -16,6 +16,7 @@ import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
+import utillity.FinalVariables;
 import utillity.Helper;
 
 import javax.swing.BorderFactory;
@@ -42,7 +43,8 @@ public class WyswietlMagazyn {
 	private DatabaseManager DM;	
 	private JTextField tfSearch;
 	private final String tfSearchText = "wpisz szukaną nazwę";
-
+	private ArrayList<Item> listOfItems;
+	private FinalVariables fv;
 	/**
 	 * Launch the application.
 	 */
@@ -66,6 +68,8 @@ public class WyswietlMagazyn {
 		DM = new DatabaseManager();
 		helper = new Helper();
 		list = new JList<String>();
+		this.listOfItems = new ArrayList<Item>();
+		this.fv = new FinalVariables();
 
 		initialize();
 		populateList();
@@ -76,10 +80,11 @@ public class WyswietlMagazyn {
 		String query = "SELECT * from stock ORDER BY item_name ASC";//item_name, cost, price,quantity
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
-		ArrayList<Item> listOfItems = DM.getItemsList(query);
+		listOfItems = DM.getItemsList(query);
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
 			Item item = listOfItems.get(i);
+			item.print();
 			modelItems.addElement(item.toString());
 //			System.out.println(tempString);
 		}
@@ -201,8 +206,8 @@ public class WyswietlMagazyn {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		        if (JOptionPane.showConfirmDialog(frame, 
-		            "Are you sure to close this window?", "Really Closing?", 
-		            JOptionPane.YES_NO_OPTION,
+			        fv.CLOSE_WINDOW, fv.CLOSE_WINDOW, 
+			        JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		        	MainView.main(null);
@@ -213,11 +218,13 @@ public class WyswietlMagazyn {
 	
 	private void editRecordInDatabase() {
 		if(!list.isSelectionEmpty()){
-			String selected = (String) list.getSelectedValue();
-			EdytujTowar.main(selected);
+			int index = list.getSelectedIndex();
+			Item i = this.listOfItems.get(index);
+			
+			EdytujTowar.main(i);
 
 		} else if(list.isSelectionEmpty()){
-		
+			JOptionPane.showMessageDialog(null, "Zaznacz przedmiot do edycji");
 		}
 	}
 

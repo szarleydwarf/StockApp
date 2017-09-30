@@ -155,6 +155,8 @@ public class DatabaseManager {
 		}
 		return new Item(stNum, itName, cost, price);
 	}
+	
+	
 	public ArrayList<Item> getItemsList(String query){
 		conn = this.connect();
 		ArrayList<Item> list = new ArrayList<Item>();

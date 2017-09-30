@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import dbase.DatabaseManager;
+import utillity.FinalVariables;
 import utillity.Helper;
 
 public class DodajTowar {
@@ -35,6 +36,7 @@ public class DodajTowar {
 
 	private Helper helper;
 	private DatabaseManager dm = null;
+	private FinalVariables fv;
 	
 
 	/**
@@ -69,6 +71,7 @@ public class DodajTowar {
 			stockNum = "AAA0000";
 		
 		helper.getIntFromStNo(stockNum, 'A');
+		this.fv = new FinalVariables();
 		
 		initialize();
 	}
@@ -88,7 +91,7 @@ public class DodajTowar {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		        if (JOptionPane.showConfirmDialog(frame, 
-		            "Are you sure to close this window?", "Really Closing?", 
+		            fv.CLOSE_WINDOW, fv.CLOSE_WINDOW, 
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

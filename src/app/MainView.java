@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
+import utillity.FinalVariables;
 
 import java.awt.Toolkit;
 import javax.swing.JButton;
@@ -22,6 +23,8 @@ public class MainView {
 	
 	private DatabaseManager DM;
 	private int invoiceNum;
+
+	private FinalVariables fv;
 	/**
 	 * Launch the application.
 	 */
@@ -49,6 +52,7 @@ public class MainView {
 //		ArrayList<Item> list = DM.getItemsList("SELECT * From services ");
 //		for(int i = 0; i < list.size();i++)
 //			list.get(i).print();
+		this.fv = new FinalVariables();
 		
 		initialize();
 	}
@@ -70,7 +74,7 @@ public class MainView {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		        if (JOptionPane.showConfirmDialog(frmHctMagazyn, 
-		            "Are you sure to close this window?", "Really Closing?", 
+			            fv.CLOSE_WINDOW, fv.CLOSE_WINDOW, 
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frmHctMagazyn.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
