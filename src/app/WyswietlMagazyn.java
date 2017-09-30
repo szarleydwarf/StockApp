@@ -84,7 +84,6 @@ public class WyswietlMagazyn {
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
 			Item item = listOfItems.get(i);
-			item.print();
 			modelItems.addElement(item.toString());
 //			System.out.println(tempString);
 		}

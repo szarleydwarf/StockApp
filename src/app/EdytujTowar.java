@@ -14,6 +14,7 @@ import dbase.DatabaseManager;
 import hct_speciale.Item;
 import hct_speciale.StockItem;
 import utillity.FinalVariables;
+import utillity.Helper;
 
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -32,6 +33,12 @@ public class EdytujTowar {
 //	private StockItem stItem;
 	private DatabaseManager dm;
 	private FinalVariables fv;
+	private Helper helper;
+	
+	private String stockNum, productName="", cost="", price="", qnt="";
+	private double dCost = 0, dPrice = 0;
+	private int iQnt = 0;
+	private boolean varEmpty = true;
 	/**
 	 * Launch the application.
 	 */
@@ -53,8 +60,11 @@ public class EdytujTowar {
 	 */
 	public EdytujTowar(Item i) {
 		this.item = (StockItem) i;
-		this.item.print();
+
 		this.fv = new FinalVariables();
+		helper = new Helper();
+		this.dm = new DatabaseManager();
+
 		initialize();
 		populateTextFields();
 	}
@@ -165,7 +175,9 @@ public class EdytujTowar {
 		JButton btnNewButton = new JButton("Zapisz");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				zapiszWBazieDanych();
+				varEmpty = getVariableForQuery();
+				if(!varEmpty)
+					zapiszWBazieDanych();
 			}
 		});
 		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
@@ -174,7 +186,49 @@ public class EdytujTowar {
 	}
 
 	protected void zapiszWBazieDanych() {
-		// TODO Auto-generated method stub
-		
+		String query  = "UPDATE \"stock\" SET item_name='"+this.productName+"', cost='"+this.dCost+"', price='"+this.dPrice+"', quantity='"+this.iQnt+"' WHERE stock_number='"+this.item.getStockNumber()+"'"; 
+		System.out.println("Q: "+query);
+		boolean saved = dm.editRecord(query);
+		if(saved){
+			JOptionPane.showMessageDialog(null, "Edycja zakończona pomyślnie");
+			this.frame.dispose();
+		} else
+			JOptionPane.showMessageDialog(null, "Błąd zapisu");
+
 	}
+	
+	private boolean getVariableForQuery() {
+//		this.stockNum = this.tfStockNum.getText();
+//		if(this.stockNum.isEmpty()) {
+//			JOptionPane.showMessageDialog(null, "Błędny numer magazynowy.");
+//			return true;
+//		}
+		
+		this.productName = this.tfName.getText();
+		if(this.productName.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Wpisz nazwe produktu");
+			return true;
+		}
+		
+		this.cost = this.tfCost.getText();
+		if(this.dCost == 0){
+			this.dCost = this.helper.checkDouble("Wpisz koszt",  "Niepoprawny format kosztu", this.cost);
+			return true;
+		}
+	
+		this.price = this.tfPrice.getText();
+		if(this.dPrice == 0) {
+			this.dPrice = helper.checkDouble("Wpisz cene", "Niepoprawny format ceny", this.price);
+			return true;
+		}
+	
+		this.qnt = this.tfQnt.getText();
+		if(this.iQnt == 0){
+			this.iQnt = this.helper.checkInteger("Wpisz ilość","Niepoprawny format ilosci", this.qnt);
+			return true;
+		}
+	
+		return false;	
+	}
+
 }
