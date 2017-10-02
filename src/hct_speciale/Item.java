@@ -83,6 +83,7 @@ public class Item {
 			paddLng+=3;
 		
 		toReturn = this.getHelper().paddStringRight(toReturn, paddLng, getPaddingChar());
+//		System.out.println("1: paddL "+paddLng+" retL "+toReturn.length()+"\n"+this.getName().length());
 		
 		toReturn += this.getCost();
 		if(Double.toString(this.getCost()).length() > 3)
@@ -91,6 +92,7 @@ public class Item {
 			paddLng = paddLng + (paddLng/2) + 4;
 		
 		toReturn = this.getHelper().paddStringRight(toReturn, paddLng, getPaddingChar());
+//		System.out.println("2: paddL "+paddLng+" retL "+toReturn.length()+"\n");
 		
 		toReturn += this.getPrice();
 		return toReturn;

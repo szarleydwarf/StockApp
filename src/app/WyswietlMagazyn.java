@@ -16,6 +16,7 @@ import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
+import hct_speciale.StockItem;
 import utillity.FinalVariables;
 import utillity.Helper;
 
@@ -43,7 +44,7 @@ public class WyswietlMagazyn {
 	private DatabaseManager DM;	
 	private JTextField tfSearch;
 	private final String tfSearchText = "wpisz szukaną nazwę";
-	private ArrayList<Item> listOfItems;
+	private ArrayList<Item> listOfItems, listOfServices;
 	private FinalVariables fv;
 	/**
 	 * Launch the application.
@@ -55,6 +56,7 @@ public class WyswietlMagazyn {
 					WyswietlMagazyn window = new WyswietlMagazyn();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "Coś poszło nie tak\n"+e.getMessage());
 					e.printStackTrace();
 				}
 			}
@@ -78,14 +80,19 @@ public class WyswietlMagazyn {
 
 	private void populateList() {
 		String query = "SELECT * from stock ORDER BY item_name ASC";//item_name, cost, price,quantity
+		String queryServices = "SELECT * from services ORDER BY service_name ASC";//item_name, cost, price,quantity
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		listOfItems = DM.getItemsList(query);
+		listOfServices = DM.getItemsList(queryServices);
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
-			Item item = listOfItems.get(i);
+			StockItem item = (StockItem) listOfItems.get(i);
 			modelItems.addElement(item.toString());
-//			System.out.println(tempString);
+		}
+		for(int i = 0; i < listOfServices.size(); i++) {
+			Item item = (Item) listOfServices.get(i);
+			modelItems.addElement(item.toString());
 		}
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -217,10 +224,18 @@ public class WyswietlMagazyn {
 	
 	private void editRecordInDatabase() {
 		if(!list.isSelectionEmpty()){
+			int listsLength = this.listOfItems.size() + this.listOfServices.size();
 			int index = list.getSelectedIndex();
-			Item i = this.listOfItems.get(index);
-			
-			EdytujTowar.main(i);
+			Item i = null;
+			if(index <= this.listOfItems.size())
+				i = this.listOfItems.get(index);
+			else if(index <= listsLength){
+				i = this.listOfServices.get(listsLength - index);
+			}
+			if(i != null)
+				EdytujTowar.main(i);
+			else
+				JOptionPane.showMessageDialog(null, this.fv.WINDOW_ERROR);
 
 		} else if(list.isSelectionEmpty()){
 			JOptionPane.showMessageDialog(null, "Zaznacz przedmiot do edycji");

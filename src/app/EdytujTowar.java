@@ -28,7 +28,7 @@ public class EdytujTowar {
 	private JTextField tfCost;
 	private JTextField tfPrice;
 	private JTextField tfQnt;
-	private StockItem item;
+	private Item item;
 
 //	private StockItem stItem;
 	private DatabaseManager dm;
@@ -59,7 +59,7 @@ public class EdytujTowar {
 	 * Create the application.
 	 */
 	public EdytujTowar(Item i) {
-		this.item = (StockItem) i;
+		this.item = (Item) i;
 
 		this.fv = new FinalVariables();
 		helper = new Helper();
@@ -82,9 +82,10 @@ public class EdytujTowar {
 		if(!Double.toString(this.item.getPrice()).isEmpty())
 			this.tfPrice.setText(Double.toString(this.item.getPrice()));
 		
-		if(!Integer.toString(this.item.getQnt()).isEmpty())
-			this.tfQnt.setText(Integer.toString(this.item.getQnt()));
-		
+		if(this.item instanceof StockItem) {
+			if(!Integer.toString(((StockItem) this.item).getQnt()).isEmpty())
+				this.tfQnt.setText(Integer.toString(((StockItem) this.item).getQnt()));
+		}
 		
 	}
 
