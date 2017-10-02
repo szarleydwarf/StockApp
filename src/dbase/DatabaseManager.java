@@ -155,6 +155,8 @@ public class DatabaseManager {
 		}
 		return new Item(stNum, itName, cost, price);
 	}
+	
+	
 	public ArrayList<Item> getItemsList(String query){
 		conn = this.connect();
 		ArrayList<Item> list = new ArrayList<Item>();
@@ -247,7 +249,6 @@ public class DatabaseManager {
 				}
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try{
@@ -370,4 +371,58 @@ public class DatabaseManager {
 			}
 		}
 	}
+	public boolean editRecord(String query) {
+		conn = this.connect();
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		if(this.conn == null)
+			conn = this.connect();
+		try {
+			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+		} catch (SQLException e) {
+			System.out.println("E "+e.getMessage());
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			int inserted = pst.executeUpdate();
+			
+			rs = pst.getGeneratedKeys();
+			if(inserted != 1){
+				this.conn.rollback();
+			} 
+			
+			conn.commit();
+			
+			if(inserted != 0)
+				return true;
+
+		} catch (SQLException e1) {
+			try{
+				if(this.conn != null){
+					this.conn.rollback();
+				}
+			} catch ( SQLException e2){
+				System.out.println("E2 "+e2.getMessage());
+			}
+			System.out.println("E1 "+e1.getMessage());
+		}	finally {
+			try{
+	               if (rs != null) {
+	                    rs.close();
+	                }
+	                if (pst != null) {
+	                    pst.close();
+	                }
+	                if (conn != null) {
+	                    conn.close();
+	                }
+			} catch (Exception e3){
+				System.out.println("E3 "+e3.getMessage());
+			}
+		}
+		return false;
+		}
 }

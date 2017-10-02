@@ -31,7 +31,6 @@ public class StockItem extends Item{
 			paddLng = toReturn.length()+10;
 
 		toReturn = this.getHelper().paddStringRight(toReturn, paddLng, getPaddingChar());
-//		System.out.println("2: paddL "+paddLng+" retL "+toReturn.length()+"\n");
 		toReturn += this.qnt;
 		
 		return toReturn;
