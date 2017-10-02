@@ -187,9 +187,23 @@ public class EdytujTowar {
 	}
 
 	protected void zapiszWBazieDanych() {
-		String query  = "UPDATE \"stock\" SET item_name='"+this.productName+"', cost='"+this.dCost+"', price='"+this.dPrice+"', quantity='"+this.iQnt+"' WHERE stock_number='"+this.item.getStockNumber()+"'"; 
+		String tableName = "", addToQuery = "", columnName="", colNameToSet="";
+		if(this.item instanceof StockItem) {
+			tableName = "stock";
+			addToQuery = ", quantity='"+this.iQnt+"'";
+			columnName = "stock_number";
+			colNameToSet = "item_name";
+		} else {
+			tableName = "services";
+			columnName = "service_number";
+			colNameToSet = "service_name";
+		}
+		String query  = "UPDATE \""+tableName+"\" SET "+colNameToSet+"='"+this.productName+"', cost='"+this.dCost+"', price='"+this.dPrice+"'";
+		query += (addToQuery);
+		query += " WHERE "+columnName+"='"+this.item.getStockNumber()+"'";
+		
 		System.out.println("Q: "+query);
-		boolean saved = dm.editRecord(query);
+		boolean saved =  dm.editRecord(query);
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Edycja zakończona pomyślnie");
 			this.frame.dispose();
@@ -204,31 +218,41 @@ public class EdytujTowar {
 //			JOptionPane.showMessageDialog(null, "Błędny numer magazynowy.");
 //			return true;
 //		}
-		
+		System.out.println("1");
 		this.productName = this.tfName.getText();
 		if(this.productName.isEmpty()) {
+			System.out.println("2");
 			JOptionPane.showMessageDialog(null, "Wpisz nazwe produktu");
 			return true;
 		}
 		
 		this.cost = this.tfCost.getText();
-		if(this.dCost == 0){
+		if(!this.cost.isEmpty()){
+			System.out.println("3");
 			this.dCost = this.helper.checkDouble("Wpisz koszt",  "Niepoprawny format kosztu", this.cost);
-			return true;
+			if(this.dCost == 0)
+				return true;
 		}
 	
 		this.price = this.tfPrice.getText();
-		if(this.dPrice == 0) {
+		if(!this.price.isEmpty()) {
+			System.out.println("4");
 			this.dPrice = helper.checkDouble("Wpisz cene", "Niepoprawny format ceny", this.price);
-			return true;
+			if(this.dPrice == 0)
+				return true;
 		}
 	
-		this.qnt = this.tfQnt.getText();
-		if(this.iQnt == 0){
-			this.iQnt = this.helper.checkInteger("Wpisz ilość","Niepoprawny format ilosci", this.qnt);
-			return true;
+		if(this.item instanceof StockItem) {
+			System.out.println("5");
+			this.qnt = this.tfQnt.getText();
+			if(!this.qnt.isEmpty()){
+				System.out.println("6");
+				this.iQnt = this.helper.checkInteger("Wpisz ilość","Niepoprawny format ilosci", this.qnt);
+				if(this.iQnt == 0)
+					return true;
+			}
 		}
-	
+		System.out.println("7");
 		return false;	
 	}
 

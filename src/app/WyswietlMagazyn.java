@@ -227,11 +227,14 @@ public class WyswietlMagazyn {
 			int listsLength = this.listOfItems.size() + this.listOfServices.size();
 			int index = list.getSelectedIndex();
 			Item i = null;
-			if(index <= this.listOfItems.size())
+
+			if(index < this.listOfItems.size())
 				i = this.listOfItems.get(index);
-			else if(index <= listsLength){
-				i = this.listOfServices.get(listsLength - index);
+			else if(index < listsLength){
+				index -= this.listOfItems.size();
+				i = this.listOfServices.get(index);
 			}
+			
 			if(i != null)
 				EdytujTowar.main(i);
 			else
