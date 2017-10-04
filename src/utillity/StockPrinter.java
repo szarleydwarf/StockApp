@@ -13,8 +13,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -64,6 +66,7 @@ public class StockPrinter  { //implements Printable
 	private Helper helper;
 	private DatabaseManager DM;
 	private ArrayList<String> stockServicesNumber;
+	private boolean jobDone = false;
 	
 	public StockPrinter(){
 		DM = new DatabaseManager();
@@ -76,7 +79,7 @@ public class StockPrinter  { //implements Printable
 		this.stockServicesNumber = new ArrayList<String>();
 	}
 	
-	public void printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
+	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		this.df = new DecimalFormat("#.##"); 
 		this.md = (DefaultListModel)list.getModel();
 		this.discount = discount;
@@ -87,17 +90,22 @@ public class StockPrinter  { //implements Printable
 		this.invNo = invoiceNum;
 		
 		this.date = helper.getFormatedDate();
-//		System.out.println("Printing "+discount+" "+applyDiscount);
+		System.out.println("Printing "+this.carManufacturer+" "+this.carRegistration);
 		generatePDF();
 
 		printPDF(docPath);
 
 		createAccountancCopy();
 		saveEntryToDatabase();
+		return jobDone ;
 	}
 
 
 	private void saveEntryToDatabase() throws SQLException {
+		Calendar today = Calendar.getInstance();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String todayDate = dateFormat.format(today.getTime());
+		
 		String servNo = "", itemNo = "";
 		for(String s : stockServicesNumber){
 			if(s.contains("AAA")){
@@ -115,13 +123,16 @@ public class StockPrinter  { //implements Printable
 		while(i<timeout){
 			i++;
 		}
-		String query = "INSERT INTO \"invoices\"  VALUES ("+this.invNo+",'"+this.carManufacturer+"','"+servNo+"','"+itemNo +"',"+sum    +");";
+		String query = "INSERT INTO \"invoice_list\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +","+todayDate    +");";
+		System.out.println("Q: "+query);
 		
 		boolean succes = DM.addNewRecord(query);
 		if(succes){
 			JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
+			this.jobDone = true;
 		}else{
 			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
+			this.jobDone = false;
 		}
 	}
 
@@ -305,7 +316,8 @@ public class StockPrinter  { //implements Printable
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
-        
+        //TODO
+        //Uncomment bellow
 //        job.print();
         
         document.close();

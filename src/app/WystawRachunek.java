@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -26,6 +28,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import dbase.DatabaseManager;
 import utillity.FinalVariables;
@@ -51,11 +55,13 @@ public class WystawRachunek {
 	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
 	private boolean applyDiscount = true;
+	private boolean printed = false;
 	private DecimalFormat df;
 	
 	private Helper helper;
 	private DatabaseManager DM;	
 	private FinalVariables fv;
+	private String lblCarManufacturerTxt = "Car manufacturer";
 
 	/**
 	 * Launch the application.
@@ -82,19 +88,9 @@ public class WystawRachunek {
 		helper = new Helper();
 		fv = new FinalVariables();
 		
-		String query = "SELECT invoice_number from invoices ORDER BY invoice_number DESC LIMIT 1";
-		ResultSet rs;
-		try {
-			rs = DM.selectRecord(query);
-			if(!rs.equals(null))
-				invoiceNum = rs.getInt(1);
-			else
-				invoiceNum = 1;
-
-//			System.out.println("invNum "+invoiceNum);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
+		invoiceNum = DM.getLastInvoiceNumber();
+		if(invoiceNum == 0)
+			invoiceNum++;
 
 		try {
 			initialize();
@@ -107,7 +103,7 @@ public class WystawRachunek {
 	 * Initialize the contents of the frame.
 	 * @throws Exception 
 	 */
-	private void initialize() throws Exception {
+	private void initialize() throws Exception {		
 		df = new DecimalFormat("#.##"); 
 		frmNowyRachunek = new JFrame();
 		
@@ -196,15 +192,19 @@ public class WystawRachunek {
 				
 		JButton btnPrint = new JButton("Drukuj rachunek");
 		btnPrint.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent arg0) {
 				
 				sPrinter = new StockPrinter();
 				try {
 					invoiceNum += 1;
 					registration = textFieldRegistration.getText();
-					if(!lblTotal.getText().equals(lblTotalSt))
-						sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
-					else
+					if(!lblTotal.getText().equals(lblTotalSt)) {
+						printed = sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
+						if(printed)
+							frmNowyRachunek.dispose();
+						
+					} else
 						JOptionPane.showMessageDialog(frmNowyRachunek, "Nie przeliczyles wyniku");
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -273,7 +273,7 @@ public class WystawRachunek {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		        if (JOptionPane.showConfirmDialog(frmNowyRachunek, 
-		            "Are you sure to close this window?", "Really Closing?", 
+		        		fv.CLOSE_WINDOW, fv.CLOSE_WINDOW,  
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frmNowyRachunek.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -283,6 +283,7 @@ public class WystawRachunek {
 		});
 	}
 	
+
 	private void sumCosts() {
 		JButton btnCalculate = new JButton("Policz = ");
 		
@@ -333,7 +334,7 @@ public class WystawRachunek {
 		scrollPaneCarList.setBounds(164, 11, 194, 78);
 		frmNowyRachunek.getContentPane().add(scrollPaneCarList);
 
-		JLabel lblCarManufacturer = new JLabel("Car manufacturer");
+		JLabel lblCarManufacturer = new JLabel(lblCarManufacturerTxt );
 		lblCarManufacturer.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
 		lblCarManufacturer.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCarManufacturer.setBounds(439, 16, 242, 45);
@@ -343,21 +344,18 @@ public class WystawRachunek {
 		JList listCars = new JList();
 		listCars.setModel(modelCars);
 		scrollPaneCarList.setViewportView(listCars);
-
-		JButton btnAddCustomer = new JButton("+");
-		btnAddCustomer.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				char ch = '_';
-				carManufacturer = (String) listCars.getSelectedValue();
-//				System.out.println(carManufacturer);
-				lblCarManufacturer.setText(carManufacturer);
-				}
-		});
-		btnAddCustomer.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnAddCustomer.setBounds(379, 16, 50, 24);
-//		lblCarManufacturer.setText(carManufacturer);
-		frmNowyRachunek.getContentPane().add(btnAddCustomer);
 		
+		listCars.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent listSelectionEvent) {
+				if(!listCars.isSelectionEmpty()){
+					lblCarManufacturer.setText((String) listCars.getSelectedValue());
+				} else {
+					lblCarManufacturer.setText(lblCarManufacturerTxt);
+				}
+			}
+			
+		});		
 		
 		JLabel labelQuantity = new JLabel("Quantity");
 		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));

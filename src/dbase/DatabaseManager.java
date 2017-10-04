@@ -92,7 +92,6 @@ public class DatabaseManager {
 	}
 	
 	public boolean deleteRecord(String query) throws SQLException{
-		System.out.println("deleting record\n"+query);
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		if(this.conn == null)
@@ -269,12 +268,110 @@ public class DatabaseManager {
 		}
 		return new StockItem(stNum, itName, cost, price, qnt);
 		}
+	
+	public int getLastInvoiceNumber(){
+		String query = "SELECT invoice_number from invoice_list ORDER BY invoice_number DESC LIMIT 1";
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		if(this.conn == null)
+			conn = this.connect();
+			try {
+				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+			} catch (SQLException e) {
+				System.out.println("E "+e.getMessage());
+			}
+			
+			try {
+				conn.setAutoCommit(false);
+				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			
+				rs = pst.executeQuery();
+				
+				while(rs.next()){
+					
+//					System.out.println("inv db "+rs.getInt("invoice_number"));
+					return rs.getInt(1);
+				}
+			} catch (SQLException e1) {
+				try{
+					if(this.conn != null){
+						this.conn.rollback();
+					}
+				} catch ( SQLException e2){
+					System.out.println("E2 "+e2.getMessage());
+				}
+				System.out.println("E1 "+e1.getMessage());
+			}	finally {
+				try{
+		               if (rs != null) {
+		                    rs.close();
+		                }
+		                if (pst != null) {
+		                    pst.close();
+		                }
+		                if (conn != null) {
+		                    conn.close();
+		                }
+				} catch (Exception e3){
+					System.out.println("E3 "+e3.getMessage());
+				}
+			}
+		return 0;
+	}
+	
 	public ResultSet selectRecord(String query) throws SQLException{
-		conn = this.connect();
-		PreparedStatement pst = conn.prepareStatement(query);		
-
-		ResultSet rs = pst.executeQuery();
-		return rs;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		if(this.conn == null)
+			conn = this.connect();
+			try {
+				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+			} catch (SQLException e) {
+				System.out.println("E "+e.getMessage());
+			}
+			
+			try {
+				conn.setAutoCommit(false);
+				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			
+				rs = pst.executeQuery();
+				
+//				rs = pst.getGeneratedKeys();
+//				if(rs == null){
+//					this.conn.rollback();
+//				} 
+//				conn.commit();
+						
+//				if(rs != null)
+					return rs;
+			
+		} catch (SQLException e1) {
+			try{
+				if(this.conn != null){
+					this.conn.rollback();
+				}
+			} catch ( SQLException e2){
+				System.out.println("E2 "+e2.getMessage());
+			}
+			System.out.println("E1 "+e1.getMessage());
+		}	finally {
+			try{
+//	               if (rs != null) {
+//	                    rs.close();
+//	                }
+	                if (pst != null) {
+	                    pst.close();
+	                }
+	                if (conn != null) {
+	                    conn.close();
+	                }
+			} catch (Exception e3){
+				System.out.println("E3 "+e3.getMessage());
+			}
+		}
+		return null;
 	}	
 	
 	public ArrayList<String> selectRecordArrayList(String query){// throws SQLException{
