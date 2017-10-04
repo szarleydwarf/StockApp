@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.awt.Toolkit;
+
 import javax.swing.SwingConstants;
 
 import dbase.DatabaseManager;
@@ -94,6 +96,7 @@ public class EdytujTowar {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 579, 193);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override

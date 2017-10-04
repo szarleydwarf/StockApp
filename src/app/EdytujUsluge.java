@@ -1,12 +1,16 @@
 package app;
 
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
+
+import utillity.FinalVariables;
 
 public class EdytujUsluge {
 
 	private JFrame frame;
+	private FinalVariables fv;
 
 	/**
 	 * Launch the application.
@@ -28,6 +32,7 @@ public class EdytujUsluge {
 	 * Create the application.
 	 */
 	public EdytujUsluge() {
+		this.fv = new FinalVariables();
 		initialize();
 	}
 
@@ -36,6 +41,7 @@ public class EdytujUsluge {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}

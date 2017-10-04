@@ -28,6 +28,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
+import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.StockPrinter;
 
@@ -54,6 +55,7 @@ public class WystawRachunek {
 	
 	private Helper helper;
 	private DatabaseManager DM;	
+	private FinalVariables fv;
 
 	/**
 	 * Launch the application.
@@ -78,6 +80,7 @@ public class WystawRachunek {
 	public WystawRachunek() throws SQLException {
 		DM = new DatabaseManager();
 		helper = new Helper();
+		fv = new FinalVariables();
 		
 		String query = "SELECT invoice_number from invoices ORDER BY invoice_number DESC LIMIT 1";
 		ResultSet rs;
@@ -108,7 +111,7 @@ public class WystawRachunek {
 		df = new DecimalFormat("#.##"); 
 		frmNowyRachunek = new JFrame();
 		
-		frmNowyRachunek.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png"));
+		frmNowyRachunek.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frmNowyRachunek.setTitle("Nowy Rachunek - HCT");
 		frmNowyRachunek.setBounds(100, 100, 769, 606);
 		frmNowyRachunek.getContentPane().setLayout(null);
@@ -266,17 +269,18 @@ public class WystawRachunek {
 
 		sumCosts();
 		
-//		frmNowyRachunek.addWindowListener(new java.awt.event.WindowAdapter() {
-//		    @Override
-//		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-//		        if (JOptionPane.showConfirmDialog(frmNowyRachunek, 
-//		            "Are you sure to close this window?", "Really Closing?", 
-//		            JOptionPane.YES_NO_OPTION,
-//		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-//		        	frmNowyRachunek.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//		        }
-//		    }
-//		});
+		frmNowyRachunek.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(frmNowyRachunek, 
+		            "Are you sure to close this window?", "Really Closing?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		        	frmNowyRachunek.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        	MainView.main(null);
+		        }
+		    }
+		});
 	}
 	
 	private void sumCosts() {

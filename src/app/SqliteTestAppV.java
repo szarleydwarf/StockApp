@@ -8,6 +8,8 @@ import javax.swing.JFrame;
 
 import dbase.DatabaseManager;
 import dbase.UserManager;
+import utillity.FinalVariables;
+
 import java.awt.Color;
 import java.awt.Toolkit;
 import javax.swing.JLabel;
@@ -25,6 +27,7 @@ public class SqliteTestAppV {
 	private JFrame frmHctApp;
 	private JTextField username;
 	private JPasswordField password;
+	private FinalVariables fv;
 	
 	private static DatabaseManager DM;
 	private static UserManager UM;
@@ -62,6 +65,7 @@ public class SqliteTestAppV {
 	 * Create the application.
 	 */
 	public SqliteTestAppV() {
+		this.fv = new FinalVariables();
 		initialize();
 	}
 
@@ -72,7 +76,7 @@ public class SqliteTestAppV {
 		frmHctApp = new JFrame();
 		frmHctApp.setTitle("HCT APP");
 		frmHctApp.setResizable(false);
-		frmHctApp.setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png"));
+		frmHctApp.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frmHctApp.setBackground(Color.RED);
 		frmHctApp.setBounds(100, 100, 450, 243);
 		frmHctApp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
