@@ -6,17 +6,22 @@ import java.sql.SQLException;
 import javax.crypto.SecretKey;
 import javax.swing.JOptionPane;
 
+import utillity.FinalVariables;
+
 public class UserManager {
 	private DatabaseManager DM = null;
 	private EncryptionClass EC = null;
+	private FinalVariables fv = null;
+	
 	public boolean login(String username, String password) throws SQLException{
 		DM = new DatabaseManager();
 		EC = new EncryptionClass();
+		fv = new FinalVariables();
 		String passEncoded = "";
 		String salt = "";
 		boolean isLogingin = false;
 		
-		String saltQuery = "Select salt from users where nick=\""+username+"\"";
+		String saltQuery = "Select salt from "+this.fv.USERS_TABLE+" where nick=\""+username+"\"";
 		ResultSet rs = DM.selectRecord(saltQuery);
 		int i=0;
 		while(rs.next()) {
@@ -39,7 +44,7 @@ public class UserManager {
 		}
 		
 		
-		String query = "select * from users where nick=\""+username+"\" and password=\""+passEncoded+"\" ";
+		String query = "select * from "+this.fv.USERS_TABLE+" where nick=\""+username+"\" and password=\""+passEncoded+"\" ";
 //		System.out.println(query);
 		ResultSet rsq = DM.selectRecord(query);
 		int count = 0;

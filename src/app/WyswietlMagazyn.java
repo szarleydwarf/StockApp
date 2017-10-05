@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
@@ -79,8 +82,8 @@ public class WyswietlMagazyn {
 	}
 
 	private void populateList() {
-		String query = "SELECT * from stock ORDER BY item_name ASC";//item_name, cost, price,quantity
-		String queryServices = "SELECT * from services ORDER BY service_name ASC";//item_name, cost, price,quantity
+		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_ITEM_NAME+" ASC";//item_name, cost, price,quantity
+		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+this.fv.SERVICES_TABLE_SERVICE_NAME+" ASC";//item_name, cost, price,quantity
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		listOfItems = DM.getItemsList(query);
@@ -105,6 +108,7 @@ public class WyswietlMagazyn {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 587, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -204,10 +208,37 @@ public class WyswietlMagazyn {
 			}
 		});
 		btnEdit.setForeground(new Color(255, 255, 255));
-		btnEdit.setBackground(new Color(255, 102, 102));
+		btnEdit.setBackground(new Color(255, 215, 0));
 		btnEdit.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnEdit.setBounds(413, 45, 124, 24);
 		frame.getContentPane().add(btnEdit);
+		
+		JButton btnDelete = new JButton("Usuń");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				deleteRocordFromDatabase();
+			}
+		});
+		btnDelete.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		btnDelete.setBounds(455, 512, 71, 20);
+		frame.getContentPane().add(btnDelete);
+		
+		this.list.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent listSelectionEvent) {
+				if(!list.isSelectionEmpty()){
+					btnDelete.setForeground(Color.ORANGE);
+					btnDelete.setBackground(Color.RED);
+					btnDelete.setEnabled(true);
+				} else {
+					btnDelete.setForeground(Color.DARK_GRAY);
+					btnDelete.setBackground(Color.lightGray);
+					btnDelete.setEnabled(false);
+				}
+			}
+			
+		});
+		
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -222,18 +253,40 @@ public class WyswietlMagazyn {
 		});
 	}
 	
+	private void deleteRocordFromDatabase() {
+		if(!list.isSelectionEmpty()){
+			Item i = getItemFromLists();
+			String tableName = "", columnName = "", column2Name = "";
+			if(i instanceof StockItem){
+				tableName = this.fv.STOCK_TABLE;
+				columnName = this.fv.STOCK_TABLE_NUMBER;
+				column2Name = this.fv.STOCK_TABLE_ITEM_NAME;
+			}else{
+				tableName = this.fv.SERVICES_TABLE;
+				columnName = this.fv.SERVICE_TABLE_NUMBER;
+				column2Name = this.fv.SERVICES_TABLE_SERVICE_NAME;
+			}
+			
+			if(i != null){
+				String query = "DELETE FROM '"+tableName+"' WHERE "+columnName+"='"+i.getStockNumber()+"' AND "+column2Name+"='"+i.getName()+"'";
+				try {
+					boolean success = this.DM.deleteRecord(query);
+					if(success)
+						JOptionPane.showMessageDialog(null, this.fv.DELETE_SUCCESS);
+					else
+						JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
+				}
+				
+			}else
+				JOptionPane.showMessageDialog(null, this.fv.WINDOW_ERROR);
+
+		}
+	}
 	private void editRecordInDatabase() {
 		if(!list.isSelectionEmpty()){
-			int listsLength = this.listOfItems.size() + this.listOfServices.size();
-			int index = list.getSelectedIndex();
-			Item i = null;
-
-			if(index < this.listOfItems.size())
-				i = this.listOfItems.get(index);
-			else if(index < listsLength){
-				index -= this.listOfItems.size();
-				i = this.listOfServices.get(index);
-			}
+			Item i = getItemFromLists();
 			
 			if(i != null)
 				EdytujTowar.main(i);
@@ -245,10 +298,23 @@ public class WyswietlMagazyn {
 		}
 	}
 
+	private Item getItemFromLists() {
+		int listsLength = this.listOfItems.size() + this.listOfServices.size();
+		int index = list.getSelectedIndex();
+
+		if(index < this.listOfItems.size())
+			return this.listOfItems.get(index);
+		else if(index < listsLength){
+			index -= this.listOfItems.size();
+			return this.listOfServices.get(index);
+		}
+		return null;
+	}
+
 	private void searchInDatabase() {
-		String query = "SELECT * FROM stock ";
+		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
 		if(!tfSearch.getText().equals(tfSearchText))
-			query += " WHERE item_name LIKE '%"+tfSearch.getText()+"%' ORDER BY price ASC";
+			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		ArrayList<Item> listOfItems = DM.getItemsList(query);

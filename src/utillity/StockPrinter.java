@@ -13,8 +13,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -57,26 +59,35 @@ public class StockPrinter  { //implements Printable
 	private double sum = 0, discount = 0;
 	private long timeout = 50000;
 	private boolean applyDiscount = false;
+	private int itemCount = 0, servCount = 0;
 	private int invNo = 1, stringLengthF = 3, stringLengthB = 12;
 	private char paddingChar = ' ';
 	private String carManufacturer = "NONE", carRegistration = "00AA0000", invSt = "Invoice", noSt = "No.", date;
 	
 	private Helper helper;
 	private DatabaseManager DM;
+	private FinalVariables fv;
+	
 	private ArrayList<String> stockServicesNumber;
+	private boolean jobDone = false;
 	
 	public StockPrinter(){
 		DM = new DatabaseManager();
 		helper = new Helper();
+		this.fv = new FinalVariables();
+		
 		String fDate = helper.getFormatedDate();
+		
 		savePath = savePath.concat(fDate);
 		helper.createFolderIfNotExist(savePath);
+		
 		accPath = savePath + "/accountacy copy";
 		helper.createFolderIfNotExist(accPath);
+		
 		this.stockServicesNumber = new ArrayList<String>();
 	}
 	
-	public void printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
+	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		this.df = new DecimalFormat("#.##"); 
 		this.md = (DefaultListModel)list.getModel();
 		this.discount = discount;
@@ -87,17 +98,22 @@ public class StockPrinter  { //implements Printable
 		this.invNo = invoiceNum;
 		
 		this.date = helper.getFormatedDate();
-//		System.out.println("Printing "+discount+" "+applyDiscount);
+		
 		generatePDF();
 
 		printPDF(docPath);
 
 		createAccountancCopy();
 		saveEntryToDatabase();
+		return jobDone ;
 	}
 
 
 	private void saveEntryToDatabase() throws SQLException {
+		Calendar today = Calendar.getInstance();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String todayDate = dateFormat.format(today.getTime());
+		
 		String servNo = "", itemNo = "";
 		for(String s : stockServicesNumber){
 			if(s.contains("AAA")){
@@ -115,13 +131,16 @@ public class StockPrinter  { //implements Printable
 		while(i<timeout){
 			i++;
 		}
-		String query = "INSERT INTO \"invoices\"  VALUES ("+this.invNo+",'"+this.carManufacturer+"','"+servNo+"','"+itemNo +"',"+sum    +");";
+		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +","+todayDate    +");";
+		System.out.println("Q: "+query);
 		
 		boolean succes = DM.addNewRecord(query);
 		if(succes){
 			JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
+			this.jobDone = true;
 		}else{
 			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
+			this.jobDone = false;
 		}
 	}
 
@@ -200,7 +219,7 @@ public class StockPrinter  { //implements Printable
 
 	private void createItemList(String description) {
 		String des = description.trim();
-		String query = "SELECT service_number FROM services WHERE service_name=\""+des+"\" union all SELECT stock_number FROM stock WHERE item_name=\""+des+"\"";
+		String query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+"=\""+des+"\" union all SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+"=\""+des+"\"";
 
 		try {
 			ArrayList<String> t = DM.selectRecordArrayList(query);
@@ -209,7 +228,7 @@ public class StockPrinter  { //implements Printable
 				//add some counter for quantity?
 				if(!stockServicesNumber.contains(ts)){
 					this.stockServicesNumber.add(ts);
-				}
+				} 
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -305,7 +324,8 @@ public class StockPrinter  { //implements Printable
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
-        
+        //TODO
+        //Uncomment bellow
 //        job.print();
         
         document.close();

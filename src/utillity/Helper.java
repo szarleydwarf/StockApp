@@ -14,6 +14,11 @@ import dbase.DatabaseManager;
 
 public class Helper {
 	public final String PIRELLI_ST = "Pirelli";
+	private FinalVariables fv;
+	
+	public Helper() {
+		this.fv = new FinalVariables();
+	}
 	
 	public double getSum(DefaultListModel md, double discount, boolean applyDiscount){
 		double sum = 0;
@@ -57,12 +62,12 @@ public class Helper {
 	}
 	
 	public int checkInteger(String msg1, String msg2, String number){
-		String pattern = "^-?\\d+$"; 
+		String pattern = this.fv.INTEGER_PATTERN; 
 
 		Pattern patern, dPattern;
 		Matcher match, dMatch;
 		patern = Pattern.compile(pattern);
-System.out.println("no "+number);
+
 		if(number.isEmpty()) {
 			JOptionPane.showMessageDialog(null, msg1);
 			return 0;
@@ -79,9 +84,9 @@ System.out.println("no "+number);
 	
 	public double checkDouble(String msg1, String msg2, String number){
 		DecimalFormat df;
-		df = new DecimalFormat("#.##"); 
+		df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 
-		String decimalPattern = "^-?([0-9]*)\\.([0-9]*)+$";
+		String decimalPattern = this.fv.DECIMAL_PATTERN;
 
 		Pattern patern, dPattern;
 		Matcher match, dMatch;
@@ -119,7 +124,7 @@ System.out.println("no "+number);
 	
 	public String getFormatedDate(){
 		Calendar today = Calendar.getInstance();
-		SimpleDateFormat df= new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat df= new SimpleDateFormat(this.fv.DATE_FORMAT);
 		
 		return df.format(today.getTime());
 

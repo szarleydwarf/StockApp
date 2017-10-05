@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import javax.swing.SwingConstants;
 
 import dbase.DatabaseManager;
+import utillity.FinalVariables;
 import utillity.Helper;
 
 import javax.swing.JTextField;
@@ -36,6 +38,7 @@ public class DodajUsluge {
 
 	private Helper helper;
 	private DatabaseManager dm = null;
+	private FinalVariables fv;
 
 	/**
 	 * Launch the application.
@@ -59,8 +62,9 @@ public class DodajUsluge {
 	public DodajUsluge() {
 		helper = new Helper();
 		dm = new DatabaseManager();
+		this.fv = new FinalVariables();
 
-		String query = "SELECT service_number FROM services ORDER BY service_number DESC LIMIT 1";
+		String query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" ORDER BY "+this.fv.SERVICE_TABLE_NUMBER+" DESC LIMIT 1";
 		ArrayList<String> stNoList = dm.selectRecordArrayList(query);
 		
 		if(!stNoList.get(0).isEmpty())
@@ -68,10 +72,8 @@ public class DodajUsluge {
 		else
 			serviceNum = "AAS0000";
 		
-		System.out.println("B "+serviceNum);
 		this.serviceNum = helper.getIntFromStNo(serviceNum, 'S');
-		System.out.println("A "+serviceNum);
-
+		
 		initialize();
 	}
 
@@ -80,6 +82,7 @@ public class DodajUsluge {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 528, 321);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -87,10 +90,11 @@ public class DodajUsluge {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 		        if (JOptionPane.showConfirmDialog(frame, 
-		            "Are you sure to close this window?", "Really Closing?", 
+		            fv.CLOSE_WINDOW, fv.CLOSE_WINDOW, 
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        	MainView.main(null);
 		        }
 		    }
 		});
@@ -150,7 +154,7 @@ public class DodajUsluge {
 	}
 
 	private void zapiszNowyProdukt() {
-		boolean saved = dm.addNewRecord("INSERT INTO \"services\"  VALUES ('"+this.serviceNum+"','"+this.serviceName+"',"+this.dCost+","+this.dPrice+");");
+		boolean saved = dm.addNewRecord("INSERT INTO \""+this.fv.SERVICES_TABLE+"\"  VALUES ('"+this.serviceNum+"','"+this.serviceName+"',"+this.dCost+","+this.dPrice+");");
 		System.out.println("zapisuje "+serviceNum+"','"+this.serviceName+"',"+this.dCost+","+this.dPrice+","+this.iQnt);
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");

@@ -3,6 +3,7 @@ package app;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class DodajTowar {
 		helper = new Helper();
 		dm = new DatabaseManager();
 
-		String query = "SELECT stock_number FROM stock ORDER BY stock_number DESC LIMIT 1";
+		String query = "SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_NUMBER+" DESC LIMIT 1";
 		ArrayList<String> stNoList = dm.selectRecordArrayList(query);
 		
 		if(!stNoList.get(0).isEmpty())
@@ -84,6 +85,7 @@ public class DodajTowar {
 	private void initialize() {
 		
 		frame = new JFrame();
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 556, 328);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -95,6 +97,7 @@ public class DodajTowar {
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        	MainView.main(null);
 		        }
 		    }
 		});
@@ -209,7 +212,7 @@ public class DodajTowar {
 	}
 
 	private void zapiszNowyProdukt() {
-		boolean saved = dm.addNewRecord("INSERT INTO \"stock\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
+		boolean saved = dm.addNewRecord("INSERT INTO \""+this.fv.STOCK_TABLE+"\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
 //		System.out.println("zapisuje "+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt);
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");
