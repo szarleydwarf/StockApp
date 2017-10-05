@@ -128,11 +128,11 @@ public class WyswietlMagazyn {
 		btnNewButton.setBackground(new Color(255, 255, 153));
 		btnNewButton.setForeground(new Color(0, 153, 255));
 		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnNewButton.setBounds(314, 46, 89, 23);
+		btnNewButton.setBounds(10, 46, 89, 23);
 		frame.getContentPane().add(btnNewButton);
 		
 		Border b = BorderFactory.createLineBorder(Color.BLUE);
-		TitledBorder border = BorderFactory.createTitledBorder(b, "WYBRANE");
+		TitledBorder border = BorderFactory.createTitledBorder(b, "LISTA USŁUG I TOWARÓW");
 		
 		JLabel label = new JLabel("");
 		label.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
@@ -174,7 +174,7 @@ public class WyswietlMagazyn {
 		tfSearch = new JTextField();
 		tfSearch.setHorizontalAlignment(SwingConstants.CENTER);
 		tfSearch.setText(tfSearchText );
-		tfSearch.setBounds(21, 46, 195, 24);
+		tfSearch.setBounds(120, 46, 195, 24);
 		frame.getContentPane().add(tfSearch);
 		tfSearch.setColumns(10);
 		
@@ -198,7 +198,7 @@ public class WyswietlMagazyn {
 		btnSearch.setForeground(new Color(255, 255, 204));
 		btnSearch.setBackground(new Color(0, 153, 255));
 		btnSearch.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnSearch.setBounds(215, 46, 89, 24);
+		btnSearch.setBounds(314, 46, 89, 24);
 		frame.getContentPane().add(btnSearch);
 		
 		JButton btnEdit = new JButton("Edytuj zaznaczone");

@@ -12,14 +12,23 @@ import javax.swing.JOptionPane;
 
 import java.awt.Font;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JScrollPane;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.JTextField;
 
 public class WyswietlRachunki {
 
 	private JFrame frame;
 	private FinalVariables fv;
+	private JTextField tfSearch;
+	private JScrollPane scrollPane;
 
 	/**
 	 * Launch the application.
@@ -66,11 +75,73 @@ public class WyswietlRachunki {
 				MainView.main(null);
 			}
 		});
-		btnNewButton.setBounds(585, 479, 89, 23);
+		btnNewButton.setBounds(459, 533, 89, 23);
 		frame.getContentPane().add(btnNewButton);
+
+		Border b = BorderFactory.createLineBorder(Color.BLUE);
+		TitledBorder border = BorderFactory.createTitledBorder(b, "LISTA WYSTAWIONYCH RACHUNKÓW");
+		
+		JLabel label = new JLabel("");
+		label.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		label.setBorder(border);
+		label.setVerticalAlignment(SwingConstants.TOP);
+		label.setBounds(10, 62, 460, 461);
+		frame.getContentPane().add(label);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(23, 114, 421, 400);
+		frame.getContentPane().add(scrollPane);
+		
+		JList<String> list = new JList<String>();
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		scrollPane.setViewportView(list);
+		
+		JButton btnRefresh = new JButton("Odśwież");
+		btnRefresh.setForeground(new Color(0, 153, 255));
+		btnRefresh.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnRefresh.setBackground(new Color(255, 255, 153));
+		btnRefresh.setBounds(23, 80, 89, 23);
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				populateList();
+			}
+		});
+		frame.getContentPane().add(btnRefresh);
+		
+		tfSearch = new JTextField();
+		tfSearch.setText("wpisz szukaną nazwę");
+		tfSearch.setHorizontalAlignment(SwingConstants.CENTER);
+		tfSearch.setColumns(10);
+		tfSearch.setBounds(121, 79, 195, 24);
+		frame.getContentPane().add(tfSearch);
+		
+		JButton btnSearch = new JButton("Szukaj");
+		btnSearch.setForeground(new Color(255, 255, 204));
+		btnSearch.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnSearch.setBackground(new Color(0, 153, 255));
+		btnSearch.setBounds(315, 79, 89, 24);
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				searchInDatabase();
+			}
+		});
+		frame.getContentPane().add(btnSearch);
+		
+		JButton btnDelete = new JButton("Usuń");
+		btnDelete.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		btnDelete.setBounds(480, 81, 71, 20);
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				deleteRocordFromDatabase();
+			}
+		});
+		frame.getContentPane().add(btnDelete);
+		
+		
 		frame.setBackground(new Color(135, 206, 235));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
-		frame.setBounds(100, 100, 700, 552);
+		frame.setBounds(100, 100, 574, 606);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -84,5 +155,20 @@ public class WyswietlRachunki {
 		    }
 		});
 
+	}
+
+	protected void populateList() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void searchInDatabase() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void deleteRocordFromDatabase() {
+		// TODO Auto-generated method stub
+		
 	}
 }
