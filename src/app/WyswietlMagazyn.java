@@ -82,8 +82,8 @@ public class WyswietlMagazyn {
 	}
 
 	private void populateList() {
-		String query = "SELECT * from stock ORDER BY item_name ASC";//item_name, cost, price,quantity
-		String queryServices = "SELECT * from services ORDER BY service_name ASC";//item_name, cost, price,quantity
+		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_ITEM_NAME+" ASC";//item_name, cost, price,quantity
+		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+this.fv.SERVICES_TABLE_SERVICE_NAME+" ASC";//item_name, cost, price,quantity
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		listOfItems = DM.getItemsList(query);
@@ -258,13 +258,13 @@ public class WyswietlMagazyn {
 			Item i = getItemFromLists();
 			String tableName = "", columnName = "", column2Name = "";
 			if(i instanceof StockItem){
-				tableName = "stock";
-				columnName = "stock_number";
-				column2Name = "item_name";
+				tableName = this.fv.STOCK_TABLE;
+				columnName = this.fv.STOCK_TABLE_NUMBER;
+				column2Name = this.fv.STOCK_TABLE_ITEM_NAME;
 			}else{
-				tableName = "services";
-				columnName = "service_number";
-				column2Name = "service_name";
+				tableName = this.fv.SERVICES_TABLE;
+				columnName = this.fv.SERVICE_TABLE_NUMBER;
+				column2Name = this.fv.SERVICES_TABLE_SERVICE_NAME;
 			}
 			
 			if(i != null){
@@ -312,9 +312,9 @@ public class WyswietlMagazyn {
 	}
 
 	private void searchInDatabase() {
-		String query = "SELECT * FROM stock ";
+		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
 		if(!tfSearch.getText().equals(tfSearchText))
-			query += " WHERE item_name LIKE '%"+tfSearch.getText()+"%' ORDER BY price ASC";
+			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		ArrayList<Item> listOfItems = DM.getItemsList(query);

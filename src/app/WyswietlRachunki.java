@@ -56,7 +56,7 @@ public class WyswietlRachunki {
 		JLabel lblNewLabel = new JLabel("Lista wystawionych rachunkow??");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Segoe UI Black", Font.PLAIN, 24));
-		lblNewLabel.setBounds(10, 83, 664, 70);
+		lblNewLabel.setBounds(10, 11, 664, 55);
 		frame.getContentPane().add(lblNewLabel);
 		
 		JButton btnNewButton = new JButton("Powr\u00F3t");
@@ -66,11 +66,11 @@ public class WyswietlRachunki {
 				MainView.main(null);
 			}
 		});
-		btnNewButton.setBounds(299, 288, 89, 23);
+		btnNewButton.setBounds(585, 479, 89, 23);
 		frame.getContentPane().add(btnNewButton);
 		frame.setBackground(new Color(135, 206, 235));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
-		frame.setBounds(100, 100, 700, 361);
+		frame.setBounds(100, 100, 700, 552);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {

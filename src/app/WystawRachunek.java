@@ -315,7 +315,7 @@ public class WystawRachunek {
 	}
 
 	private void populateCarList() throws Exception {
-		String queryCars = "SELECT manufacturer FROM manufacturers ORDER BY manufacturer ASC";
+		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_LIST_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
 		carManufacturer = "Car manufacturer";
 		DefaultListModel<String> modelCars = new DefaultListModel<>();
 	
@@ -350,6 +350,7 @@ public class WystawRachunek {
 			public void valueChanged(ListSelectionEvent listSelectionEvent) {
 				if(!listCars.isSelectionEmpty()){
 					lblCarManufacturer.setText((String) listCars.getSelectedValue());
+					carManufacturer = (String) listCars.getSelectedValue();
 				} else {
 					lblCarManufacturer.setText(lblCarManufacturerTxt);
 				}
@@ -364,7 +365,7 @@ public class WystawRachunek {
 	}
 
 	private void populateItems() throws Exception {
-		String queryItems = "SELECT item_name, price FROM stock";
+		String queryItems = "SELECT "+this.fv.STOCK_TABLE_ITEM_NAME+", "+this.fv.STOCK_TABLE_PRICE+" FROM "+this.fv.STOCK_TABLE+"";
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 	
 		ArrayList<String> listOfItems = DM.selectRecordArrayList(queryItems);
@@ -411,7 +412,7 @@ public class WystawRachunek {
 	}
 
 	private void populateServices() throws Exception {
-		String queryServices = "SELECT service_name, price FROM services";
+		String queryServices = "SELECT "+this.fv.SERVICES_TABLE_SERVICE_NAME+", "+this.fv.STOCK_TABLE_PRICE+" FROM "+this.fv.SERVICES_TABLE+"";
 		DefaultListModel<String> model = new DefaultListModel<>();
 	
 		ArrayList<String> listOfServices = DM.selectRecordArrayList(queryServices);
@@ -419,7 +420,6 @@ public class WystawRachunek {
 		for(int i = 0; i < listOfServices.size(); i+=2) {
 			String tempString = listOfServices.get(i);
 			model.addElement(tempString);
-//			System.out.println("ST: "+alist.get(i));
 		}
 				
 		JLabel lblChoseServiceitem = new JLabel("Wybierz us\u0142ug\u0119");

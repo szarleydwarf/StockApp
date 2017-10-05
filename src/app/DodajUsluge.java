@@ -64,7 +64,7 @@ public class DodajUsluge {
 		dm = new DatabaseManager();
 		this.fv = new FinalVariables();
 
-		String query = "SELECT service_number FROM services ORDER BY service_number DESC LIMIT 1";
+		String query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" ORDER BY "+this.fv.SERVICE_TABLE_NUMBER+" DESC LIMIT 1";
 		ArrayList<String> stNoList = dm.selectRecordArrayList(query);
 		
 		if(!stNoList.get(0).isEmpty())
@@ -154,7 +154,7 @@ public class DodajUsluge {
 	}
 
 	private void zapiszNowyProdukt() {
-		boolean saved = dm.addNewRecord("INSERT INTO \"services\"  VALUES ('"+this.serviceNum+"','"+this.serviceName+"',"+this.dCost+","+this.dPrice+");");
+		boolean saved = dm.addNewRecord("INSERT INTO \""+this.fv.SERVICES_TABLE+"\"  VALUES ('"+this.serviceNum+"','"+this.serviceName+"',"+this.dCost+","+this.dPrice+");");
 		System.out.println("zapisuje "+serviceNum+"','"+this.serviceName+"',"+this.dCost+","+this.dPrice+","+this.iQnt);
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");

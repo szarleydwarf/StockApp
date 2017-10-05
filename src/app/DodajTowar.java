@@ -63,7 +63,7 @@ public class DodajTowar {
 		helper = new Helper();
 		dm = new DatabaseManager();
 
-		String query = "SELECT stock_number FROM stock ORDER BY stock_number DESC LIMIT 1";
+		String query = "SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_NUMBER+" DESC LIMIT 1";
 		ArrayList<String> stNoList = dm.selectRecordArrayList(query);
 		
 		if(!stNoList.get(0).isEmpty())
@@ -212,7 +212,7 @@ public class DodajTowar {
 	}
 
 	private void zapiszNowyProdukt() {
-		boolean saved = dm.addNewRecord("INSERT INTO \"stock\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
+		boolean saved = dm.addNewRecord("INSERT INTO \""+this.fv.STOCK_TABLE+"\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
 //		System.out.println("zapisuje "+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt);
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");

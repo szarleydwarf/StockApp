@@ -15,14 +15,16 @@ import javax.swing.JOptionPane;
 
 import hct_speciale.Item;
 import hct_speciale.StockItem;
+import utillity.FinalVariables;
 
 public class DatabaseManager {
 	private Connection conn = null;
 	private PreparedStatement pst = null;
 	private ResultSet rs = null;
-	
+	private FinalVariables fv;
+
 	public DatabaseManager () {
-		
+		this.fv = new FinalVariables();
 	}
 	public Connection connect() {
 		try {
@@ -207,9 +209,9 @@ public class DatabaseManager {
 		conn = this.connect();
 		ArrayList<Item> list = new ArrayList<Item>();
 		boolean isItem = false;
-		if(query.contains("stock")){
+		if(query.contains(this.fv.STOCK_TABLE)){
 			isItem = true;
-		} else if(query.contains("services")){
+		} else if(query.contains(this.fv.SERVICES_TABLE)){
 			isItem = false;
 		}
 //		System.out.println(query);
@@ -270,7 +272,7 @@ public class DatabaseManager {
 		}
 	
 	public int getLastInvoiceNumber(){
-		String query = "SELECT invoice_number from invoice_list ORDER BY invoice_number DESC LIMIT 1";
+		String query = "SELECT "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" from "+this.fv.INVOCE_TABLE+" ORDER BY "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" DESC LIMIT 1";
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		if(this.conn == null)
