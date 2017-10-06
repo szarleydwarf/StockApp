@@ -1,5 +1,6 @@
 package utillity;
 
+import java.awt.Color;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -8,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import dbase.DatabaseManager;
@@ -155,6 +157,13 @@ public class Helper {
 			return stLength+addMax;
 		else 
 			return stLength+addMin;
+	}
+
+	public void toggleJButton(JButton btn_references, Color background_color, Color foreground_color, boolean toggle) {
+		btn_references.setForeground(foreground_color);
+		btn_references.setBackground(background_color);
+		btn_references.setEnabled(toggle);
+
 	}
 
 }

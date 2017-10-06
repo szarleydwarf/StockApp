@@ -46,7 +46,6 @@ public class WyswietlMagazyn {
 	private Helper helper;
 	private DatabaseManager DM;	
 	private JTextField tfSearch;
-	private final String tfSearchText = "wpisz szukaną nazwę";
 	private ArrayList<Item> listOfItems, listOfServices;
 	private FinalVariables fv;
 	/**
@@ -119,17 +118,17 @@ public class WyswietlMagazyn {
 		lblTitle.setBounds(141, 11, 120, 24);
 		frame.getContentPane().add(lblTitle);
 		
-		JButton btnNewButton = new JButton("Od\u015Bwie\u017C");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton btnRefresh = new JButton("Od\u015Bwie\u017C");
+		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				populateList();
 			}
 		});
-		btnNewButton.setBackground(new Color(255, 255, 153));
-		btnNewButton.setForeground(new Color(0, 153, 255));
-		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnNewButton.setBounds(10, 46, 89, 23);
-		frame.getContentPane().add(btnNewButton);
+		btnRefresh.setBackground(new Color(255, 255, 153));
+		btnRefresh.setForeground(new Color(0, 153, 255));
+		btnRefresh.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnRefresh.setBounds(10, 46, 89, 23);
+		frame.getContentPane().add(btnRefresh);
 		
 		Border b = BorderFactory.createLineBorder(Color.BLUE);
 		TitledBorder border = BorderFactory.createTitledBorder(b, "LISTA USŁUG I TOWARÓW");
@@ -173,7 +172,7 @@ public class WyswietlMagazyn {
 		
 		tfSearch = new JTextField();
 		tfSearch.setHorizontalAlignment(SwingConstants.CENTER);
-		tfSearch.setText(tfSearchText );
+		tfSearch.setText(this.fv.SEARCH_TEXT_FIELD_FRAZE );
 		tfSearch.setBounds(120, 46, 195, 24);
 		frame.getContentPane().add(tfSearch);
 		tfSearch.setColumns(10);
@@ -227,13 +226,9 @@ public class WyswietlMagazyn {
 			@Override
 			public void valueChanged(ListSelectionEvent listSelectionEvent) {
 				if(!list.isSelectionEmpty()){
-					btnDelete.setForeground(Color.ORANGE);
-					btnDelete.setBackground(Color.RED);
-					btnDelete.setEnabled(true);
+					helper.toggleJButton(btnDelete, Color.RED, Color.ORANGE, true);
 				} else {
-					btnDelete.setForeground(Color.DARK_GRAY);
-					btnDelete.setBackground(Color.lightGray);
-					btnDelete.setEnabled(false);
+					helper.toggleJButton(btnDelete, Color.DARK_GRAY, Color.lightGray, false);
 				}
 			}
 			
@@ -284,6 +279,7 @@ public class WyswietlMagazyn {
 
 		}
 	}
+	
 	private void editRecordInDatabase() {
 		if(!list.isSelectionEmpty()){
 			Item i = getItemFromLists();
@@ -313,7 +309,7 @@ public class WyswietlMagazyn {
 
 	private void searchInDatabase() {
 		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
-		if(!tfSearch.getText().equals(tfSearchText))
+		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
 			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		

@@ -6,6 +6,8 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 import utillity.FinalVariables;
+import utillity.Helper;
+
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,6 +28,8 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
@@ -44,6 +48,7 @@ public class WyswietlRachunki {
 	private FinalVariables fv;
 	private DatabaseManager DM;
 	private ArrayList<Invoice> listOfInvoices;
+	private Helper helper;
 	/**
 	 * Launch the application.
 	 */
@@ -66,7 +71,8 @@ public class WyswietlRachunki {
 	public WyswietlRachunki() {
 		this.fv = new FinalVariables();
 		this.DM = new DatabaseManager();
-		
+		this.helper = new Helper();
+
 		this.listOfInvoices = new ArrayList<Invoice>();
 		list = new JList<String>();
 		
@@ -88,15 +94,15 @@ public class WyswietlRachunki {
 		lblNewLabel.setBounds(10, 11, 724, 43);
 		frame.getContentPane().add(lblNewLabel);
 		
-		JButton btnNewButton = new JButton("Powr\u00F3t");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton btnBack = new JButton("Powr\u00F3t");
+		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
 				MainView.main(null);
 			}
 		});
-		btnNewButton.setBounds(645, 533, 89, 23);
-		frame.getContentPane().add(btnNewButton);
+		btnBack.setBounds(645, 533, 89, 23);
+		frame.getContentPane().add(btnBack);
 
 		Border b = BorderFactory.createLineBorder(Color.BLUE);
 		TitledBorder border = BorderFactory.createTitledBorder(b, "LISTA WYSTAWIONYCH RACHUNKÓW");
@@ -111,17 +117,19 @@ public class WyswietlRachunki {
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(23, 114, 601, 400);
 		frame.getContentPane().add(scrollPane);
-		
-//		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-//		scrollPane.setViewportView(list);
-		
+			
 		JButton btnRefresh = new JButton("Odśwież");
 		btnRefresh.setForeground(new Color(0, 153, 255));
 		btnRefresh.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnRefresh.setBackground(new Color(255, 255, 153));
 		btnRefresh.setBounds(23, 80, 89, 23);
-		btnNewButton.addActionListener(new ActionListener() {
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				populateList();
+			}
+		});
+		
+		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				populateList();
 			}
@@ -134,6 +142,17 @@ public class WyswietlRachunki {
 		tfSearch.setColumns(10);
 		tfSearch.setBounds(121, 79, 288, 24);
 		frame.getContentPane().add(tfSearch);
+		
+		tfSearch.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	            tfSearch.setText("");
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+			}
+		});
+
 		
 		JButton btnSearch = new JButton("Szukaj");
 		btnSearch.setForeground(new Color(255, 255, 204));
@@ -173,15 +192,11 @@ public class WyswietlRachunki {
 			@Override
 			public void valueChanged(ListSelectionEvent listSelectionEvent) {
 				if(!list.isSelectionEmpty()){
-					//TODO
-					//create method in helper to change color
-					btnDelete.setForeground(Color.ORANGE);
-					btnDelete.setBackground(Color.RED);
-					btnDelete.setEnabled(true);
+					helper.toggleJButton(btnDelete, Color.RED, Color.ORANGE, true);
+					helper.toggleJButton(btnPrintOne, Color.BLUE, Color.GREEN, true);
 				} else {
-					btnDelete.setForeground(Color.DARK_GRAY);
-					btnDelete.setBackground(Color.lightGray);
-					btnDelete.setEnabled(false);
+					helper.toggleJButton(btnDelete, Color.DARK_GRAY, Color.lightGray, false);
+					helper.toggleJButton(btnPrintOne, Color.DARK_GRAY, Color.lightGray, false);
 				}
 			}
 			
@@ -222,8 +237,21 @@ public class WyswietlRachunki {
 	}
 
 	protected void searchInDatabase() {
-		// TODO Auto-generated method stub
+		String query = "SELECT * FROM "+this.fv.INVOCE_TABLE+"";
+		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
+			query += " WHERE "+this.fv.INVOCE_TABLE_CUSTOMER_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.INVOCE_TABLE_DATE+" ASC";
+		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
+		ArrayList<Invoice> listOfIvoices = DM.getInvoiceList(query);
+		
+		for(int i = 0; i < listOfIvoices.size(); i++) {
+			Invoice item = listOfIvoices.get(i);
+			modelItems.addElement(item.toString());
+		}
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		scrollPane.setViewportView(list);
+		list.setModel(modelItems);
 	}
 
 	protected void deleteRocordFromDatabase() {
