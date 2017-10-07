@@ -13,6 +13,7 @@ import java.sql.Statement;
 
 import javax.swing.JOptionPane;
 
+import hct_speciale.Invoice;
 import hct_speciale.Item;
 import hct_speciale.StockItem;
 import utillity.FinalVariables;
@@ -495,28 +496,6 @@ public class DatabaseManager {
 		return true;
 	}
 
-
-	public void close() {
-		try {
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try{
-	               if (rs != null) {
-	                    rs.close();
-	                }
-	                if (pst != null) {
-	                    pst.close();
-	                }
-	                if (conn != null) {
-	                    conn.close();
-	                }
-			} catch (Exception e3){
-				System.out.println("E3 "+e3.getMessage());
-			}
-		}
-	}
 	public boolean editRecord(String query) {
 		conn = this.connect();
 		PreparedStatement pst = null;
@@ -571,4 +550,93 @@ public class DatabaseManager {
 		}
 		return false;
 		}
+
+	
+	public ArrayList<Invoice> getInvoiceList(String query) {
+		conn = this.connect();
+		ArrayList<Invoice> list = new ArrayList<Invoice>();
+
+//		System.out.println(query);
+		try {
+			PreparedStatement pst = conn.prepareStatement(query);		
+			
+			ResultSet rs = pst.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+			while (rs.next()){
+				Invoice i = null;
+				i = createInvoice(rs, columnsNumber);
+//				i.print();
+				list.add(i);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try{
+				rs.close();
+				pst.close();
+			} catch (Exception e){
+				
+			}
+		}
+		return list;
+	}
+
+	private Invoice createInvoice(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {
+		String  customer_name = "", service_number = "",item_number = "", invoice_date = "", invoice_path_name = "";
+		double total = 0;
+		int invoice_number = 0;
+		for(int i = 1 ; i <= columnsNumber; i++){
+//			System.out.println(i + " "+ rs.getString(i));
+			if(!rs.getString(i).isEmpty()) {
+				switch(i){
+				case 1:
+					invoice_number = Integer.parseInt(rs.getString(i));
+					break;
+				case 2:
+					customer_name = rs.getString(i);
+					break;
+				case 3:
+					service_number = rs.getString(i);
+					break;
+				case 4:
+					item_number = rs.getString(i);
+					break;
+				case 5:
+					total = Double.parseDouble(rs.getString(i));
+					break;
+				case 6:
+					invoice_date = rs.getString(i);
+					break;
+				case 7:
+					invoice_path_name = rs.getString(i);
+					break;
+				}
+			}
+		}
+		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, invoice_path_name, total);
+	}
+	public void close() {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try{
+	               if (rs != null) {
+	                    rs.close();
+	                }
+	                if (pst != null) {
+	                    pst.close();
+	                }
+	                if (conn != null) {
+	                    conn.close();
+	                }
+			} catch (Exception e3){
+				System.out.println("E3 "+e3.getMessage());
+			}
+		}
+	}
+	
+
 }

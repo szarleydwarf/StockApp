@@ -49,7 +49,7 @@ public class StockPrinter  { //implements Printable
 	private final String imagePath = "D:/@Development/EclipseJavaProjects/sqliteTestApp/StockApp/resources/img/Logo HCT 245x84.png";
 	private final String printerName = "Canon MP620 series Printer WS";
 	
-	private String savePath = "D:/@Development/__TEMP/", accPath = "";
+	private String savePath = "", accPath = "";
 	private String ext = ".pdf", docNameCopy = "AC_";
 	private String docPath = "";
 	private PDPageContentStream contentStream ;
@@ -75,7 +75,12 @@ public class StockPrinter  { //implements Printable
 		DM = new DatabaseManager();
 		helper = new Helper();
 		this.fv = new FinalVariables();
+		this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
 		
+		this.stockServicesNumber = new ArrayList<String>();
+	}
+	
+	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		String fDate = helper.getFormatedDate();
 		
 		savePath = savePath.concat(fDate);
@@ -83,11 +88,7 @@ public class StockPrinter  { //implements Printable
 		
 		accPath = savePath + "/accountacy copy";
 		helper.createFolderIfNotExist(accPath);
-		
-		this.stockServicesNumber = new ArrayList<String>();
-	}
-	
-	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
+
 		this.df = new DecimalFormat("#.##"); 
 		this.md = (DefaultListModel)list.getModel();
 		this.discount = discount;
@@ -315,7 +316,7 @@ public class StockPrinter  { //implements Printable
 		customerCopyDoc.close();
 	}
 
-	private void printPDF(String docPath) throws IOException, Exception{
+	public void printPDF(String docPath) throws IOException, Exception{
         PDDocument document = PDDocument.load(new File(docPath));
 
         PrintService myPrintService = findPrintService(this.printerName);
@@ -324,6 +325,7 @@ public class StockPrinter  { //implements Printable
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
+//        System.out.println("Print pdf\nPath:\n"+docPath);
         //TODO
         //Uncomment bellow
 //        job.print();

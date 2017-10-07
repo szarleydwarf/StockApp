@@ -1,14 +1,21 @@
 package utillity;
 
 public class FinalVariables {
+	//JOptionPane messages
 	public final String CLOSE_WINDOW = "Czy napewno chcesz zamknąć te okienko?";
 	public final String WINDOW_ERROR = "Coś poszło nie tak\n";
-	public final String ICON_PATH = "D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png";
 	
+	//paths - consider to allow to specify this by user
+	public final String ICON_PATH = "D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png";
+	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP/";
+	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	
 	public final String INTEGER_PATTERN = "^-?\\d+$";
 	public final String DECIMAL_FORMAT = "#.##";
 	public final String DATE_FORMAT = "dd-MM-yyyy";
+
+	//other
+	public final String SEARCH_TEXT_FIELD_FRAZE = "wpisz szukaną nazwę";
 
 	
 	//Database related
@@ -30,5 +37,6 @@ public class FinalVariables {
 	public final String MANUFACTURER_TABLE_NAME = "manufacturer";
 	public final String STOCK_TABLE_PRICE = "price";
 	public final String INVOCE_TABLE_INVOICE_NUMBER = "invoice_number";
-//	public final String INVOCE_TABLE = "invoice_number";
+	public final String INVOCE_TABLE_CUSTOMER_NAME = "customer_name";
+	public final String INVOCE_TABLE_DATE = "invoice_date";
 	}
