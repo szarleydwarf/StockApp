@@ -7,12 +7,13 @@ public class FinalVariables {
 	
 	//paths - consider to allow to specify this by user
 	public final String ICON_PATH = "D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png";
+	public final String INVOICE_LOGO_PATH = "D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\Logo HCT 245x84.png";
 	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP/";
 	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	
 	public final String INTEGER_PATTERN = "^-?\\d+$";
 	public final String DECIMAL_FORMAT = "#.##";
-	public final String DATE_FORMAT = "dd-MM-yyyy";
+	public final String DATE_FORMAT = "dd-MM-yyyy";//"yyyy-MM-dd" ?? not sure which format is correct for a database entry. so far works
 
 	//other
 	public final String SEARCH_TEXT_FIELD_FRAZE = "wpisz szukaną nazwę";
