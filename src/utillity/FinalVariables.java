@@ -7,7 +7,7 @@ public class FinalVariables {
 	
 	//paths - consider to allow to specify this by user
 	public final String ICON_PATH = "D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png";
-	
+	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP/";
 	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	
 	public final String INTEGER_PATTERN = "^-?\\d+$";

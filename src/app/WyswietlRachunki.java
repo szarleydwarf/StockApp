@@ -49,6 +49,7 @@ public class WyswietlRachunki {
 	private DatabaseManager DM;
 	private ArrayList<Invoice> listOfInvoices;
 	private Helper helper;
+	private Invoice selectedInvoice;
 	/**
 	 * Launch the application.
 	 */
@@ -72,6 +73,8 @@ public class WyswietlRachunki {
 		this.fv = new FinalVariables();
 		this.DM = new DatabaseManager();
 		this.helper = new Helper();
+		
+		this.selectedInvoice = new Invoice();
 
 		this.listOfInvoices = new ArrayList<Invoice>();
 		list = new JList<String>();
@@ -181,6 +184,11 @@ public class WyswietlRachunki {
 		btnPrintOne.setForeground(Color.GRAY);
 		btnPrintOne.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
 		btnPrintOne.setBounds(663, 114, 71, 23);
+		btnPrintOne.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				selectedInvoice.print();
+			}
+		});
 		frame.getContentPane().add(btnPrintOne);
 		
 		
@@ -194,6 +202,7 @@ public class WyswietlRachunki {
 				if(!list.isSelectionEmpty()){
 					helper.toggleJButton(btnDelete, Color.RED, Color.ORANGE, true);
 					helper.toggleJButton(btnPrintOne, Color.BLUE, Color.GREEN, true);
+					selectedInvoice = listOfInvoices.get(list.getSelectedIndex());
 				} else {
 					helper.toggleJButton(btnDelete, Color.DARK_GRAY, Color.lightGray, false);
 					helper.toggleJButton(btnPrintOne, Color.DARK_GRAY, Color.lightGray, false);

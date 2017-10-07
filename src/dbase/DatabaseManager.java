@@ -583,7 +583,7 @@ public class DatabaseManager {
 	}
 
 	private Invoice createInvoice(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {
-		String  customer_name = "", service_number = "",item_number = "", invoice_date = "";
+		String  customer_name = "", service_number = "",item_number = "", invoice_date = "", invoice_path_name = "";
 		double total = 0;
 		int invoice_number = 0;
 		for(int i = 1 ; i <= columnsNumber; i++){
@@ -608,10 +608,13 @@ public class DatabaseManager {
 				case 6:
 					invoice_date = rs.getString(i);
 					break;
+				case 7:
+					invoice_path_name = rs.getString(i);
+					break;
 				}
 			}
 		}
-		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, total);
+		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, invoice_path_name, total);
 	}
 	public void close() {
 		try {
