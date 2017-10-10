@@ -201,9 +201,10 @@ public class WystawRachunek {
 					registration = textFieldRegistration.getText();
 					if(!lblTotal.getText().equals(lblTotalSt)) {
 						printed = sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
-						if(printed)
+						if(printed){
 							frmNowyRachunek.dispose();
-						
+							MainView.main(null);
+						}
 					} else
 						JOptionPane.showMessageDialog(frmNowyRachunek, "Nie przeliczyles wyniku");
 				} catch (IOException e) {

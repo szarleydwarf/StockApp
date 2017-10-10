@@ -308,12 +308,23 @@ public class WyswietlMagazyn {
 	}
 
 	private void searchInDatabase() {
+		//"SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+"=\""+des+"\" 
+		//union all SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+"=\""+des+"\""
 		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
 		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
 			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+				
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		ArrayList<Item> listOfItems = DM.getItemsList(query);
+		
+		if(listOfItems.size() <= 0){
+			query = "SELECT * FROM "+this.fv.SERVICES_TABLE+"";
+			if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
+				query += " WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+			
+			listOfItems = DM.getItemsList(query);
+		}
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
 			Item item = listOfItems.get(i);
