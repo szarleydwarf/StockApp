@@ -10,13 +10,19 @@ import hct_speciale.Item;
 import utillity.FinalVariables;
 
 import java.awt.Toolkit;
+
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Color;
 
 public class MainView {
@@ -156,6 +162,17 @@ public class MainView {
 		});
 		nowaUslugaBtn.setBounds(358, 112, 200, 36);
 		frmHctMagazyn.getContentPane().add(nowaUslugaBtn);
+		
+		Icon settingsImg = new ImageIcon("resources/img/cogs.png");
+		JButton btnSettings = new JButton("Settings", settingsImg);
+		btnSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SettingsFrame.main(null);
+			}
+		});
+		btnSettings.setBounds(574, 180, 52, 52);
+		
+//		btnSettings.setIcon(new ImageIcon(settingsImg))
+		frmHctMagazyn.getContentPane().add(btnSettings);
 	}
-
 }
