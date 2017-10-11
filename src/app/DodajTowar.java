@@ -62,6 +62,7 @@ public class DodajTowar {
 	public DodajTowar() {
 		helper = new Helper();
 		dm = new DatabaseManager();
+		this.fv = new FinalVariables();
 
 		String query = "SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_NUMBER+" DESC LIMIT 1";
 		ArrayList<String> stNoList = dm.selectRecordArrayList(query);

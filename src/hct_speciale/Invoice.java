@@ -33,7 +33,7 @@ public class Invoice {
 		this.filePathName = p_file_path_name;
 		this.total = p_total;
 
-		this.sPrinter = new StockPrinter();
+		this.sPrinter = new StockPrinter("");
 
 		this.fv = new FinalVariables();
 		this.helper = new Helper();

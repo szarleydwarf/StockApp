@@ -39,11 +39,11 @@ public class SettingsFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(String invoiceFolderPath) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					SettingsFrame window = new SettingsFrame();
+					SettingsFrame window = new SettingsFrame(invoiceFolderPath);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -54,20 +54,22 @@ public class SettingsFrame {
 
 	/**
 	 * Create the application.
+	 * @param invoiceFolderPath 
 	 */
-	public SettingsFrame() {
+	public SettingsFrame(String invoiceFolderPath) {
 		DM = new DatabaseManager();
 		this.helper = new Helper();
 		this.fv = new FinalVariables();
 		
 		fc = new JFileChooser();
 		
-		folderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"=1");
+		folderPath = invoiceFolderPath;//DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"=1");
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		defaultFolder = new File(folderPath);
 		
 		this.helper.createFolderIfNotExist(folderPath);
 		fc.setCurrentDirectory(defaultFolder);
+		
 		initialize();
 	}
 
@@ -78,6 +80,11 @@ public class SettingsFrame {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 722, 235);
 		frame.getContentPane().setLayout(null);
+		
+		JLabel lblSaveFolderPathInfo = new JLabel("Folder z rachunkami:");
+		lblSaveFolderPathInfo.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblSaveFolderPathInfo.setBounds(10, 21, 138, 24);
+		frame.getContentPane().add(lblSaveFolderPathInfo);
 		
 		
 		lblSaveFolderPath = new JLabel("");
@@ -101,10 +108,20 @@ public class SettingsFrame {
 		btnSaveFolderPath.setBounds(618, 23, 78, 23);
 		frame.getContentPane().add(btnSaveFolderPath);
 		
-		JLabel lblSaveFolderPathInfo = new JLabel("Folder z rachunkami:");
-		lblSaveFolderPathInfo.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblSaveFolderPathInfo.setBounds(10, 21, 138, 24);
-		frame.getContentPane().add(lblSaveFolderPathInfo);
+		JLabel lblDBSavePathInfo = new JLabel("Folder z baz\u0105 danych");
+		lblDBSavePathInfo.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblDBSavePathInfo.setBounds(10, 56, 138, 24);
+		frame.getContentPane().add(lblDBSavePathInfo);
+		
+		JLabel lblDBSavePath = new JLabel("<dynamic>");
+		lblDBSavePath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblDBSavePath.setBounds(147, 56, 464, 24);
+		frame.getContentPane().add(lblDBSavePath);
+		
+		JButton btnSaveDBPath = new JButton("Zmie\u0144");
+		btnSaveDBPath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnSaveDBPath.setBounds(618, 58, 78, 23);
+		frame.getContentPane().add(btnSaveDBPath);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {

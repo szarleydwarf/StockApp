@@ -72,11 +72,16 @@ public class StockPrinter  {
 	private String invoiceFileName;
 	private String fileName;
 	
-	public StockPrinter(){
+	public StockPrinter(String invoiceFolderPath){
 		DM = new DatabaseManager();
 		helper = new Helper();
 		this.fv = new FinalVariables();
-		this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		if(invoiceFolderPath.isEmpty())
+			this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		else
+			this.savePath = invoiceFolderPath;
+		
+		this.savePath+="/";
 		
 		this.stockServicesNumber = new ArrayList<String>();
 	}

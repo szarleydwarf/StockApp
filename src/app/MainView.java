@@ -31,7 +31,15 @@ public class MainView {
 	
 	private DatabaseManager DM;
 	private int invoiceNum;
+	private String invoiceFolderPath = "";
 
+	public String getInvoiceFolderPath() {
+		return invoiceFolderPath;
+	}
+
+	public void setInvoiceFolderPath(String invoiceFolderPath) {
+		this.invoiceFolderPath = invoiceFolderPath;
+	}
 	private FinalVariables fv;
 	/**
 	 * Launch the application.
@@ -59,7 +67,8 @@ public class MainView {
 		DM = new DatabaseManager();
 
 		this.fv = new FinalVariables();
-		
+		invoiceFolderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"=1");
+
 		initialize();
 	}
 
@@ -105,16 +114,6 @@ public class MainView {
 		stockBtn.setBounds(60, 52, 200, 36);
 		frmHctMagazyn.getContentPane().add(stockBtn);
 		
-//		JButton servicesBtn = new JButton("Wyswietl uslugi");
-//		servicesBtn.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				frmHctMagazyn.dispose();
-//				WyswietlListeUslug.main(null);
-//			}
-//		});
-//		servicesBtn.setBounds(358, 173, 200, 36);
-//		frmHctMagazyn.getContentPane().add(servicesBtn);
-		
 		JButton invoiceBtn = new JButton("Wyswietl rachunki");
 		invoiceBtn.setBackground(new Color(135, 206, 235));
 		invoiceBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
@@ -133,7 +132,7 @@ public class MainView {
 		nowyRachunekBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frmHctMagazyn.dispose();
-				WystawRachunek.main(null);
+				WystawRachunek.main(invoiceFolderPath);
 			}
 		});
 		nowyRachunekBtn.setBounds(358, 52, 200, 36);
@@ -167,12 +166,12 @@ public class MainView {
 		JButton btnSettings = new JButton("Settings", settingsImg);
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				SettingsFrame.main(null);
+				frmHctMagazyn.dispose();
+				SettingsFrame.main(invoiceFolderPath);
 			}
 		});
 		btnSettings.setBounds(574, 180, 52, 52);
 		
-//		btnSettings.setIcon(new ImageIcon(settingsImg))
 		frmHctMagazyn.getContentPane().add(btnSettings);
 	}
 }

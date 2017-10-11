@@ -6,9 +6,10 @@ public class FinalVariables {
 	public final String WINDOW_ERROR = "Coś poszło nie tak\n";
 	
 	//paths - consider to allow to specify this by user
-	public final String ICON_PATH = "D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\icon_hct.png";
-	public final String INVOICE_LOGO_PATH = "D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\resources\\img\\Logo HCT 245x84.png";
-	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP/";
+	public final String ICON_PATH = "resources\\img\\icon_hct.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
+	public final String INVOICE_LOGO_PATH = "resources\\img\\Logo HCT 245x84.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
+	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP";
+	public final String DATABASE_DEFAULT_PATH = "dbase\\theDBase.sqlite";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
 	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	
 	public final String INTEGER_PATTERN = "^-?\\d+$";

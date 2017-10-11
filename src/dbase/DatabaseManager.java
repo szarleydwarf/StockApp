@@ -30,7 +30,7 @@ public class DatabaseManager {
 	public Connection connect() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			conn = DriverManager.getConnection("jdbc:sqlite:D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\dbase\\theDBase.sqlite");
+			conn = DriverManager.getConnection("jdbc:sqlite:"+this.fv.DATABASE_DEFAULT_PATH);
 //			JOptionPane.showMessageDialog(null, "Connected!");
 			return conn;
 		} catch (Exception ex) {
