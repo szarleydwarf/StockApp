@@ -272,6 +272,7 @@ public class DatabaseManager {
 		}
 		return new StockItem(stNum, itName, cost, price, qnt);
 		}
+	
 	public String getPath(String query) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;

@@ -30,6 +30,7 @@ public class FinalVariables {
 	public final String SERVICES_TABLE = "services";
 	public final String STOCK_TABLE = "stock";
 	public final String USERS_TABLE = "users";
+	public final String SETTINGS_TABLE = "settings";
 	//Database columns names 
 	public final String SERVICE_TABLE_NUMBER = "service_number";
 	public final String SERVICES_TABLE_SERVICE_NAME = "service_name";
@@ -40,4 +41,7 @@ public class FinalVariables {
 	public final String INVOCE_TABLE_INVOICE_NUMBER = "invoice_number";
 	public final String INVOCE_TABLE_CUSTOMER_NAME = "customer_name";
 	public final String INVOCE_TABLE_DATE = "invoice_date";
-	}
+	public final String SETTINGS_TABLE_PATH = "path";
+	public final String ROW_ID = "rowid";
+	
+}

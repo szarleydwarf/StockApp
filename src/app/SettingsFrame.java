@@ -4,9 +4,11 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import dbase.DatabaseManager;
 import utillity.FinalVariables;
+import utillity.Helper;
 
 import java.awt.Font;
 import java.sql.ResultSet;
@@ -22,14 +24,17 @@ import java.awt.event.ActionEvent;
 public class SettingsFrame {
 
 	private JFrame frame;
-	JFileChooser fc;
+	private JButton btnSaveFolderPath;
+	private JLabel lblSaveFolderPath;
+	private JFileChooser fc;
 	
 	private DatabaseManager DM;
 	private FinalVariables fv;
+	private Helper helper;
 	
 	private String folderPath="";
-	private JButton btnSaveFolderPath;
-	private JLabel lblSaveFolderPath;
+	protected File current;
+	private File defaultFolder;
 
 	/**
 	 * Launch the application.
@@ -52,14 +57,17 @@ public class SettingsFrame {
 	 */
 	public SettingsFrame() {
 		DM = new DatabaseManager();
-
+		this.helper = new Helper();
 		this.fv = new FinalVariables();
 		
 		fc = new JFileChooser();
 		
-		folderPath = DM.getPath("SELECT path FROM settings WHERE rowid=1");
-		System.out.println(folderPath);
+		folderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"=1");
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		defaultFolder = new File(folderPath);
 		
+		this.helper.createFolderIfNotExist(folderPath);
+		fc.setCurrentDirectory(defaultFolder);
 		initialize();
 	}
 
@@ -69,22 +77,20 @@ public class SettingsFrame {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 722, 235);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		
 		lblSaveFolderPath = new JLabel("");
 		lblSaveFolderPath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblSaveFolderPath.setBounds(10, 21, 600, 24);
+		lblSaveFolderPath.setBounds(147, 21, 464, 24);
 		lblSaveFolderPath.setText(folderPath);
 		frame.getContentPane().add(lblSaveFolderPath);
-		
-		btnSaveFolderPath = new JButton("...");
+    	
+		btnSaveFolderPath = new JButton("Zmie\u0144");
 		btnSaveFolderPath.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					performAction(e);
+		            performAction(e);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -94,18 +100,47 @@ public class SettingsFrame {
 		btnSaveFolderPath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnSaveFolderPath.setBounds(618, 23, 78, 23);
 		frame.getContentPane().add(btnSaveFolderPath);
+		
+		JLabel lblSaveFolderPathInfo = new JLabel("Folder z rachunkami:");
+		lblSaveFolderPathInfo.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblSaveFolderPathInfo.setBounds(10, 21, 138, 24);
+		frame.getContentPane().add(lblSaveFolderPathInfo);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(frame, 
+		            fv.CLOSE_WINDOW, fv.CLOSE_WINDOW, 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        	MainView.main(null);
+		        }
+		    }
+		});
 	}
 	
 	private void performAction(ActionEvent e) throws IOException {
-		if (e.getSource() == btnSaveFolderPath) {
-			 int returnVal = fc.showSaveDialog(null);
-	            if (returnVal == JFileChooser.APPROVE_OPTION) {
-	                System.out.println(fc.getCurrentDirectory());
-	                //This is where a real application would save the file.
-//	                (lblSaveFolderPath).setText("Saving: " + file.getName() + ".");
-	            } else {
-	            	(lblSaveFolderPath).setText("Save command cancelled by user.");
-	            }
+		if (e.getSource() == btnSaveFolderPath) {	
+			int returnVal = fc.showSaveDialog(null);
+			File newDir = null;
+			current = fc.getCurrentDirectory().getAbsoluteFile();
+		 
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+            	newDir = fc.getSelectedFile();
+            } else {
+            	newDir = current;
+            }
+        	System.out.println(fc.getCurrentDirectory()+" "+newDir.getAbsoluteFile()+" "+current.getAbsoluteFile());
+            fc.setCurrentDirectory(newDir.getAbsoluteFile());
+            (lblSaveFolderPath).setText(""+newDir.getAbsoluteFile());
+        	
+            //"UPDATE \""+tableName+"\" SET "+colNameToSet+"='"+this.productName+"', cost='"+this.dCost+"', price='"+this.dPrice+"'";
+            String query = "UPDATE \""+this.fv.SETTINGS_TABLE+"\" SET "+this.fv.SETTINGS_TABLE_PATH+"='"+newDir.getAbsolutePath()+"' WHERE "+this.fv.ROW_ID+"=1";
+            boolean updated = this.DM.editRecord(query);
+            if(updated)
+            	System.out.println("SUCCESS");
+            else
+            	System.out.println("O O");
         }
 	}
 }
