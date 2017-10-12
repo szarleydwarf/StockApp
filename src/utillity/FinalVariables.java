@@ -8,8 +8,10 @@ public class FinalVariables {
 	//paths - consider to allow to specify this by user
 	public final String ICON_PATH = "resources\\img\\icon_hct.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
 	public final String INVOICE_LOGO_PATH = "resources\\img\\Logo HCT 245x84.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
-	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP";
 	public final String DATABASE_DEFAULT_PATH = "dbase\\theDBase.sqlite";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
+	public String PRINTER_NAME = "Canon MP620 series Printer WS";
+	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP";
+	
 	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	
 	public final String INTEGER_PATTERN = "^-?\\d+$";
@@ -45,4 +47,7 @@ public class FinalVariables {
 	public final String SETTINGS_TABLE_PATH = "path";
 	public final String ROW_ID = "rowid";
 	
+	public final int DEFAULT_FOLDER_DATABASE_ROW_ID = 1;
+	public final int PRINTER_DATABASE_ROW_ID = 2;
+
 }

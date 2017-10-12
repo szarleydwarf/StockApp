@@ -52,13 +52,15 @@ public class Invoice {
 	}
 	
 	public void print() {
-		String invoicePath = this.fv.SAVE_FOLDER_DEFAULT_PATH+this.filePathName;
+		String invoicePath = this.fv.SAVE_FOLDER_DEFAULT_PATH+"/"+this.filePathName;
+		System.out.println(invoicePath);
 		try {
 			this.sPrinter.printPDF(invoicePath);
 		} catch (IOException e) {
-			System.out.println("IOException "+e.getMessage());
+			System.out.println("Inv IOException "+e.getMessage());
 		} catch (Exception e) {
-			System.out.println("Exception "+e.getMessage());
+			System.out.println("Inv Exception "+e.getMessage());
+			e.printStackTrace();
 			
 		}
 	}

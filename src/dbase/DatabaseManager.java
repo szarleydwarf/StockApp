@@ -276,6 +276,7 @@ public class DatabaseManager {
 	public String getPath(String query) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
+		System.out.println(query);
 		if(this.conn == null)
 			conn = this.connect();
 			try {

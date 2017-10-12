@@ -35,6 +35,7 @@ import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.StockPrinter;
+import javax.swing.ListSelectionModel;
 
 public class WystawRachunek {
 
@@ -63,6 +64,7 @@ public class WystawRachunek {
 	private FinalVariables fv;
 	private String lblCarManufacturerTxt = "Car manufacturer";
 	private String invoiceFolderPath;
+	private String printerName;
 
 	/**
 	 * Launch the application.
@@ -90,6 +92,7 @@ public class WystawRachunek {
 		helper = new Helper();
 		fv = new FinalVariables();
 		this.invoiceFolderPath = invoiceFolderPath;
+		this.printerName = printerName;
 		
 		invoiceNum = DM.getLastInvoiceNumber();
 		if(invoiceNum == 0)
@@ -351,6 +354,7 @@ public class WystawRachunek {
 		frmNowyRachunek.getContentPane().add(lblCarManufacturer);
 			
 		JList listCars = new JList();
+		listCars.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listCars.setModel(modelCars);
 		scrollPaneCarList.setViewportView(listCars);
 		

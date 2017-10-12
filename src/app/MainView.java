@@ -32,15 +32,9 @@ public class MainView {
 	private DatabaseManager DM;
 	private int invoiceNum;
 	private String invoiceFolderPath = "";
-
-	public String getInvoiceFolderPath() {
-		return invoiceFolderPath;
-	}
-
-	public void setInvoiceFolderPath(String invoiceFolderPath) {
-		this.invoiceFolderPath = invoiceFolderPath;
-	}
+//	private String printerName="";
 	private FinalVariables fv;
+
 	/**
 	 * Launch the application.
 	 */
@@ -67,8 +61,8 @@ public class MainView {
 		DM = new DatabaseManager();
 
 		this.fv = new FinalVariables();
-		invoiceFolderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"=1");
-
+		invoiceFolderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"="+this.fv.DEFAULT_FOLDER_DATABASE_ROW_ID);
+		
 		initialize();
 	}
 
@@ -125,7 +119,8 @@ public class MainView {
 		});
 		invoiceBtn.setBounds(208, 171, 200, 36);
 		frmHctMagazyn.getContentPane().add(invoiceBtn);
-		
+
+
 		JButton nowyRachunekBtn = new JButton("Wystaw rachunek");
 		nowyRachunekBtn.setBackground(new Color(135, 206, 235));
 		nowyRachunekBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));

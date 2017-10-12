@@ -46,7 +46,6 @@ import dbase.DatabaseManager;
 
 
 public class StockPrinter  { 
-	private final String printerName = "Canon MP620 series Printer WS";
 	
 	private String savePath = "", accPath = "";
 	private String ext = ".pdf", docNameCopy = "AC_";
@@ -71,11 +70,13 @@ public class StockPrinter  {
 	private boolean jobDone = false;
 	private String invoiceFileName;
 	private String fileName;
+	private String printerName;
 	
 	public StockPrinter(String invoiceFolderPath){
 		DM = new DatabaseManager();
 		helper = new Helper();
 		this.fv = new FinalVariables();
+		this.printerName = "";
 		if(invoiceFolderPath.isEmpty())
 			this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
 		else
@@ -321,14 +322,17 @@ public class StockPrinter  {
 
 	public void printPDF(String docPath) throws IOException, Exception{
         PDDocument document = PDDocument.load(new File(docPath));
-
-        PrintService myPrintService = findPrintService(this.printerName);
+        
+        if(this.printerName.isEmpty() || this.printerName == "")
+        	this.printerName = this.fv.PRINTER_NAME;
+System.out.println(this.printerName);
+        PrintService myPrintService = findPrintService(this.printerName);//this.fv.PRINTER_NAME
         PrintServiceAttributeSet set = myPrintService.getAttributes();
                 
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
-//        System.out.println("Print pdf\nPath:\n"+docPath);
+
         //TODO
         //Uncomment bellow
 //        job.print();

@@ -14,6 +14,7 @@ import utillity.Helper;
 import java.awt.Font;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.JList;
 
 public class SettingsFrame {
@@ -39,10 +41,10 @@ public class SettingsFrame {
 	private FinalVariables fv;
 	private Helper helper;
 	
-	private String folderPath="";
+	private String folderPath="", printerName;
 	protected File current;
 	private File defaultFolder;
-	private Component listPrinters;
+	private JList<String> listPrinters;
 
 	/**
 	 * Launch the application.
@@ -72,6 +74,7 @@ public class SettingsFrame {
 		fc = new JFileChooser();
 		
 		folderPath = invoiceFolderPath;//DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"=1");
+		this.printerName = printerName;
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		defaultFolder = new File(folderPath);
 		
@@ -103,7 +106,8 @@ public class SettingsFrame {
     	
 		listPrinters = new JList<String>();
 		listPrinters.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-
+		listPrinters.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 		btnSaveFolderPath = new JButton("Zmie\u0144");
 		btnSaveFolderPath.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -130,7 +134,7 @@ public class SettingsFrame {
 		frame.getContentPane().add(btnSaveDBPath);
 		
 
-		
+		getPrinterName();
 		getListOfPrinters();
 		
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -147,26 +151,33 @@ public class SettingsFrame {
 		});
 	}
 	
+	private void getPrinterName() {
+
+	}
+
 	private void getListOfPrinters() {
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
         PrintService defPrinter = PrintServiceLookup.lookupDefaultPrintService();
-        
+        String[] temp = new String[printServices.length];
+        int i = 0;
         JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(185, 58, 258, 100);
+		scrollPane.setBounds(185, 58, 426, 100);
 		frame.getContentPane().add(scrollPane);
-		
-		DefaultListModel<String> defModel = new DefaultListModel<>();
-		
+			
         for (PrintService printer : printServices) {
         	String printerName;
         	if(defPrinter != null && defPrinter.getName().compareTo(printer.getName()) == 0) {
-        		printerName = "[DEFAULT]: "+defPrinter.getName();
+        		printerName = defPrinter.getName()+" [DEFAULT]";
         	}else
         		printerName = printer.getName();
         	
-        	defModel.addElement(printerName);
+        	temp[i] = printerName;
+        	i++;
+       
         }
-        ((JList<String>) listPrinters).setModel(defModel);
+        Arrays.sort(temp);
+
+        listPrinters.setListData(temp);
         scrollPane.setViewportView(listPrinters);
 	}
 
