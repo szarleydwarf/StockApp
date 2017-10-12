@@ -1,5 +1,6 @@
 package app;
 
+import java.awt.Component;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -14,12 +15,18 @@ import java.awt.Font;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.swing.AbstractButton;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
+import javax.swing.JScrollPane;
+import javax.swing.JList;
 
 public class SettingsFrame {
 
@@ -35,6 +42,7 @@ public class SettingsFrame {
 	private String folderPath="";
 	protected File current;
 	private File defaultFolder;
+	private Component listPrinters;
 
 	/**
 	 * Launch the application.
@@ -89,10 +97,13 @@ public class SettingsFrame {
 		
 		lblSaveFolderPath = new JLabel("");
 		lblSaveFolderPath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblSaveFolderPath.setBounds(147, 21, 464, 24);
+		lblSaveFolderPath.setBounds(185, 21, 426, 24);
 		lblSaveFolderPath.setText(folderPath);
 		frame.getContentPane().add(lblSaveFolderPath);
     	
+		listPrinters = new JList<String>();
+		listPrinters.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+
 		btnSaveFolderPath = new JButton("Zmie\u0144");
 		btnSaveFolderPath.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -108,20 +119,20 @@ public class SettingsFrame {
 		btnSaveFolderPath.setBounds(618, 23, 78, 23);
 		frame.getContentPane().add(btnSaveFolderPath);
 		
-		JLabel lblDBSavePathInfo = new JLabel("Folder z baz\u0105 danych");
-		lblDBSavePathInfo.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblDBSavePathInfo.setBounds(10, 56, 138, 24);
-		frame.getContentPane().add(lblDBSavePathInfo);
-		
-		JLabel lblDBSavePath = new JLabel("<dynamic>");
-		lblDBSavePath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblDBSavePath.setBounds(147, 56, 464, 24);
-		frame.getContentPane().add(lblDBSavePath);
+		JLabel lblPrinterList = new JLabel("Zainstalowane drukarki");
+		lblPrinterList.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblPrinterList.setBounds(10, 56, 155, 24);
+		frame.getContentPane().add(lblPrinterList);
 		
 		JButton btnSaveDBPath = new JButton("Zmie\u0144");
 		btnSaveDBPath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnSaveDBPath.setBounds(618, 58, 78, 23);
 		frame.getContentPane().add(btnSaveDBPath);
+		
+
+		
+		getListOfPrinters();
+		
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -136,6 +147,29 @@ public class SettingsFrame {
 		});
 	}
 	
+	private void getListOfPrinters() {
+		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+        PrintService defPrinter = PrintServiceLookup.lookupDefaultPrintService();
+        
+        JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(185, 58, 258, 100);
+		frame.getContentPane().add(scrollPane);
+		
+		DefaultListModel<String> defModel = new DefaultListModel<>();
+		
+        for (PrintService printer : printServices) {
+        	String printerName;
+        	if(defPrinter != null && defPrinter.getName().compareTo(printer.getName()) == 0) {
+        		printerName = "[DEFAULT]: "+defPrinter.getName();
+        	}else
+        		printerName = printer.getName();
+        	
+        	defModel.addElement(printerName);
+        }
+        ((JList<String>) listPrinters).setModel(defModel);
+        scrollPane.setViewportView(listPrinters);
+	}
+
 	private void performAction(ActionEvent e) throws IOException {
 		if (e.getSource() == btnSaveFolderPath) {	
 			int returnVal = fc.showSaveDialog(null);

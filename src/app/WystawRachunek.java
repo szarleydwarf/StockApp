@@ -267,6 +267,11 @@ public class WystawRachunek {
 		lblRegistration.setBounds(439, 75, 84, 28);
 		frmNowyRachunek.getContentPane().add(lblRegistration);
 		
+		JLabel labelQuantity = new JLabel("Quantity");
+		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		labelQuantity.setBounds(319, 122, 61, 19);
+		frmNowyRachunek.getContentPane().add(labelQuantity);
+		
 		populateServices();
 		populateItems();
 		populateCarList();
@@ -362,10 +367,7 @@ public class WystawRachunek {
 			
 		});		
 		
-		JLabel labelQuantity = new JLabel("Quantity");
-		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		labelQuantity.setBounds(319, 122, 61, 19);
-		frmNowyRachunek.getContentPane().add(labelQuantity);
+
 	}
 
 	private void populateItems() throws Exception {
