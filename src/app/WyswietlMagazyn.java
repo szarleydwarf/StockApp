@@ -137,7 +137,7 @@ public class WyswietlMagazyn {
 		label.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		label.setBorder(border);
 		label.setVerticalAlignment(SwingConstants.TOP);
-		label.setBounds(10, 89, 527, 461);
+		label.setBounds(10, 89, 551, 461);
 		
 		label.setVerticalAlignment(SwingConstants.TOP);
 		frame.getContentPane().add(label);
@@ -219,7 +219,7 @@ public class WyswietlMagazyn {
 			}
 		});
 		btnDelete.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		btnDelete.setBounds(455, 512, 71, 20);
+		btnDelete.setBounds(468, 490, 71, 20);
 		frame.getContentPane().add(btnDelete);
 		
 		this.list.addListSelectionListener(new ListSelectionListener() {
@@ -246,6 +246,16 @@ public class WyswietlMagazyn {
 		        }
 		    }
 		});
+		
+		JButton btnBack = new JButton("Powr\u00F3t");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				MainView.main(null);
+			}
+		});
+		btnBack.setBounds(452, 515, 100, 23);
+		frame.getContentPane().add(btnBack);
 	}
 	
 	private void deleteRocordFromDatabase() {
@@ -308,12 +318,23 @@ public class WyswietlMagazyn {
 	}
 
 	private void searchInDatabase() {
+		//"SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+"=\""+des+"\" 
+		//union all SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+"=\""+des+"\""
 		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
 		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
 			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+				
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		ArrayList<Item> listOfItems = DM.getItemsList(query);
+		
+		if(listOfItems.size() <= 0){
+			query = "SELECT * FROM "+this.fv.SERVICES_TABLE+"";
+			if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
+				query += " WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+			
+			listOfItems = DM.getItemsList(query);
+		}
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
 			Item item = listOfItems.get(i);

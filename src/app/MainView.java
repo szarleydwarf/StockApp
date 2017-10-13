@@ -10,13 +10,19 @@ import hct_speciale.Item;
 import utillity.FinalVariables;
 
 import java.awt.Toolkit;
+
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Color;
 
 public class MainView {
@@ -25,8 +31,12 @@ public class MainView {
 	
 	private DatabaseManager DM;
 	private int invoiceNum;
-
+	private String invoiceFolderPath = "";
+//	private String printerName="";
 	private FinalVariables fv;
+
+private ArrayList<String> defaultPaths;
+
 	/**
 	 * Launch the application.
 	 */
@@ -51,8 +61,14 @@ public class MainView {
 	 */
 	public MainView() {
 		DM = new DatabaseManager();
-
+		defaultPaths = new ArrayList<String>();
+		
 		this.fv = new FinalVariables();
+		
+		if(this.defaultPaths.isEmpty())
+			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+//		for(int i = 0; i < defaultPaths.size(); i++)
+//			System.out.println(defaultPaths.get(i));
 		
 		initialize();
 	}
@@ -99,16 +115,6 @@ public class MainView {
 		stockBtn.setBounds(60, 52, 200, 36);
 		frmHctMagazyn.getContentPane().add(stockBtn);
 		
-//		JButton servicesBtn = new JButton("Wyswietl uslugi");
-//		servicesBtn.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				frmHctMagazyn.dispose();
-//				WyswietlListeUslug.main(null);
-//			}
-//		});
-//		servicesBtn.setBounds(358, 173, 200, 36);
-//		frmHctMagazyn.getContentPane().add(servicesBtn);
-		
 		JButton invoiceBtn = new JButton("Wyswietl rachunki");
 		invoiceBtn.setBackground(new Color(135, 206, 235));
 		invoiceBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
@@ -120,14 +126,15 @@ public class MainView {
 		});
 		invoiceBtn.setBounds(208, 171, 200, 36);
 		frmHctMagazyn.getContentPane().add(invoiceBtn);
-		
+
+
 		JButton nowyRachunekBtn = new JButton("Wystaw rachunek");
 		nowyRachunekBtn.setBackground(new Color(135, 206, 235));
 		nowyRachunekBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		nowyRachunekBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frmHctMagazyn.dispose();
-				WystawRachunek.main(null);
+				WystawRachunek.main(defaultPaths);
 			}
 		});
 		nowyRachunekBtn.setBounds(358, 52, 200, 36);
@@ -156,6 +163,17 @@ public class MainView {
 		});
 		nowaUslugaBtn.setBounds(358, 112, 200, 36);
 		frmHctMagazyn.getContentPane().add(nowaUslugaBtn);
+		
+		Icon settingsImg = new ImageIcon("resources/img/cogs.png");
+		JButton btnSettings = new JButton("Settings", settingsImg);
+		btnSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frmHctMagazyn.dispose();
+				SettingsFrame.main(defaultPaths);
+			}
+		});
+		btnSettings.setBounds(574, 180, 52, 52);
+		
+		frmHctMagazyn.getContentPane().add(btnSettings);
 	}
-
 }

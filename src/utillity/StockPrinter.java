@@ -45,9 +45,7 @@ import org.apache.xmpbox.type.Attribute;
 import dbase.DatabaseManager;
 
 
-public class StockPrinter  { //implements Printable
-	private final String imagePath = "D:/@Development/EclipseJavaProjects/sqliteTestApp/StockApp/resources/img/Logo HCT 245x84.png";
-	private final String printerName = "Canon MP620 series Printer WS";
+public class StockPrinter  { 
 	
 	private String savePath = "", accPath = "";
 	private String ext = ".pdf", docNameCopy = "AC_";
@@ -62,7 +60,7 @@ public class StockPrinter  { //implements Printable
 	private int itemCount = 0, servCount = 0;
 	private int invNo = 1, stringLengthF = 3, stringLengthB = 12;
 	private char paddingChar = ' ';
-	private String carManufacturer = "NONE", carRegistration = "00AA0000", invSt = "Invoice", noSt = "No.", date;
+	private String carManufacturer = "OTHER", carRegistration = "00AA0000", invSt = "Invoice", noSt = "No.", date;
 	
 	private Helper helper;
 	private DatabaseManager DM;
@@ -70,26 +68,47 @@ public class StockPrinter  { //implements Printable
 	
 	private ArrayList<String> stockServicesNumber;
 	private boolean jobDone = false;
+	private String invoiceFileName;
+	private String fileName;
+	private String printerName;
+	private ArrayList<String> m_defaultPaths;
 	
-	public StockPrinter(){
+	public StockPrinter(ArrayList<String> defaultPaths){
 		DM = new DatabaseManager();
 		helper = new Helper();
 		this.fv = new FinalVariables();
-		this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		this.printerName = "";
+		
+		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
+			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
+		else{
+			m_defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+			if(this.m_defaultPaths != null)
+				this.savePath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
+			else
+				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		}
+		
+		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
+			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
+		else
+			this.printerName = this.fv.PRINTER_NAME;
+		
+		this.savePath+="/";
 		
 		this.stockServicesNumber = new ArrayList<String>();
 	}
 	
 	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
-		String fDate = helper.getFormatedDate();
+		this.date = helper.getFormatedDate();
 		
-		savePath = savePath.concat(fDate);
+		savePath = savePath.concat(this.date);
 		helper.createFolderIfNotExist(savePath);
 		
 		accPath = savePath + "/accountacy copy";
 		helper.createFolderIfNotExist(accPath);
 
-		this.df = new DecimalFormat("#.##"); 
+		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 		this.md = (DefaultListModel)list.getModel();
 		this.discount = discount;
 		this.applyDiscount = applyDiscount;
@@ -98,7 +117,6 @@ public class StockPrinter  { //implements Printable
 			this.carRegistration = registration;
 		this.invNo = invoiceNum;
 		
-		this.date = helper.getFormatedDate();
 		
 		generatePDF();
 
@@ -111,10 +129,6 @@ public class StockPrinter  { //implements Printable
 
 
 	private void saveEntryToDatabase() throws SQLException {
-		Calendar today = Calendar.getInstance();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String todayDate = dateFormat.format(today.getTime());
-		
 		String servNo = "", itemNo = "";
 		for(String s : stockServicesNumber){
 			if(s.contains("AAA")){
@@ -132,8 +146,8 @@ public class StockPrinter  { //implements Printable
 		while(i<timeout){
 			i++;
 		}
-		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +","+todayDate    +");";
-		System.out.println("Q: "+query);
+		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"');";
+//		System.out.println("Q: "+query);
 		
 		boolean succes = DM.addNewRecord(query);
 		if(succes){
@@ -157,13 +171,15 @@ public class StockPrinter  { //implements Printable
 		populateItemsTable();
 
 		contentStream.close();
-		docPath = savePath+"/"+date+" "+invNo+ext;
+		this.fileName =  date+" "+invNo+ext; 
+		this.invoiceFileName = date+"/"+this.fileName;
+		docPath = savePath+"/"+this.fileName;
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
 
 	private void addLogo(PDDocument customerCopyDoc) throws IOException {
-		PDImageXObject pdImage = PDImageXObject.createFromFile(imagePath, customerCopyDoc);
+		PDImageXObject pdImage = PDImageXObject.createFromFile(this.fv.INVOICE_LOGO_PATH, customerCopyDoc);
 		
 		contentStream.drawImage(pdImage, 210,  675);
 		contentStream.setNonStrokingColor(Color.darkGray);
@@ -318,14 +334,17 @@ public class StockPrinter  { //implements Printable
 
 	public void printPDF(String docPath) throws IOException, Exception{
         PDDocument document = PDDocument.load(new File(docPath));
-
-        PrintService myPrintService = findPrintService(this.printerName);
+        
+        if(this.printerName.isEmpty() || this.printerName == "")
+        	this.printerName = this.fv.PRINTER_NAME;
+System.out.println(this.printerName);
+        PrintService myPrintService = findPrintService(this.printerName);//this.fv.PRINTER_NAME
         PrintServiceAttributeSet set = myPrintService.getAttributes();
                 
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
-//        System.out.println("Print pdf\nPath:\n"+docPath);
+
         //TODO
         //Uncomment bellow
 //        job.print();
