@@ -64,10 +64,11 @@ private ArrayList<String> defaultPaths;
 		defaultPaths = new ArrayList<String>();
 		
 		this.fv = new FinalVariables();
-//		invoiceFolderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"="+this.fv.DEFAULT_FOLDER_DATABASE_ROW_ID);
-		defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
-		for(int i = 0; i < defaultPaths.size(); i++)
-			System.out.println(defaultPaths.get(i));
+		
+		if(this.defaultPaths.isEmpty())
+			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+//		for(int i = 0; i < defaultPaths.size(); i++)
+//			System.out.println(defaultPaths.get(i));
 		
 		initialize();
 	}

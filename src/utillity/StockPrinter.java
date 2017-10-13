@@ -79,7 +79,7 @@ public class StockPrinter  {
 		this.fv = new FinalVariables();
 		this.printerName = "";
 		
-		if(defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
+		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
 			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
 		else{
 			m_defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
@@ -89,7 +89,7 @@ public class StockPrinter  {
 				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
 		}
 		
-		if(defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
+		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
 			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
 		else
 			this.printerName = this.fv.PRINTER_NAME;

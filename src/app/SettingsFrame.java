@@ -1,5 +1,6 @@
 package app;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 
@@ -29,6 +30,8 @@ import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JList;
 
 public class SettingsFrame {
@@ -43,9 +46,13 @@ public class SettingsFrame {
 	private Helper helper;
 	
 	private String folderPath="", printerName;
+	private String selectedPrinterName;
 	protected File current;
 	private File defaultFolder;
 	private JList<String> listPrinters;
+	private ArrayList<String> m_defaultPaths;
+	private JLabel lblPrinterNameDisplay;
+	private final String defString = "[DEFAULT]";
 
 	/**
 	 * Launch the application.
@@ -74,12 +81,17 @@ public class SettingsFrame {
 		
 		fc = new JFileChooser();
 		
-		if(defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
+		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
 			folderPath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
-		else
-			this.folderPath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		else{
+			m_defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+			if(this.m_defaultPaths != null)
+				this.folderPath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
+			else
+				this.folderPath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		}
 		
-		if(defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
+		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
 			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
 		else
 			this.printerName = this.fv.PRINTER_NAME;
@@ -98,7 +110,7 @@ public class SettingsFrame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 722, 235);
+		frame.setBounds(100, 100, 722, 271);
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblSaveFolderPathInfo = new JLabel("Folder z rachunkami:");
@@ -134,12 +146,17 @@ public class SettingsFrame {
 		
 		JLabel lblPrinterList = new JLabel("Zainstalowane drukarki");
 		lblPrinterList.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblPrinterList.setBounds(10, 56, 155, 24);
+		lblPrinterList.setBounds(10, 97, 155, 24);
 		frame.getContentPane().add(lblPrinterList);
 		
 		JButton btnSaveDBPath = new JButton("Zmie\u0144");
+		btnSaveDBPath.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				savePrinterToDatabase();
+			}
+		});
 		btnSaveDBPath.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnSaveDBPath.setBounds(618, 58, 78, 23);
+		btnSaveDBPath.setBounds(618, 99, 78, 23);
 		frame.getContentPane().add(btnSaveDBPath);
 		
 		JButton btnBack = new JButton("Powr\u00F3t");
@@ -149,8 +166,20 @@ public class SettingsFrame {
 				MainView.main(null);
 			}
 		});
-		btnBack.setBounds(618, 162, 78, 23);
+		btnBack.setBounds(618, 203, 78, 23);
 		frame.getContentPane().add(btnBack);
+        
+        JLabel lblPrinterName = new JLabel("Ustawiona drukarka");
+        lblPrinterName.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+        lblPrinterName.setBounds(10, 62, 138, 24);
+        frame.getContentPane().add(lblPrinterName);
+        
+        lblPrinterNameDisplay = new JLabel("");
+        lblPrinterNameDisplay.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+        lblPrinterNameDisplay.setBounds(185, 62, 426, 24);
+        frame.getContentPane().add(lblPrinterNameDisplay);
+        
+        lblPrinterNameDisplay.setText(printerName);
 
 		getPrinterName();
 		getListOfPrinters();
@@ -169,8 +198,46 @@ public class SettingsFrame {
 		});
 	}
 	
-	private void getPrinterName() {
+	protected void savePrinterToDatabase() {
+		if (JOptionPane.showConfirmDialog(frame, 
+	            fv.PRINTER_CHANGE, fv.CLOSE_WINDOW, 
+	            JOptionPane.YES_NO_OPTION,
+	            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+			
+			if(selectedPrinterName.contains(defString)){
+				String regex = "\\s*["+defString+"]\\s*";
+//				selectedPrinterName = selectedPrinterName.replaceAll(regex, "");
+				selectedPrinterName = selectedPrinterName.substring(0, selectedPrinterName.indexOf("["));
+				System.out.println("pName "+selectedPrinterName);
+			}
+			
+        	String query = "UPDATE \""+this.fv.SETTINGS_TABLE+"\" SET "+this.fv.SETTINGS_TABLE_PATH+"='"+selectedPrinterName+"' WHERE "+this.fv.ROW_ID+"="+this.fv.PRINTER_DATABASE_ROW_ID+"";
+			boolean saved = this.DM.editRecord(query );
+			if(saved){
+            	JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
+            	printerName = selectedPrinterName;
+            	lblPrinterNameDisplay.setText(printerName);
+			} else
+            	JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
+            
+		}else{
+			System.out.println("operacja anulowana");
+			
+		}
+		
+	}
 
+	private void getPrinterName() {
+		this.listPrinters.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent listSelectionEvent) {
+				if(!listPrinters.isSelectionEmpty()){
+//					System.out.println(listPrinters.getSelectedValue());
+					selectedPrinterName = listPrinters.getSelectedValue();
+				} 
+			}
+		});
 	}
 
 	private void getListOfPrinters() {
@@ -179,13 +246,13 @@ public class SettingsFrame {
         String[] temp = new String[printServices.length];
         int i = 0;
         JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(185, 58, 426, 100);
+		scrollPane.setBounds(185, 99, 426, 100);
 		frame.getContentPane().add(scrollPane);
 			
         for (PrintService printer : printServices) {
         	String printerName;
         	if(defPrinter != null && defPrinter.getName().compareTo(printer.getName()) == 0) {
-        		printerName = defPrinter.getName()+" [DEFAULT]";
+        		printerName = defPrinter.getName()+defString ;
         	}else
         		printerName = printer.getName();
         	
@@ -213,14 +280,13 @@ public class SettingsFrame {
         	System.out.println(fc.getCurrentDirectory()+" "+newDir.getAbsoluteFile()+" "+current.getAbsoluteFile());
             fc.setCurrentDirectory(newDir.getAbsoluteFile());
             (lblSaveFolderPath).setText(""+newDir.getAbsoluteFile());
-        	
-            //"UPDATE \""+tableName+"\" SET "+colNameToSet+"='"+this.productName+"', cost='"+this.dCost+"', price='"+this.dPrice+"'";
-            String query = "UPDATE \""+this.fv.SETTINGS_TABLE+"\" SET "+this.fv.SETTINGS_TABLE_PATH+"='"+newDir.getAbsolutePath()+"' WHERE "+this.fv.ROW_ID+"=1";
+
+            String query = "UPDATE \""+this.fv.SETTINGS_TABLE+"\" SET "+this.fv.SETTINGS_TABLE_PATH+"='"+newDir.getAbsolutePath()+"' WHERE "+this.fv.ROW_ID+"="+this.fv.DEFAULT_FOLDER_DATABASE_ROW_ID+"";
             boolean updated = this.DM.editRecord(query);
             if(updated)
-            	System.out.println("SUCCESS");
+            	JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
             else
-            	System.out.println("O O");
+            	JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
         }
 	}
 }

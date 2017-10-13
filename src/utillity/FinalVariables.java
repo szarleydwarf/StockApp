@@ -4,6 +4,7 @@ public class FinalVariables {
 	//JOptionPane messages
 	public final String CLOSE_WINDOW = "Czy napewno chcesz zamknąć te okienko?";
 	public final String WINDOW_ERROR = "Coś poszło nie tak\n";
+	public final String PRINTER_CHANGE = "Czy napewno chcesz zmienić drukarkę? Może to spowodować problemy z drukowaniem.";
 	
 	//paths - consider to allow to specify this by user
 	public final String ICON_PATH = "resources\\img\\icon_hct.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
