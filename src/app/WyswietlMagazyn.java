@@ -137,7 +137,7 @@ public class WyswietlMagazyn {
 		label.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		label.setBorder(border);
 		label.setVerticalAlignment(SwingConstants.TOP);
-		label.setBounds(10, 89, 527, 461);
+		label.setBounds(10, 89, 551, 461);
 		
 		label.setVerticalAlignment(SwingConstants.TOP);
 		frame.getContentPane().add(label);
@@ -219,7 +219,7 @@ public class WyswietlMagazyn {
 			}
 		});
 		btnDelete.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		btnDelete.setBounds(455, 512, 71, 20);
+		btnDelete.setBounds(468, 490, 71, 20);
 		frame.getContentPane().add(btnDelete);
 		
 		this.list.addListSelectionListener(new ListSelectionListener() {
@@ -246,6 +246,16 @@ public class WyswietlMagazyn {
 		        }
 		    }
 		});
+		
+		JButton btnBack = new JButton("Powr\u00F3t");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				MainView.main(null);
+			}
+		});
+		btnBack.setBounds(452, 515, 100, 23);
+		frame.getContentPane().add(btnBack);
 	}
 	
 	private void deleteRocordFromDatabase() {

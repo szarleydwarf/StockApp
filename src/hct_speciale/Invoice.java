@@ -1,7 +1,7 @@
 package hct_speciale;
 
 import java.io.IOException;
-import java.util.Calendar;
+import java.util.ArrayList;
 
 import utillity.FinalVariables;
 import utillity.Helper;
@@ -23,6 +23,7 @@ public class Invoice {
 	private Helper helper;
 	private StockPrinter sPrinter;
 	private FinalVariables fv;
+	private ArrayList<String> defaultPaths = new ArrayList<String>();
 	
 	public Invoice(int p_invoice_number, String p_customer_name, String p_service_number, String p_item_number, String p_invoice_date, String p_file_path_name, double p_total){
 		this.invoiceNumber = p_invoice_number;
@@ -32,15 +33,17 @@ public class Invoice {
 		this.invoiceDateString = p_invoice_date;
 		this.filePathName = p_file_path_name;
 		this.total = p_total;
+		
+//		this.defaultPaths = p_default_paths;
 
-		this.sPrinter = new StockPrinter("");
+		this.sPrinter = new StockPrinter(null);
 
 		this.fv = new FinalVariables();
 		this.helper = new Helper();
 	}
 	
 	public Invoice() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	@Override

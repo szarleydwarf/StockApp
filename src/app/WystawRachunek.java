@@ -63,17 +63,17 @@ public class WystawRachunek {
 	private DatabaseManager DM;	
 	private FinalVariables fv;
 	private String lblCarManufacturerTxt = "Car manufacturer";
-	private String invoiceFolderPath;
-	private String printerName;
+	private ArrayList<String> defaultPaths;
+	
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String invoiceFolderPath) {
+	public static void main(ArrayList<String> defaultPaths) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					WystawRachunek window = new WystawRachunek(invoiceFolderPath);
+					WystawRachunek window = new WystawRachunek(defaultPaths);
 					window.frmNowyRachunek.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -84,15 +84,16 @@ public class WystawRachunek {
 
 	/**
 	 * Create the application.
-	 * @param invoiceFolderPath 
+	 * @param defaultPaths 
 	 * @throws SQLException 
 	 */
-	public WystawRachunek(String invoiceFolderPath) throws SQLException {
+	public WystawRachunek(ArrayList<String> defaultPaths) throws SQLException {
 		DM = new DatabaseManager();
 		helper = new Helper();
 		fv = new FinalVariables();
-		this.invoiceFolderPath = invoiceFolderPath;
-		this.printerName = printerName;
+		//TODO: add check for arraylist null?
+		this.defaultPaths = new ArrayList<String>();
+		this.defaultPaths = defaultPaths;
 		
 		invoiceNum = DM.getLastInvoiceNumber();
 		if(invoiceNum == 0)
@@ -201,7 +202,7 @@ public class WystawRachunek {
 
 			public void actionPerformed(ActionEvent arg0) {
 				
-				sPrinter = new StockPrinter(invoiceFolderPath);
+				sPrinter = new StockPrinter(defaultPaths);
 				try {
 					invoiceNum += 1;
 					registration = textFieldRegistration.getText();
@@ -222,7 +223,7 @@ public class WystawRachunek {
 		});
 		btnPrint.setForeground(Color.BLACK);
 		btnPrint.setBackground(new Color(178, 34, 34));
-		btnPrint.setBounds(439, 498, 248, 32);
+		btnPrint.setBounds(439, 457, 248, 32);
 		frmNowyRachunek.getContentPane().add(btnPrint);
 		
 
@@ -275,6 +276,16 @@ public class WystawRachunek {
 		labelQuantity.setBounds(319, 122, 61, 19);
 		frmNowyRachunek.getContentPane().add(labelQuantity);
 		
+		JButton btnBack = new JButton("Powr\u00F3t");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frmNowyRachunek.dispose();
+				MainView.main(null);
+			}
+		});
+		btnBack.setBounds(648, 515, 89, 23);
+		frmNowyRachunek.getContentPane().add(btnBack);
+		
 		populateServices();
 		populateItems();
 		populateCarList();
@@ -302,7 +313,7 @@ public class WystawRachunek {
 		lblTotal = new JLabel(lblTotalSt);
 		lblTotal.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
 		lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTotal.setBounds(450, 447, 205, 32);
+		lblTotal.setBounds(470, 403, 205, 32);
 		frmNowyRachunek.getContentPane().add(lblTotal);
 
 		btnCalculate.addActionListener(new ActionListener() {
@@ -322,7 +333,7 @@ public class WystawRachunek {
 		});
 		btnCalculate.setForeground(new Color(0, 0, 0));
 		btnCalculate.setBackground(new Color(220, 20, 60));
-		btnCalculate.setBounds(304, 447, 120, 32);
+		btnCalculate.setBounds(336, 403, 120, 32);
 		frmNowyRachunek.getContentPane().add(btnCalculate);
 	}
 

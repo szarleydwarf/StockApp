@@ -35,6 +35,8 @@ public class MainView {
 //	private String printerName="";
 	private FinalVariables fv;
 
+private ArrayList<String> defaultPaths;
+
 	/**
 	 * Launch the application.
 	 */
@@ -59,9 +61,13 @@ public class MainView {
 	 */
 	public MainView() {
 		DM = new DatabaseManager();
-
+		defaultPaths = new ArrayList<String>();
+		
 		this.fv = new FinalVariables();
-		invoiceFolderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"="+this.fv.DEFAULT_FOLDER_DATABASE_ROW_ID);
+//		invoiceFolderPath = DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"="+this.fv.DEFAULT_FOLDER_DATABASE_ROW_ID);
+		defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+		for(int i = 0; i < defaultPaths.size(); i++)
+			System.out.println(defaultPaths.get(i));
 		
 		initialize();
 	}
@@ -127,7 +133,7 @@ public class MainView {
 		nowyRachunekBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frmHctMagazyn.dispose();
-				WystawRachunek.main(invoiceFolderPath);
+				WystawRachunek.main(defaultPaths);
 			}
 		});
 		nowyRachunekBtn.setBounds(358, 52, 200, 36);
@@ -162,7 +168,7 @@ public class MainView {
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frmHctMagazyn.dispose();
-				SettingsFrame.main(invoiceFolderPath);
+				SettingsFrame.main(defaultPaths);
 			}
 		});
 		btnSettings.setBounds(574, 180, 52, 52);

@@ -14,6 +14,7 @@ import utillity.Helper;
 import java.awt.Font;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.print.PrintService;
@@ -49,11 +50,11 @@ public class SettingsFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String invoiceFolderPath) {
+	public static void main(ArrayList<String> defaultPaths) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					SettingsFrame window = new SettingsFrame(invoiceFolderPath);
+					SettingsFrame window = new SettingsFrame(defaultPaths);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -64,17 +65,25 @@ public class SettingsFrame {
 
 	/**
 	 * Create the application.
-	 * @param invoiceFolderPath 
+	 * @param defaultPaths 
 	 */
-	public SettingsFrame(String invoiceFolderPath) {
+	public SettingsFrame(ArrayList<String> defaultPaths) {
 		DM = new DatabaseManager();
 		this.helper = new Helper();
 		this.fv = new FinalVariables();
 		
 		fc = new JFileChooser();
 		
-		folderPath = invoiceFolderPath;//DM.getPath("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"=1");
-		this.printerName = printerName;
+		if(defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
+			folderPath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
+		else
+			this.folderPath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		
+		if(defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
+			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
+		else
+			this.printerName = this.fv.PRINTER_NAME;
+		
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		defaultFolder = new File(folderPath);
 		
@@ -133,6 +142,15 @@ public class SettingsFrame {
 		btnSaveDBPath.setBounds(618, 58, 78, 23);
 		frame.getContentPane().add(btnSaveDBPath);
 		
+		JButton btnBack = new JButton("Powr\u00F3t");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				MainView.main(null);
+			}
+		});
+		btnBack.setBounds(618, 162, 78, 23);
+		frame.getContentPane().add(btnBack);
 
 		getPrinterName();
 		getListOfPrinters();

@@ -71,16 +71,28 @@ public class StockPrinter  {
 	private String invoiceFileName;
 	private String fileName;
 	private String printerName;
+	private ArrayList<String> m_defaultPaths;
 	
-	public StockPrinter(String invoiceFolderPath){
+	public StockPrinter(ArrayList<String> defaultPaths){
 		DM = new DatabaseManager();
 		helper = new Helper();
 		this.fv = new FinalVariables();
 		this.printerName = "";
-		if(invoiceFolderPath.isEmpty())
-			this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		
+		if(defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
+			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
+		else{
+			m_defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+			if(this.m_defaultPaths != null)
+				this.savePath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
+			else
+				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+		}
+		
+		if(defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
+			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
 		else
-			this.savePath = invoiceFolderPath;
+			this.printerName = this.fv.PRINTER_NAME;
 		
 		this.savePath+="/";
 		

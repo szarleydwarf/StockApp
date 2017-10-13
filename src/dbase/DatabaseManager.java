@@ -322,7 +322,56 @@ public class DatabaseManager {
 		return "";
 	}
 	
-
+	public ArrayList<String> getPaths(String query) {
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		ArrayList<String> list = new ArrayList<String>();
+		System.out.println(query);
+		if(this.conn == null)
+			conn = this.connect();
+			try {
+				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+			} catch (SQLException e) {
+				System.out.println("E "+e.getMessage());
+			}
+			
+			try {
+				conn.setAutoCommit(false);
+				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			
+				rs = pst.executeQuery();
+				
+				while(rs.next()){
+					list.add(rs.getString(1));
+				}
+				return list;
+			} catch (SQLException e1) {
+				try{
+					if(this.conn != null){
+						this.conn.rollback();
+					}
+				} catch ( SQLException e2){
+					System.out.println("E2 "+e2.getMessage());
+				}
+				System.out.println("E1 "+e1.getMessage());
+			}	finally {
+				try{
+		               if (rs != null) {
+		                    rs.close();
+		                }
+		                if (pst != null) {
+		                    pst.close();
+		                }
+		                if (conn != null) {
+		                    conn.close();
+		                }
+				} catch (Exception e3){
+					System.out.println("E3 "+e3.getMessage());
+				}
+			}
+		return null;
+	}
 	public int getLastInvoiceNumber(){
 		String query = "SELECT "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" from "+this.fv.INVOCE_TABLE+" ORDER BY "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" DESC LIMIT 1";
 		PreparedStatement pst = null;

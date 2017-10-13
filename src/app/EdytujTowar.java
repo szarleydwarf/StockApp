@@ -176,17 +176,27 @@ public class EdytujTowar {
 		lblQnt.setBounds(488, 49, 60, 14);
 		frame.getContentPane().add(lblQnt);
 		
-		JButton btnNewButton = new JButton("Zapisz");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton bgtnSave = new JButton("Zapisz");
+		bgtnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				varEmpty = getVariableForQuery();
 				if(!varEmpty)
 					zapiszWBazieDanych();
 			}
 		});
-		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnNewButton.setBounds(459, 120, 89, 23);
-		frame.getContentPane().add(btnNewButton);
+		bgtnSave.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		bgtnSave.setBounds(350, 120, 89, 23);
+		frame.getContentPane().add(bgtnSave);
+		
+		JButton btnBack = new JButton("Powr\u00F3t");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				MainView.main(null);
+			}
+		});
+		btnBack.setBounds(459, 120, 89, 23);
+		frame.getContentPane().add(btnBack);
 	}
 
 	protected void zapiszWBazieDanych() {

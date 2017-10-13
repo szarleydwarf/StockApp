@@ -154,7 +154,7 @@ public class DodajTowar {
 		btnZapisz.setBackground(new Color(255, 215, 0));
 		btnZapisz.setForeground(Color.BLUE);
 		btnZapisz.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnZapisz.setBounds(441, 249, 89, 23);
+		btnZapisz.setBounds(342, 249, 89, 23);
 		frame.getContentPane().add(btnZapisz);
 	
 		btnZapisz.addActionListener(new ActionListener() {
@@ -166,6 +166,15 @@ public class DodajTowar {
 			}
 		});		
 
+		JButton btnBack = new JButton("Powr\u00F3t");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				MainView.main(null);
+			}
+		});
+		btnBack.setBounds(441, 249, 89, 23);
+		frame.getContentPane().add(btnBack);
 	}
 	
 	private boolean getVariableForQuery() {
