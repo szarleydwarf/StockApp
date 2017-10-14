@@ -17,15 +17,25 @@ import hct_speciale.Invoice;
 import hct_speciale.Item;
 import hct_speciale.StockItem;
 import utillity.FinalVariables;
+import utillity.Helper;
+import utillity.Logger;
 
 public class DatabaseManager {
 	private Connection conn = null;
 	private PreparedStatement pst = null;
 	private ResultSet rs = null;
 	private FinalVariables fv;
+	private String loggerFolderPath;
+	private Logger log;
+	private Helper helper;
+	private String date;
 
-	public DatabaseManager () {
+	public DatabaseManager (String p_loggerFolderPath) {
 		this.fv = new FinalVariables();
+		loggerFolderPath = p_loggerFolderPath;
+		log = new Logger(loggerFolderPath);
+		helper = new Helper();
+		date = helper.getFormatedDate();
 	}
 	public Connection connect() {
 		try {
@@ -35,6 +45,7 @@ public class DatabaseManager {
 			return conn;
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(null, "Error: "+ex);
+			log.logError(date+" "+this.getClass().getName()+"\t"+ex.getMessage());
 			return null;		
 		}		
 	}
@@ -48,7 +59,7 @@ public class DatabaseManager {
 		try {
 			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 		} catch (SQLException e) {
-			System.out.println("E "+e.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e.getMessage());
 		}
 		
 		try {
@@ -73,9 +84,11 @@ public class DatabaseManager {
 					this.conn.rollback();
 				}
 			} catch ( SQLException e2){
+				log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e2.getMessage());
 				System.out.println("E2 "+e2.getMessage());
 			}
 			System.out.println("E1 "+e1.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e1.getMessage());
 		}	finally {
 			try{
 	               if (rs != null) {
@@ -89,6 +102,7 @@ public class DatabaseManager {
 	                }
 			} catch (Exception e3){
 				System.out.println("E3 "+e3.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e3.getMessage());
 			}
 		}
 		return false;
@@ -103,6 +117,7 @@ public class DatabaseManager {
 				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 			} catch (SQLException e) {
 				System.out.println("Delete Record E "+e.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tDelete Record\t"+e.getMessage());
 			}
 			
 			try {
@@ -128,8 +143,10 @@ public class DatabaseManager {
 				}
 			} catch ( SQLException e2){
 				System.out.println("Delete Record E2 "+e2.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tDelete Record\t"+e2.getMessage());
 			}
 			System.out.println("Delete Record E1 "+e1.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tDelete Record\t"+e1.getMessage());
 		}	finally {
 			try{
 	               if (rs != null) {
@@ -143,16 +160,17 @@ public class DatabaseManager {
 	                }
 			} catch (Exception e3){
 				System.out.println("Delete Record E3 "+e3.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tDelete Record\t"+e3.getMessage());
 			}
 		}
 		return false;
 	}
 	
-	public boolean editRecord(String table, String newValue, String where) throws SQLException{
-		conn = this.connect();
-		System.out.println("editing record");
-		return false;
-	}
+//	public boolean editRecord(String table, String newValue, String where) throws SQLException{
+//		conn = this.connect();
+//		System.out.println("editing record");
+//		return false;
+//	}
 	
 	public Item getOneItem(String query){
 		conn = this.connect();
@@ -172,11 +190,14 @@ public class DatabaseManager {
 			}
 		} catch (SQLException e) {
 			System.out.println("get one item E "+e.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tget one item\t"+e.getMessage());
 		} finally {
 			try{
 				rs.close();
 				pst.close();
-			} catch (Exception e){}
+			} catch (Exception e){
+				log.logError(date+" "+this.getClass().getName()+"\tget one item\t"+e.getMessage());
+			}
 		}
 		return item;
 	}
@@ -231,14 +252,14 @@ public class DatabaseManager {
 //				i.print();
 				list.add(i);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException e1) {
+			log.logError(date+" "+this.getClass().getName()+"\tGET ITEMS LIST\tE1 "+e1.getMessage());
 		} finally {
 			try{
 				rs.close();
 				pst.close();
-			} catch (Exception e){
-				
+			} catch (Exception e2){
+				log.logError(date+" "+this.getClass().getName()+"\tGET ITEMS LIST\tE2 "+e2.getMessage());
 			}
 		}
 		return list;
@@ -282,7 +303,7 @@ public class DatabaseManager {
 			try {
 				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 			} catch (SQLException e) {
-				System.out.println("getPath E "+e.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e.getMessage());
 			}
 			
 			try {
@@ -301,9 +322,9 @@ public class DatabaseManager {
 						this.conn.rollback();
 					}
 				} catch ( SQLException e2){
-					System.out.println("getPath E2 "+e2.getMessage());
+					log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e2.getMessage());
 				}
-				System.out.println("getPath E1 "+e1.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e1.getMessage());
 			}	finally {
 				try{
 		               if (rs != null) {
@@ -316,7 +337,7 @@ public class DatabaseManager {
 		                    conn.close();
 		                }
 				} catch (Exception e3){
-					System.out.println("getPath E3 "+e3.getMessage());
+					log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e3.getMessage());
 				}
 			}
 		return "";
@@ -332,7 +353,7 @@ public class DatabaseManager {
 			try {
 				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 			} catch (SQLException e) {
-				System.out.println("getPaths E "+e.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e.getMessage());
 			}
 			
 			try {
@@ -352,9 +373,9 @@ public class DatabaseManager {
 						this.conn.rollback();
 					}
 				} catch ( SQLException e2){
-					System.out.println("getPaths E2 "+e2.getMessage());
+					log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e2.getMessage());
 				}
-				System.out.println("getPaths E1 "+e1.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e1.getMessage());
 			}	finally {
 				try{
 		               if (rs != null) {
@@ -367,7 +388,7 @@ public class DatabaseManager {
 		                    conn.close();
 		                }
 				} catch (Exception e3){
-					System.out.println("getPaths E3 "+e3.getMessage());
+					log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e3.getMessage());
 				}
 			}
 		return null;
@@ -381,7 +402,7 @@ public class DatabaseManager {
 			try {
 				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 			} catch (SQLException e) {
-				System.out.println("getLastInvoiceNumber E "+e.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e.getMessage());
 			}
 			
 			try {
@@ -402,9 +423,9 @@ public class DatabaseManager {
 						this.conn.rollback();
 					}
 				} catch ( SQLException e2){
-					System.out.println("getLastInvoiceNumber E2 "+e2.getMessage());
+					log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e2.getMessage());
 				}
-				System.out.println("getLastInvoiceNumber E1 "+e1.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e1.getMessage());
 			}	finally {
 				try{
 		               if (rs != null) {
@@ -417,7 +438,7 @@ public class DatabaseManager {
 		                    conn.close();
 		                }
 				} catch (Exception e3){
-					System.out.println("getLastInvoiceNumber E3 "+e3.getMessage());
+					log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e3.getMessage());
 				}
 			}
 		return 0;
@@ -431,7 +452,7 @@ public class DatabaseManager {
 			try {
 				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 			} catch (SQLException e) {
-				System.out.println("E "+e.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e.getMessage());
 			}
 			
 			try {
@@ -456,9 +477,9 @@ public class DatabaseManager {
 					this.conn.rollback();
 				}
 			} catch ( SQLException e2){
-				System.out.println("selectRecord E2 "+e2.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e2.getMessage());
 			}
-			System.out.println("selectRecord E1 "+e1.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e1.getMessage());
 		}	finally {
 			try{
 //	               if (rs != null) {
@@ -471,7 +492,7 @@ public class DatabaseManager {
 	                    conn.close();
 	                }
 			} catch (Exception e3){
-				System.out.println("selectRecord E3 "+e3.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e3.getMessage());
 			}
 		}
 		return null;
@@ -496,13 +517,13 @@ public class DatabaseManager {
 				}
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD ARRAY LIST\t"+e.getMessage());
 		} finally {
 			try{
 				rs.close();
 				pst.close();
 			} catch (Exception e){
-				
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD ARRAY LIST\t"+e.getMessage());				
 			}
 		}
 		
@@ -546,14 +567,13 @@ public class DatabaseManager {
 //				System.out.println("\n");//Move to the next line to print the next row.          
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
 		} finally {
 			try{
 				rs.close();
 				pst.close();
 			} catch (Exception e){
-				
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
 			}
 		}
 	
@@ -584,13 +604,13 @@ public class DatabaseManager {
 				System.out.println("\n");//Move to the next line to print the next row.          
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD WITH SQL\t"+e.getMessage());
 		} finally {
 			try{
 				rs.close();
 				pst.close();
 			} catch (Exception e){
-				
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD WITH SQL\t"+e.getMessage());
 			}
 		}
 		return true;
@@ -605,7 +625,7 @@ public class DatabaseManager {
 		try {
 			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 		} catch (SQLException e) {
-			System.out.println("E "+e.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD\t"+e.getMessage());
 		}
 		
 		try {
@@ -630,9 +650,9 @@ public class DatabaseManager {
 					this.conn.rollback();
 				}
 			} catch ( SQLException e2){
-				System.out.println("E2 "+e2.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD E2\t"+e2.getMessage());
 			}
-			System.out.println("E1 "+e1.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD E1\t"+e1.getMessage());
 		}	finally {
 			try{
 	               if (rs != null) {
@@ -645,7 +665,7 @@ public class DatabaseManager {
 	                    conn.close();
 	                }
 			} catch (Exception e3){
-				System.out.println("E3 "+e3.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD E3\t"+e3.getMessage());
 			}
 		}
 		return false;
@@ -669,14 +689,20 @@ public class DatabaseManager {
 //				i.print();
 				list.add(i);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException e1) {
+			log.logError(date+" "+this.getClass().getName()+"\tGET INVOICE LIST E1\t"+e1.getMessage());
 		} finally {
 			try{
-				rs.close();
-				pst.close();
-			} catch (Exception e){
-				
+				if (rs != null) {
+                    rs.close();
+                }
+                if (pst != null) {
+                    pst.close();
+                }
+
+			} catch (Exception e2){
+				log.logError(date+" "+this.getClass().getName()+"\tGET INVOICE LIST E2\t"+e2.getMessage()+"\n\t"+e2.getLocalizedMessage());
+				e2.printStackTrace();
 			}
 		}
 		return list;
@@ -714,13 +740,13 @@ public class DatabaseManager {
 				}
 			}
 		}
-		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, invoice_path_name, total);
+		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, invoice_path_name, loggerFolderPath, total);
 	}
 	public void close() {
 		try {
 			conn.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			log.logError(date+" "+this.getClass().getName()+"\tCLOSE E\t"+e.getMessage());
 		}finally {
 			try{
 	               if (rs != null) {
@@ -733,7 +759,7 @@ public class DatabaseManager {
 	                    conn.close();
 	                }
 			} catch (Exception e3){
-				System.out.println("E3 "+e3.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tCLOSE E3\t"+e3.getMessage());
 			}
 		}
 	}

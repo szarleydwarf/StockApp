@@ -27,15 +27,18 @@ public class SqliteTestAppV {
 	private JFrame frmHctApp;
 	private JTextField username;
 	private JPasswordField password;
-	private FinalVariables fv;
+	private static FinalVariables fv;
 	
 	private static DatabaseManager DM;
 	private static UserManager UM;
+	private static String loggerFolderPath;
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		DM = new DatabaseManager();
+		fv = new FinalVariables();
+		loggerFolderPath = fv.SAVE_FOLDER_DEFAULT_PATH+"\\"+fv.LOGGER_FOLDER_NAME;
+		DM = new DatabaseManager(loggerFolderPath);
 		UM = new UserManager();
 		try {
 //			DM.selectRecordWithSQL("Select * from users where nick=\"admin\" ");
@@ -128,7 +131,7 @@ public class SqliteTestAppV {
 			String pass = password.getText();
 //			System.out.println("logowanie "+username_str + " "+pass);
 
-		 	boolean isLogged = UM.login(username_str, pass);
+		 	boolean isLogged = UM.login(username_str, pass, loggerFolderPath);
 		 	if(isLogged){
 		 		frmHctApp.setVisible(false);
 		 		MainView.main(null);

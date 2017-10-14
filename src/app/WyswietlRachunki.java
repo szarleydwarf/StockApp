@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 
 import utillity.FinalVariables;
 import utillity.Helper;
+import utillity.Logger;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -48,20 +49,29 @@ public class WyswietlRachunki {
 	private FinalVariables fv;
 	private DatabaseManager DM;
 	private ArrayList<Invoice> listOfInvoices;
-	private Helper helper;
 	private Invoice selectedInvoice;
+
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
+
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(String p_loggerFolderPath) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				loggerFolderPath = p_loggerFolderPath;
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
 				try {
 					WyswietlRachunki window = new WyswietlRachunki();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
-				}
+					log.logError(date+"## "+this.getClass().getName()+"\t"+e.getMessage()+"\n\t"+e.toString());
+					e.printStackTrace();}
 			}
 		});
 	}
@@ -71,8 +81,7 @@ public class WyswietlRachunki {
 	 */
 	public WyswietlRachunki() {
 		this.fv = new FinalVariables();
-		this.DM = new DatabaseManager();
-		this.helper = new Helper();
+		this.DM = new DatabaseManager(loggerFolderPath);
 		
 		this.selectedInvoice = new Invoice();
 
@@ -229,7 +238,6 @@ public class WyswietlRachunki {
 
 	protected void populateList() {
 		String query = "SELECT * from "+this.fv.INVOCE_TABLE+" ORDER BY "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" ASC";//item_name, cost, price,quantity
-		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+this.fv.SERVICES_TABLE_SERVICE_NAME+" ASC";//item_name, cost, price,quantity
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		listOfInvoices = DM.getInvoiceList(query);

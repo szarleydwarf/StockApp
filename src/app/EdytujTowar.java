@@ -17,6 +17,7 @@ import hct_speciale.Item;
 import hct_speciale.StockItem;
 import utillity.FinalVariables;
 import utillity.Helper;
+import utillity.Logger;
 
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -35,7 +36,11 @@ public class EdytujTowar {
 //	private StockItem stItem;
 	private DatabaseManager dm;
 	private FinalVariables fv;
-	private Helper helper;
+
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
 	
 	private String stockNum, productName="", cost="", price="", qnt="";
 	private double dCost = 0, dPrice = 0;
@@ -44,14 +49,18 @@ public class EdytujTowar {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(Item i) {
+	public static void main(Item i, String p_loggerFolderPath) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				loggerFolderPath = p_loggerFolderPath;
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
 				try {
 					EdytujTowar window = new EdytujTowar(i);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 			}
 		});
@@ -65,7 +74,7 @@ public class EdytujTowar {
 
 		this.fv = new FinalVariables();
 		helper = new Helper();
-		this.dm = new DatabaseManager();
+		this.dm = new DatabaseManager(loggerFolderPath);
 
 		initialize();
 		populateTextFields();

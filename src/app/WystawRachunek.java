@@ -7,12 +7,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -25,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -34,8 +32,8 @@ import javax.swing.event.ListSelectionListener;
 import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
+import utillity.Logger;
 import utillity.StockPrinter;
-import javax.swing.ListSelectionModel;
 
 public class WystawRachunek {
 
@@ -59,12 +57,15 @@ public class WystawRachunek {
 	private boolean printed = false;
 	private DecimalFormat df;
 	
-	private Helper helper;
 	private DatabaseManager DM;	
-	private FinalVariables fv;
+	private static FinalVariables fv;
 	private String lblCarManufacturerTxt = "Car manufacturer";
 	private ArrayList<String> defaultPaths;
 	
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
 
 	/**
 	 * Launch the application.
@@ -72,11 +73,16 @@ public class WystawRachunek {
 	public static void main(ArrayList<String> defaultPaths) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				fv = new FinalVariables();
+				loggerFolderPath = defaultPaths.get(0)+"\\"+fv.LOGGER_FOLDER_NAME;
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
 				try {
 					WystawRachunek window = new WystawRachunek(defaultPaths);
 					window.frmNowyRachunek.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 			}
 		});
@@ -88,7 +94,7 @@ public class WystawRachunek {
 	 * @throws SQLException 
 	 */
 	public WystawRachunek(ArrayList<String> defaultPaths) throws SQLException {
-		DM = new DatabaseManager();
+		DM = new DatabaseManager(loggerFolderPath);
 		helper = new Helper();
 		fv = new FinalVariables();
 		//TODO: add check for arraylist null?
@@ -102,7 +108,7 @@ public class WystawRachunek {
 		try {
 			initialize();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 		}
 	}
 
@@ -215,9 +221,9 @@ public class WystawRachunek {
 					} else
 						JOptionPane.showMessageDialog(frmNowyRachunek, "Nie przeliczyles wyniku");
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 			}
 		});

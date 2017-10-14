@@ -12,6 +12,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 
+import utillity.Helper;
+import utillity.Logger;
+
 public class EncryptionClass {
     private static final String UNICODE_FORMAT = "UTF8";
     public static final String DESEDE_ENCRYPTION_SCHEME = "DESede";
@@ -22,27 +25,34 @@ public class EncryptionClass {
     private String myEncryptionKey;
     private String myEncryptionScheme;
     SecretKey key;
-    
-    public EncryptionClass(){
+   
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
+
+    public EncryptionClass(String p_loggerFolderPath){
     	myEncryptionKey = "ThisIsSpartaThisIsSparta";
         myEncryptionScheme = DESEDE_ENCRYPTION_SCHEME;
-        try {
+		loggerFolderPath = p_loggerFolderPath;
+		log = new Logger(loggerFolderPath);
+		helper = new Helper();
+		date = helper.getFormatedDate();
+		try {
 			arrayBytes = myEncryptionKey.getBytes(UNICODE_FORMAT);
 	        ks = new DESedeKeySpec(arrayBytes);
 	        skf = SecretKeyFactory.getInstance(myEncryptionScheme);
 	        cipher = Cipher.getInstance(myEncryptionScheme);
 	        key = skf.generateSecret(ks);} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+	        log.logError(date+" "+this.getClass().getName()+"\tE "+e.getMessage());
+		} catch (InvalidKeyException e1) {
+			log.logError(date+" "+this.getClass().getName()+"\tE1 "+e1.getMessage());
+			} catch (NoSuchAlgorithmException e2) {
+				log.logError(date+" "+this.getClass().getName()+"\tE2 "+e2.getMessage());
+
+		} catch (Exception e3) {
+			log.logError(date+" "+this.getClass().getName()+"\tE3 "+e3.getMessage());
 			}
     	
     }

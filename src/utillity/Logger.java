@@ -13,16 +13,18 @@ public class Logger {
 		this.defaultFolderPath = folderPath;
 	}
 	
+	public Logger() {
+		
+	}
+
+
 	public void logError(String msg){
 		String fileName = this.helper.getFormatedDate()+".txt";
 		String filePathName = this.defaultFolderPath+ "\\"+fileName;
 		
-		System.out.println("Logger msg "+msg+"\n"+filePathName);
 		boolean folderExist = this.helper.createFolderIfNotExist(defaultFolderPath);
-		System.out.println("Logger folder "+folderExist);
 		
 		boolean fileExist = this.helper.createFileIfNotExist(filePathName);
-		System.out.println("Logger file msg "+fileExist);
 		
 		try {
 			FileWriter write = new FileWriter(filePathName, true);
@@ -31,9 +33,16 @@ public class Logger {
 			printLine.close();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+	}
+
+	public String getDefaultFolderPath() {
+		return defaultFolderPath;
+	}
+
+	public void setFolderPath(String path) {
+		this.defaultFolderPath = path;
 	}
 }

@@ -6,23 +6,34 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 import utillity.FinalVariables;
+import utillity.Helper;
+import utillity.Logger;
 
 public class WyswietlListeUslug {
 
 	private JFrame frame;
 	private FinalVariables fv;
+	
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(String p_loggerFolderPath) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				loggerFolderPath = p_loggerFolderPath;
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
 				try {
 					WyswietlListeUslug window = new WyswietlListeUslug();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 			}
 		});

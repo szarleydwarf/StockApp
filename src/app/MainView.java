@@ -1,31 +1,23 @@
 package app;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import dbase.DatabaseManager;
-import hct_speciale.Item;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
-
-import java.awt.Toolkit;
-
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
-import java.awt.Image;
-import java.awt.Color;
 
 public class MainView {
 
@@ -38,9 +30,11 @@ public class MainView {
 	private FinalVariables fv;
 	private Logger logger;
 
-private ArrayList<String> defaultPaths;
-
-private Helper helper;
+	private ArrayList<String> defaultPaths;
+	
+	private Helper helper;
+	
+	private String loggerFolderPath;
 
 	/**
 	 * Launch the application.
@@ -65,9 +59,10 @@ private Helper helper;
 	 * Create the application.
 	 */
 	public MainView() {
-		DM = new DatabaseManager();
 		this.helper = new Helper();
 		this.fv = new FinalVariables();
+		this.loggerFolderPath = this.fv.SAVE_FOLDER_DEFAULT_PATH+"\\"+this.fv.LOGGER_FOLDER_NAME;
+		DM = new DatabaseManager(loggerFolderPath);
 
 		defaultPaths = new ArrayList<String>();
 		
@@ -75,12 +70,11 @@ private Helper helper;
 			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
 //		for(int i = 0; i < defaultPaths.size(); i++)
 //			System.out.println(defaultPaths.get(i));
-		String path = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
-		this.logger = new Logger(path);
+		if(!loggerFolderPath.equalsIgnoreCase(defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME))
+			loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
 		
-//		String date = "["+this.helper.getFormatedDate()+"]";
-//		for(int i=0;i<10;i++)
-//		this.logger.logError(date+"this is just test message no - "+i);
+		this.logger = new Logger(loggerFolderPath);
+;
 		
 		initialize();
 	}
@@ -121,7 +115,7 @@ private Helper helper;
 		stockBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frmHctMagazyn.dispose();
-				WyswietlMagazyn.main(null);
+				WyswietlMagazyn.main(loggerFolderPath);
 			}
 		});
 		stockBtn.setBounds(60, 52, 200, 36);
@@ -133,7 +127,7 @@ private Helper helper;
 		invoiceBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frmHctMagazyn.dispose();
-				WyswietlRachunki.main(null);
+				WyswietlRachunki.main(loggerFolderPath);
 			}
 		});
 		invoiceBtn.setBounds(208, 171, 200, 36);
@@ -158,7 +152,7 @@ private Helper helper;
 		nowyTowarBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frmHctMagazyn.dispose();
-				DodajTowar.main(null);
+				DodajTowar.main(loggerFolderPath);
 			}
 		});
 		nowyTowarBtn.setBounds(60, 112, 200, 36);
@@ -170,7 +164,7 @@ private Helper helper;
 		nowaUslugaBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frmHctMagazyn.dispose();
-				DodajUsluge.main(null);
+				DodajUsluge.main(loggerFolderPath);
 			}
 		});
 		nowaUslugaBtn.setBounds(358, 112, 200, 36);

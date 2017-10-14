@@ -133,7 +133,7 @@ public class Helper {
 	}
 	
 	public boolean createFolderIfNotExist (String path) {
-//		System.out.println("Folder path: "+path);
+//		System.out.println("helper Folder path: "+path);
 		
 		File dir = new File(path);
 		if(!dir.exists()){
@@ -143,7 +143,7 @@ public class Helper {
 	}
 	
 	public boolean createFileIfNotExist(String fileName){
-		System.out.println("Filename: "+fileName);
+//		System.out.println("Filename: "+fileName);
 		File file = new File(fileName);
 	    if (!file.exists()) {
 	    	try {

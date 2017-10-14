@@ -7,16 +7,28 @@ import javax.crypto.SecretKey;
 import javax.swing.JOptionPane;
 
 import utillity.FinalVariables;
+import utillity.Helper;
+import utillity.Logger;
 
 public class UserManager {
 	private DatabaseManager DM = null;
 	private EncryptionClass EC = null;
 	private FinalVariables fv = null;
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
 	
-	public boolean login(String username, String password) throws SQLException{
-		DM = new DatabaseManager();
-		EC = new EncryptionClass();
+	public boolean login(String username, String password, String p_loggerFolderPath) throws SQLException{
 		fv = new FinalVariables();
+		loggerFolderPath = p_loggerFolderPath;
+		log = new Logger(loggerFolderPath);
+		helper = new Helper();
+		date = helper.getFormatedDate();
+
+		DM = new DatabaseManager(loggerFolderPath);
+		EC = new EncryptionClass(loggerFolderPath);
+
 		String passEncoded = "";
 		String salt = "";
 		boolean isLogingin = false;
@@ -39,8 +51,7 @@ public class UserManager {
 			SecretKey sk = EC.getSKey();
 			passEncoded = EC.encrypt(pass, sk);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 		}
 		
 		

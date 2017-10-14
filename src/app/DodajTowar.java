@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
+import utillity.Logger;
 
 public class DodajTowar {
 
@@ -35,22 +36,30 @@ public class DodajTowar {
 	private double dCost = 0, dPrice = 0;
 	private int iQnt = 0;
 
-	private Helper helper;
 	private DatabaseManager dm = null;
 	private FinalVariables fv;
+	
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
 	
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(String p_loggerFolderPath) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				loggerFolderPath = p_loggerFolderPath;
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
 				try {
 					DodajTowar window = new DodajTowar();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 			}
 		});
@@ -61,7 +70,7 @@ public class DodajTowar {
 	 */
 	public DodajTowar() {
 		helper = new Helper();
-		dm = new DatabaseManager();
+		dm = new DatabaseManager(loggerFolderPath);
 		this.fv = new FinalVariables();
 
 		String query = "SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_NUMBER+" DESC LIMIT 1";
