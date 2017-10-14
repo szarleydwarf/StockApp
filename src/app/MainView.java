@@ -8,6 +8,8 @@ import javax.swing.JOptionPane;
 import dbase.DatabaseManager;
 import hct_speciale.Item;
 import utillity.FinalVariables;
+import utillity.Helper;
+import utillity.Logger;
 
 import java.awt.Toolkit;
 
@@ -32,10 +34,13 @@ public class MainView {
 	private DatabaseManager DM;
 	private int invoiceNum;
 	private String invoiceFolderPath = "";
-//	private String printerName="";
+
 	private FinalVariables fv;
+	private Logger logger;
 
 private ArrayList<String> defaultPaths;
+
+private Helper helper;
 
 	/**
 	 * Launch the application.
@@ -61,14 +66,21 @@ private ArrayList<String> defaultPaths;
 	 */
 	public MainView() {
 		DM = new DatabaseManager();
-		defaultPaths = new ArrayList<String>();
-		
+		this.helper = new Helper();
 		this.fv = new FinalVariables();
+
+		defaultPaths = new ArrayList<String>();
 		
 		if(this.defaultPaths.isEmpty())
 			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
 //		for(int i = 0; i < defaultPaths.size(); i++)
 //			System.out.println(defaultPaths.get(i));
+		String path = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
+		this.logger = new Logger(path);
+		
+//		String date = "["+this.helper.getFormatedDate()+"]";
+//		for(int i=0;i<10;i++)
+//		this.logger.logError(date+"this is just test message no - "+i);
 		
 		initialize();
 	}

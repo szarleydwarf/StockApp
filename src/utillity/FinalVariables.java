@@ -12,6 +12,7 @@ public class FinalVariables {
 	public final String DATABASE_DEFAULT_PATH = "dbase\\theDBase.sqlite";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
 	public String PRINTER_NAME = "Canon MP620 series Printer WS";
 	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP";
+	public  final String LOGGER_FOLDER_NAME = "_LOG_FILES";
 	
 	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	
