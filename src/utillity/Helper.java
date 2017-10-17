@@ -13,8 +13,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
-import dbase.DatabaseManager;
-
 public class Helper {
 	public final String PIRELLI_ST = "Pirelli";
 	private FinalVariables fv;

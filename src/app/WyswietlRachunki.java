@@ -141,11 +141,6 @@ public class WyswietlRachunki {
 			}
 		});
 		
-		btnBack.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				populateList();
-			}
-		});
 		frame.getContentPane().add(btnRefresh);
 		
 		tfSearch = new JTextField();

@@ -29,19 +29,22 @@ public class UserManager {
 		DM = new DatabaseManager(loggerFolderPath);
 		EC = new EncryptionClass(loggerFolderPath);
 
+//		this.createNewUser();
 		String passEncoded = "";
 		String salt = "";
 		boolean isLogingin = false;
 		
-		String saltQuery = "Select salt from "+this.fv.USERS_TABLE+" where nick=\""+username+"\"";
+		String saltQuery = "Select \"salt\" from \""+this.fv.USERS_TABLE+"\" where \"nick\"=\""+username+"\"";
 		ResultSet rs = DM.selectRecord(saltQuery);
+//		System.out.println(saltQuery+"\n"+rs.getString(1));
+		
 		int i=0;
 		while(rs.next()) {
 			i++;	
 			salt = rs.getString("salt");
+//			System.out.println("salt "+salt);
 		}
-//		System.out.println(i);
-		
+	
 		if(i<=0){
 			JOptionPane.showMessageDialog(null, "Podany uzytkownik nie istnieje w bazie danych.");
 		}
@@ -56,7 +59,7 @@ public class UserManager {
 		
 		
 		String query = "select * from "+this.fv.USERS_TABLE+" where nick=\""+username+"\" and password=\""+passEncoded+"\" ";
-//		System.out.println(query);
+		System.out.println(query);
 		ResultSet rsq = DM.selectRecord(query);
 		int count = 0;
 		while(rsq.next()) {
@@ -73,7 +76,20 @@ public class UserManager {
 		}
 		rs.close();
 		DM.close();
-//		pst.close();
 		return isLogingin;
+	}
+	
+	public void createNewUser(){
+		String query = "INSERT INTO \"users\" VALUES('admin','tezrn6H#s7|89jd-M@voxEBI|@£*cW$I','EDORzQox5Kot57a7BlT3jkTiBDXhuFclXYnsBEUtZzmiSrabadAdtx8g8W67U9LO','Rad','Cho','HCT','0892422993','Killaneen','Ballinamore','Leitrim','Ireland','N41YK50');";
+		System.out.println(query);
+		String pass = "Pa55word1!";
+		String pass2 = "Alex123!";
+		try {
+			this.EC.saltPassword(pass2);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }

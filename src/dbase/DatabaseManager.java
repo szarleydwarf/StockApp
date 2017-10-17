@@ -37,6 +37,7 @@ public class DatabaseManager {
 		helper = new Helper();
 		date = helper.getFormatedDate();
 	}
+	
 	public Connection connect() {
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -292,7 +293,7 @@ public class DatabaseManager {
 			}
 		}
 		return new StockItem(stNum, itName, cost, price, qnt);
-		}
+	}
 	
 	public String getPath(String query) {
 		PreparedStatement pst = null;
@@ -393,6 +394,7 @@ public class DatabaseManager {
 			}
 		return null;
 	}
+	
 	public int getLastInvoiceNumber(){
 		String query = "SELECT "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" from "+this.fv.INVOCE_TABLE+" ORDER BY "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" DESC LIMIT 1";
 		PreparedStatement pst = null;
@@ -452,7 +454,7 @@ public class DatabaseManager {
 			try {
 				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 			} catch (SQLException e) {
-				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORDe \t"+e.getMessage());
 			}
 			
 			try {
@@ -460,16 +462,7 @@ public class DatabaseManager {
 				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
 				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			
-				rs = pst.executeQuery();
-				
-//				rs = pst.getGeneratedKeys();
-//				if(rs == null){
-//					this.conn.rollback();
-//				} 
-//				conn.commit();
-						
-//				if(rs != null)
-					return rs;
+				return pst.executeQuery();
 			
 		} catch (SQLException e1) {
 			try{
@@ -477,22 +470,19 @@ public class DatabaseManager {
 					this.conn.rollback();
 				}
 			} catch ( SQLException e2){
-				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e2.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD e2\t"+e2.getMessage());
 			}
-			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e1.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD e1\t"+e1.getMessage());
 		}	finally {
 			try{
-//	               if (rs != null) {
-//	                    rs.close();
-//	                }
-	                if (pst != null) {
-	                    pst.close();
-	                }
-	                if (conn != null) {
-	                    conn.close();
-	                }
+//                if (pst != null) {
+//                    pst.close();
+//                }
+//                if (conn != null) {
+//                    conn.close();
+//                }
 			} catch (Exception e3){
-				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD\t"+e3.getMessage());
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD e3\t"+e3.getMessage());
 			}
 		}
 		return null;
@@ -742,6 +732,58 @@ public class DatabaseManager {
 		}
 		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, invoice_path_name, loggerFolderPath, total);
 	}
+	
+	public void createTables(String query) {
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		if(this.conn == null)
+			conn = this.connect();
+		try {
+			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tCREATE TABLE\t"+e.getMessage());
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		
+			rs = pst.executeQuery();
+			
+			int count = 0;
+			while(rs.next()) {
+				count++;			
+			}
+			System.out.println("createTabele "+ count);
+		} catch (SQLException e1) {
+			try{
+				if(this.conn != null){
+					this.conn.rollback();
+				}
+			} catch ( SQLException e2){
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e2.getMessage());
+			}
+			log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e1.getMessage());
+		}	finally {
+			try{
+	               if (rs != null) {
+	                    rs.close();
+	                }
+	                if (pst != null) {
+	                    pst.close();
+	                }
+	                if (conn != null) {
+	                    conn.close();
+	                }
+			} catch (Exception e3){
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e3.getMessage());
+			}
+		}
+	}
+
+	
 	public void close() {
 		try {
 			conn.close();

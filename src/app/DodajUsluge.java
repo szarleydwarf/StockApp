@@ -177,6 +177,7 @@ public class DodajUsluge {
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");
 			this.frame.dispose();
+			MainView.main(null);
 		} else
 			JOptionPane.showMessageDialog(null, "Błąd zapisu");
 	}

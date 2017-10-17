@@ -81,7 +81,7 @@ public class DodajTowar {
 		else
 			stockNum = "AAA0000";
 		
-		helper.getIntFromStNo(stockNum, 'A');
+		stockNum = helper.getIntFromStNo(stockNum, 'A');
 		this.fv = new FinalVariables();
 		
 		initialize();
@@ -194,13 +194,13 @@ public class DodajTowar {
 		}
 		
 		this.cost = this.tfCost.getText();
-		if(this.dCost == 0){
+		if(this.dCost == 0.0){
 			this.dCost = this.helper.checkDouble("Wpisz koszt",  "Niepoprawny format kosztu", this.cost);
 			return true;
 		}
 	
 		this.price = this.tfPrice.getText();
-		if(this.dPrice == 0) {
+		if(this.dPrice == 0.0) {
 			this.dPrice = helper.checkDouble("Wpisz cene", "Niepoprawny format ceny", this.price);
 			return true;
 		}
@@ -236,6 +236,7 @@ public class DodajTowar {
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");
 			this.frame.dispose();
+			MainView.main(null);
 		} else
 			JOptionPane.showMessageDialog(null, "Błąd zapisu");
 

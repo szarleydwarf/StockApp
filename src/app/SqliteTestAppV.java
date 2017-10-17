@@ -40,17 +40,6 @@ public class SqliteTestAppV {
 		loggerFolderPath = fv.SAVE_FOLDER_DEFAULT_PATH+"\\"+fv.LOGGER_FOLDER_NAME;
 		DM = new DatabaseManager(loggerFolderPath);
 		UM = new UserManager();
-		try {
-//			DM.selectRecordWithSQL("Select * from users where nick=\"admin\" ");
-			Map<String, String> where = new HashMap<String, String>();
-			where.put("service_number", "AAS0002");
-//			where.put("first_name", "Rad2");
-			DM.selectRecord("services", "*", where);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -69,7 +58,17 @@ public class SqliteTestAppV {
 	 */
 	public SqliteTestAppV() {
 		this.fv = new FinalVariables();
+//		initiateDatbase();
+
 		initialize();
+	}
+
+	private void initiateDatbase() {
+		String query = "CREATE TABLE IF NOT EXISTS \"users\" (\"nick\" varchar(64) PRIMARY KEY  NOT NULL  DEFAULT (null) ,\"salt\" varchar(32) NOT NULL ,\"password\" varchar(64) NOT NULL, \"first_name\" varchar(32)NOT NULL,\"last_name\" varchar(32)NOT NULL ,\"company_name\" varchar(32)NOT NULL , \"mobile\" varchar(10), \"addres\" varchar(32)NOT NULL, \"town\" varchar(32)NOT NULL,\"county\" varchar(32)NOT NULL,\"country\" varchar(32)NOT NULL,\"eircode\" varchar(7)NOT NULL);"
+		+"INSERT INTO \"users\" VALUES('admin','tezrn6H#s7|89jd-M@voxEBI|@£*cW$I','EDORzQox5Kot57a7BlT3jkTiBDXhuFclXYnsBEUtZzlojcBFQj5KV11Zd9qXMUEO','Rad','Cho','HCT','0892422993','Killaneen','Ballinamore','Leitrim','Ireland','N41YK50');"
+		+"INSERT INTO \"users\" VALUES('admin2','tezrn6H#s7|89jd-M@voxEBI|@£*cW$I','EDORzQox5Kot57a7BlT3jkTiBDXhuFclXYnsBEUtZzlojcBFQj5KV11Zd9qXMUEO','Marcin','Chrostek','HCT','0892422992','Killaneen','Ballinamore','Leitrim','Ireland','N41YK50');";
+		
+		DM.createTables(query);
 	}
 
 	/**
@@ -114,8 +113,6 @@ public class SqliteTestAppV {
 			public void actionPerformed(ActionEvent arg0) {
 				zaloguj();
 			}
-
-
 		});
 		login_btn.setForeground(Color.YELLOW);
 		login_btn.setBackground(Color.BLUE);
@@ -129,7 +126,7 @@ public class SqliteTestAppV {
 			String username_str = username.getText();
 			@SuppressWarnings("deprecation")
 			String pass = password.getText();
-//			System.out.println("logowanie "+username_str + " "+pass);
+			System.out.println("logowanie "+username_str + " "+pass);
 
 		 	boolean isLogged = UM.login(username_str, pass, loggerFolderPath);
 		 	if(isLogged){

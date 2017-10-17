@@ -354,7 +354,7 @@ System.out.println(this.printerName);
 
         //TODO
         //Uncomment bellow
-//        job.print();
+        job.print();
         
         document.close();
    }
