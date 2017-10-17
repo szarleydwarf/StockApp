@@ -73,23 +73,30 @@ public class StockPrinter  {
 	private String printerName;
 	private ArrayList<String> m_defaultPaths;
 	
+	protected static String loggerFolderPath;
+	private static Logger log;
+	
+	
 	public StockPrinter(ArrayList<String> defaultPaths){
-		DM = new DatabaseManager();
-		helper = new Helper();
 		this.fv = new FinalVariables();
+		loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
+		DM = new DatabaseManager(loggerFolderPath);
+		helper = new Helper();
 		this.printerName = "";
 		
-		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty())
+		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty()){
 			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
-		else{
+			loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
+		}else{
 			m_defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
-			if(this.m_defaultPaths != null)
+			if(this.m_defaultPaths != null){
 				this.savePath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
-			else
+				loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
+			}else
 				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
 		}
 		
-		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
+		if(!defaultPaths.isEmpty() && defaultPaths != null && this.fv.PRINTER__ARRAYLIST_INDEX < defaultPaths.size() && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
 			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
 		else
 			this.printerName = this.fv.PRINTER_NAME;
@@ -248,7 +255,7 @@ public class StockPrinter  {
 				} 
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 		}
 	}
 
@@ -347,7 +354,7 @@ System.out.println(this.printerName);
 
         //TODO
         //Uncomment bellow
-//        job.print();
+        job.print();
         
         document.close();
    }

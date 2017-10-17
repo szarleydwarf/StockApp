@@ -1,16 +1,26 @@
 package app;
 
+import java.awt.Color;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.sql.ResultSet;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -22,44 +32,40 @@ import hct_speciale.Item;
 import hct_speciale.StockItem;
 import utillity.FinalVariables;
 import utillity.Helper;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import java.awt.Color;
-import javax.swing.JScrollPane;
-import javax.swing.JList;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ActionEvent;
+import utillity.Logger;
 
 public class WyswietlMagazyn {
 
 	private JFrame frame;
 	private JScrollPane scrollPane ;
-	JList<String> list ;
+	private JList<String> list ;
 	
-	private Helper helper;
+	private static String loggerFolderPath;
+	private static String date;
+	
+	private static Helper helper;
 	private DatabaseManager DM;	
 	private JTextField tfSearch;
 	private ArrayList<Item> listOfItems, listOfServices;
 	private FinalVariables fv;
+	private static Logger log;
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(String p_loggerFolderPath) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				loggerFolderPath = p_loggerFolderPath;
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
 				try {
 					WyswietlMagazyn window = new WyswietlMagazyn();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Coś poszło nie tak\n"+e.getMessage());
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+//					e.printStackTrace();
 				}
 			}
 		});
@@ -69,8 +75,8 @@ public class WyswietlMagazyn {
 	 * Create the application.
 	 */
 	public WyswietlMagazyn() {
-		DM = new DatabaseManager();
-		helper = new Helper();
+		DM = new DatabaseManager(loggerFolderPath);
+//		helper = new Helper();
 		list = new JList<String>();
 		this.listOfItems = new ArrayList<Item>();
 		this.fv = new FinalVariables();
@@ -282,6 +288,7 @@ public class WyswietlMagazyn {
 						JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 				
 			}else
@@ -295,7 +302,7 @@ public class WyswietlMagazyn {
 			Item i = getItemFromLists();
 			
 			if(i != null)
-				EdytujTowar.main(i);
+				EdytujTowar.main(i, this.loggerFolderPath);
 			else
 				JOptionPane.showMessageDialog(null, this.fv.WINDOW_ERROR);
 

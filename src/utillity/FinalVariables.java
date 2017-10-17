@@ -9,9 +9,11 @@ public class FinalVariables {
 	//paths - consider to allow to specify this by user
 	public final String ICON_PATH = "resources\\img\\icon_hct.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
 	public final String INVOICE_LOGO_PATH = "resources\\img\\Logo HCT 245x84.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
-	public final String DATABASE_DEFAULT_PATH = "dbase\\theDBase.sqlite";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
+//	public final String DATABASE_DEFAULT_PATH = "dbase\\theDBase.sqlite";
+	public final String DATABASE_DEFAULT_PATH = "D:\\@Development\\__TEMP\\SQLite\\theDBase.sqlite";
 	public String PRINTER_NAME = "Canon MP620 series Printer WS";
-	public String SAVE_FOLDER_DEFAULT_PATH = "D:/@Development/__TEMP";
+	public String SAVE_FOLDER_DEFAULT_PATH = "D:\\@Development\\__TEMP";
+	public  final String LOGGER_FOLDER_NAME = "_LOG_FILES";
 	
 	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	

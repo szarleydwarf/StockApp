@@ -2,6 +2,7 @@ package utillity;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,8 +12,6 @@ import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-
-import dbase.DatabaseManager;
 
 public class Helper {
 	public final String PIRELLI_ST = "Pirelli";
@@ -49,20 +48,7 @@ public class Helper {
 		}
 		return sum;
 	}
-	
-	public String paddStringRight(String string2Padd, int stringLength, char paddingChar){
-		if(stringLength <= 0)
-			return string2Padd;
 		
-		StringBuilder sb = new StringBuilder(string2Padd);
-		stringLength = stringLength - sb.length() - 1;
-		while(stringLength-- >= 0){
-			sb.append(paddingChar);
-		}
-		return sb.toString();
-		
-	}
-	
 	public int checkInteger(String msg1, String msg2, String number){
 		String pattern = this.fv.INTEGER_PATTERN; 
 
@@ -123,7 +109,19 @@ public class Helper {
 		
 	}
 
-	
+	public String paddStringRight(String string2Padd, int stringLength, char paddingChar){
+		if(stringLength <= 0)
+			return string2Padd;
+		
+		StringBuilder sb = new StringBuilder(string2Padd);
+		stringLength = stringLength - sb.length() - 1;
+		while(stringLength-- >= 0){
+			sb.append(paddingChar);
+		}
+		return sb.toString();
+		
+	}
+
 	public String getFormatedDate(){
 		Calendar today = Calendar.getInstance();
 		SimpleDateFormat df= new SimpleDateFormat(this.fv.DATE_FORMAT);
@@ -133,13 +131,27 @@ public class Helper {
 	}
 	
 	public boolean createFolderIfNotExist (String path) {
-//		System.out.println("Folder path: "+path);
+//		System.out.println("helper Folder path: "+path);
 		
 		File dir = new File(path);
 		if(!dir.exists()){
-			dir.mkdir();
+			return dir.mkdir();
 		}
 		return false;
+	}
+	
+	public boolean createFileIfNotExist(String fileName){
+//		System.out.println("Filename: "+fileName);
+		File file = new File(fileName);
+	    if (!file.exists()) {
+	    	try {
+				return file.createNewFile();
+			} catch (IOException e) {
+				// TODO Add logger :P
+				e.printStackTrace();
+			}
+	    }
+	    return false;
 	}
 
 	public String getIntFromStNo(String string, char char2find) {

@@ -1,38 +1,31 @@
 package app;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
-import dbase.DatabaseManager;
-import utillity.FinalVariables;
-import utillity.Helper;
-
 import java.awt.Font;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.swing.AbstractButton;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.JList;
+
+import dbase.DatabaseManager;
+import utillity.FinalVariables;
+import utillity.Helper;
+import utillity.Logger;
 
 public class SettingsFrame {
 
@@ -42,8 +35,7 @@ public class SettingsFrame {
 	private JFileChooser fc;
 	
 	private DatabaseManager DM;
-	private FinalVariables fv;
-	private Helper helper;
+	private static FinalVariables fv;
 	
 	private String folderPath="", printerName;
 	private String selectedPrinterName;
@@ -54,17 +46,28 @@ public class SettingsFrame {
 	private JLabel lblPrinterNameDisplay;
 	private final String defString = "[DEFAULT]";
 
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
+	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(ArrayList<String> defaultPaths) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				try {
+				fv = new FinalVariables();
+				loggerFolderPath = defaultPaths.get(0)+"\\"+fv.LOGGER_FOLDER_NAME;
+//				System.out.print("Settings frame "+loggerFolderPath);
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
+			try {
 					SettingsFrame window = new SettingsFrame(defaultPaths);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 			}
 		});
@@ -75,9 +78,7 @@ public class SettingsFrame {
 	 * @param defaultPaths 
 	 */
 	public SettingsFrame(ArrayList<String> defaultPaths) {
-		DM = new DatabaseManager();
-		this.helper = new Helper();
-		this.fv = new FinalVariables();
+		DM = new DatabaseManager(loggerFolderPath);
 		
 		fc = new JFileChooser();
 		
@@ -135,8 +136,7 @@ public class SettingsFrame {
 				try {
 		            performAction(e);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e1.getMessage());
 				}
 			}
 		});

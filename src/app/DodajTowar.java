@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
+import utillity.Logger;
 
 public class DodajTowar {
 
@@ -35,22 +36,30 @@ public class DodajTowar {
 	private double dCost = 0, dPrice = 0;
 	private int iQnt = 0;
 
-	private Helper helper;
 	private DatabaseManager dm = null;
 	private FinalVariables fv;
+	
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
 	
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(String p_loggerFolderPath) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				loggerFolderPath = p_loggerFolderPath;
+				log = new Logger(loggerFolderPath);
+				helper = new Helper();
+				date = helper.getFormatedDate();
 				try {
 					DodajTowar window = new DodajTowar();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 				}
 			}
 		});
@@ -61,7 +70,7 @@ public class DodajTowar {
 	 */
 	public DodajTowar() {
 		helper = new Helper();
-		dm = new DatabaseManager();
+		dm = new DatabaseManager(loggerFolderPath);
 		this.fv = new FinalVariables();
 
 		String query = "SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_NUMBER+" DESC LIMIT 1";
@@ -72,7 +81,7 @@ public class DodajTowar {
 		else
 			stockNum = "AAA0000";
 		
-		helper.getIntFromStNo(stockNum, 'A');
+		stockNum = helper.getIntFromStNo(stockNum, 'A');
 		this.fv = new FinalVariables();
 		
 		initialize();
@@ -185,13 +194,13 @@ public class DodajTowar {
 		}
 		
 		this.cost = this.tfCost.getText();
-		if(this.dCost == 0){
+		if(this.dCost == 0.0){
 			this.dCost = this.helper.checkDouble("Wpisz koszt",  "Niepoprawny format kosztu", this.cost);
 			return true;
 		}
 	
 		this.price = this.tfPrice.getText();
-		if(this.dPrice == 0) {
+		if(this.dPrice == 0.0) {
 			this.dPrice = helper.checkDouble("Wpisz cene", "Niepoprawny format ceny", this.price);
 			return true;
 		}
@@ -227,6 +236,7 @@ public class DodajTowar {
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");
 			this.frame.dispose();
+			MainView.main(null);
 		} else
 			JOptionPane.showMessageDialog(null, "Błąd zapisu");
 

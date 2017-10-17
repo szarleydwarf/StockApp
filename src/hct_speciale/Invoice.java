@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import utillity.FinalVariables;
 import utillity.Helper;
+import utillity.Logger;
 import utillity.StockPrinter;
 
 public class Invoice {
@@ -20,12 +21,16 @@ public class Invoice {
 	private char paddingChar = ' ';
 	private int stringLength = 42;
 	
-	private Helper helper;
 	private StockPrinter sPrinter;
 	private FinalVariables fv;
 	private ArrayList<String> defaultPaths = new ArrayList<String>();
 	
-	public Invoice(int p_invoice_number, String p_customer_name, String p_service_number, String p_item_number, String p_invoice_date, String p_file_path_name, double p_total){
+	protected static String date;
+	protected static String loggerFolderPath;
+	private static Logger log;
+	private static Helper helper;
+	
+	public Invoice(int p_invoice_number, String p_customer_name, String p_service_number, String p_item_number, String p_invoice_date, String p_file_path_name, String p_loggerFolderPath, double p_total){
 		this.invoiceNumber = p_invoice_number;
 		this.customerName = p_customer_name;
 		this.serviceNumber = p_service_number;
@@ -34,12 +39,15 @@ public class Invoice {
 		this.filePathName = p_file_path_name;
 		this.total = p_total;
 		
-//		this.defaultPaths = p_default_paths;
-
-		this.sPrinter = new StockPrinter(null);
+		ArrayList<String> defaultPaths = new ArrayList<String>();
+		defaultPaths.add(p_loggerFolderPath);
+		this.sPrinter = new StockPrinter(defaultPaths);
 
 		this.fv = new FinalVariables();
-		this.helper = new Helper();
+		loggerFolderPath = p_loggerFolderPath;
+		log = new Logger(loggerFolderPath);
+		helper = new Helper();
+		date = helper.getFormatedDate();
 	}
 	
 	public Invoice() {
@@ -59,11 +67,10 @@ public class Invoice {
 		System.out.println(invoicePath);
 		try {
 			this.sPrinter.printPDF(invoicePath);
-		} catch (IOException e) {
-			System.out.println("Inv IOException "+e.getMessage());
-		} catch (Exception e) {
-			System.out.println("Inv Exception "+e.getMessage());
-			e.printStackTrace();
+		} catch (IOException e1) {
+			log.logError(date+" "+this.getClass().getName()+"\tE1 "+e1.getMessage());
+		} catch (Exception e2) {
+			log.logError(date+" "+this.getClass().getName()+"\tE2 "+e2.getMessage());
 			
 		}
 	}
