@@ -50,8 +50,7 @@ public class DatabaseManager {
 			return null;		
 		}		
 	}
-	
-	
+		
 	public boolean addNewRecord(String query) {// throws SQLException{
 		PreparedStatement pst = null;
 		ResultSet rs = null;
@@ -167,12 +166,6 @@ public class DatabaseManager {
 		return false;
 	}
 	
-//	public boolean editRecord(String table, String newValue, String where) throws SQLException{
-//		conn = this.connect();
-//		System.out.println("editing record");
-//		return false;
-//	}
-	
 	public Item getOneItem(String query){
 		conn = this.connect();
 		Item item = null;
@@ -226,8 +219,7 @@ public class DatabaseManager {
 		}
 		return new Item(stNum, itName, cost, price);
 	}
-	
-	
+		
 	public ArrayList<Item> getItemsList(String query){
 		conn = this.connect();
 		ArrayList<Item> list = new ArrayList<Item>();
@@ -782,7 +774,6 @@ public class DatabaseManager {
 			}
 		}
 	}
-
 	
 	public void close() {
 		try {

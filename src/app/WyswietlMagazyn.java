@@ -76,7 +76,7 @@ public class WyswietlMagazyn {
 	 */
 	public WyswietlMagazyn() {
 		DM = new DatabaseManager(loggerFolderPath);
-//		helper = new Helper();
+
 		list = new JList<String>();
 		this.listOfItems = new ArrayList<Item>();
 		this.fv = new FinalVariables();

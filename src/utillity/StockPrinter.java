@@ -205,7 +205,7 @@ public class StockPrinter  {
 		contentStream.newLine();
 		contentStream.newLine();
 		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.setFont(PDType1Font.COURIER, 18);
+		contentStream.setFont(PDType1Font.COURIER, 12);
 		
 		if(md.size() > 0){
 			for(int i = 0; i < md.size(); i++){
@@ -224,7 +224,7 @@ public class StockPrinter  {
 
 				priceSt = helper.paddStringLeft(priceSt, stringLengthF, paddingChar);
 				priceSt = helper.paddStringRight(priceSt, stringLengthB, paddingChar);
-				contentStream.showText((i+1)+"   -  "+description+ "  " +priceSt+"  "+quant);
+				contentStream.showText((i+1)+" - "+description+ "  " +priceSt+"  "+quant);
 				contentStream.newLine();			
 			}
 		}		
@@ -232,7 +232,8 @@ public class StockPrinter  {
 		contentStream.newLine();	
 		contentStream.newLine();	
 		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
-		contentStream.showText("                         Discount            € "+df.format(this.discount));
+		contentStream.setFont(PDType1Font.COURIER, 18);
+		contentStream.showText("                         Discount          € "+df.format(this.discount));
 		contentStream.newLine();	
 		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
 		
@@ -340,11 +341,12 @@ public class StockPrinter  {
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{
-        PDDocument document = PDDocument.load(new File(docPath));
-        
+		System.out.println(docPath);
+		PDDocument document = PDDocument.load(new File(docPath));
+		System.out.println(document.getDocumentInformation().toString());
         if(this.printerName.isEmpty() || this.printerName == "")
         	this.printerName = this.fv.PRINTER_NAME;
-System.out.println(this.printerName);
+
         PrintService myPrintService = findPrintService(this.printerName);//this.fv.PRINTER_NAME
         PrintServiceAttributeSet set = myPrintService.getAttributes();
                 
@@ -354,7 +356,7 @@ System.out.println(this.printerName);
 
         //TODO
         //Uncomment bellow
-        job.print();
+//        job.print();
         
         document.close();
    }

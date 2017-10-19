@@ -42,6 +42,7 @@ public class FinalVariables {
 	public final String SERVICES_TABLE_SERVICE_NAME = "service_name";
 	public final String STOCK_TABLE_NUMBER = "stock_number";
 	public final String STOCK_TABLE_ITEM_NAME = "item_name";
+	public final String STOCK_TABLE_QNT = "quantity";
 	public final String MANUFACTURER_TABLE_NAME = "manufacturer";
 	public final String STOCK_TABLE_PRICE = "price";
 	public final String INVOCE_TABLE_INVOICE_NUMBER = "invoice_number";
