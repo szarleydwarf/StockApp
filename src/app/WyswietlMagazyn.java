@@ -65,7 +65,7 @@ public class WyswietlMagazyn {
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Coś poszło nie tak\n"+e.getMessage());
 					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
-//					e.printStackTrace();
+					e.printStackTrace();
 				}
 			}
 		});
