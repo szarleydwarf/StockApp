@@ -1,34 +1,16 @@
 package utillity;
 
 import java.awt.Color;
-import java.awt.Desktop;
-import java.awt.Graphics;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintException;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
-import javax.print.attribute.standard.Sides;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -36,11 +18,9 @@ import javax.swing.JOptionPane;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.printing.PDFPageable;
-import org.apache.xmpbox.type.Attribute;
 
 import dbase.DatabaseManager;
 
@@ -205,16 +185,16 @@ public class StockPrinter  {
 		contentStream.newLine();
 		contentStream.newLine();
 		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.setFont(PDType1Font.COURIER, 18);
+		contentStream.setFont(PDType1Font.COURIER, 12);
 		
 		if(md.size() > 0){
 			for(int i = 0; i < md.size(); i++){
 				String tempSt = md.getElementAt(i).toString();
-				String description = tempSt.substring(0, tempSt.lastIndexOf("€"));
+				String description = tempSt.substring(0, tempSt.lastIndexOf("ï¿½"));
 				
 				createItemList(description);
 				
-				String priceSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
+				String priceSt = tempSt.substring(tempSt.lastIndexOf("ï¿½")+1);
 				priceSt = priceSt.substring(0, priceSt.lastIndexOf("x"));
 				String quant = tempSt.substring(tempSt.lastIndexOf("x")+1);
 				
@@ -224,7 +204,7 @@ public class StockPrinter  {
 
 				priceSt = helper.paddStringLeft(priceSt, stringLengthF, paddingChar);
 				priceSt = helper.paddStringRight(priceSt, stringLengthB, paddingChar);
-				contentStream.showText((i+1)+"   -  "+description+ "  " +priceSt+"  "+quant);
+				contentStream.showText((i+1)+" - "+description+ "  " +priceSt+"  "+quant);
 				contentStream.newLine();			
 			}
 		}		
@@ -232,9 +212,10 @@ public class StockPrinter  {
 		contentStream.newLine();	
 		contentStream.newLine();	
 		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
-		contentStream.showText("                         Discount            € "+df.format(this.discount));
+		contentStream.setFont(PDType1Font.COURIER, 18);
+		contentStream.showText("                         Discount          ï¿½ "+df.format(this.discount));
 		contentStream.newLine();	
-		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
+		contentStream.showText("                         TOTAL            ï¿½ "+df.format(this.sum));
 		
 		
 		contentStream.endText();
@@ -340,11 +321,12 @@ public class StockPrinter  {
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{
-        PDDocument document = PDDocument.load(new File(docPath));
-        
+		System.out.println(docPath);
+		PDDocument document = PDDocument.load(new File(docPath));
+		System.out.println(document.getDocumentInformation().toString());
         if(this.printerName.isEmpty() || this.printerName == "")
         	this.printerName = this.fv.PRINTER_NAME;
-System.out.println(this.printerName);
+
         PrintService myPrintService = findPrintService(this.printerName);//this.fv.PRINTER_NAME
         PrintServiceAttributeSet set = myPrintService.getAttributes();
                 
@@ -354,7 +336,7 @@ System.out.println(this.printerName);
 
         //TODO
         //Uncomment bellow
-        job.print();
+//        job.print();
         
         document.close();
    }
