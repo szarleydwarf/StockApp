@@ -59,9 +59,6 @@ public class StockPrinter  {
 	
 	public StockPrinter(ArrayList<String> defaultPaths){
 		this.fv = new FinalVariables();
-		loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
-		DM = new DatabaseManager(loggerFolderPath);
-		helper = new Helper();
 		this.printerName = "";
 		
 		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty()){
@@ -72,17 +69,24 @@ public class StockPrinter  {
 			if(this.m_defaultPaths != null){
 				this.savePath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
 				loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
-			}else
+			}else {
 				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
+				loggerFolderPath = "\\"+this.fv.LOGGER_FOLDER_NAME;
+			}
 		}
+		
+//		loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
+		DM = new DatabaseManager(loggerFolderPath);
+		helper = new Helper();
+		log = new Logger(loggerFolderPath);
 		
 		if(!defaultPaths.isEmpty() && defaultPaths != null && this.fv.PRINTER__ARRAYLIST_INDEX < defaultPaths.size() && !defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX).isEmpty())
 			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
 		else
 			this.printerName = this.fv.PRINTER_NAME;
 		
-		this.savePath+="/";
-		
+		this.savePath+="\\";
+		log.logError("folder "+this.loggerFolderPath+"\t savepath "+this.savePath);//+"\tprinter "+this.printerName
 		this.stockServicesNumber = new ArrayList<String>();
 	}
 	
@@ -92,7 +96,7 @@ public class StockPrinter  {
 		savePath = savePath.concat(this.date);
 		helper.createFolderIfNotExist(savePath);
 		
-		accPath = savePath + "/accountacy copy";
+		accPath = savePath + "\\accountacy copy";
 		helper.createFolderIfNotExist(accPath);
 
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
@@ -104,6 +108,7 @@ public class StockPrinter  {
 			this.carRegistration = registration;
 		this.invNo = invoiceNum;
 		
+//		log.logError("disc "+this.discount+" "+this.applyDiscount+"\t carMan "+this.carManufacturer+" "+this.carRegistration+"\tinv "+this.invNo);
 		
 		generatePDF();
 
@@ -151,7 +156,7 @@ public class StockPrinter  {
 		PDPage page = new PDPage();
 		customerCopyDoc.addPage(page);
 		contentStream = new PDPageContentStream(customerCopyDoc, page);
-		
+		log.logError("start creating pdf");
 		addLogo(customerCopyDoc);
 		fillCompanyDetails();
 		populateInvNumManufacturer();
@@ -160,7 +165,8 @@ public class StockPrinter  {
 		contentStream.close();
 		this.fileName =  date+" "+invNo+ext; 
 		this.invoiceFileName = date+"/"+this.fileName;
-		docPath = savePath+"/"+this.fileName;
+		docPath = savePath+"\\"+this.fileName;
+		log.logError("docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
@@ -172,7 +178,7 @@ public class StockPrinter  {
 		contentStream.setNonStrokingColor(Color.darkGray);
 		contentStream.addRect(15, 420, 580, 50);
 		contentStream.fill();
-
+		log.logError("LOGO");
 	}
 
 	private void populateItemsTable() throws IOException {
@@ -190,11 +196,11 @@ public class StockPrinter  {
 		if(md.size() > 0){
 			for(int i = 0; i < md.size(); i++){
 				String tempSt = md.getElementAt(i).toString();
-				String description = tempSt.substring(0, tempSt.lastIndexOf("�"));
+				String description = tempSt.substring(0, tempSt.lastIndexOf("€"));
 				
 				createItemList(description);
 				
-				String priceSt = tempSt.substring(tempSt.lastIndexOf("�")+1);
+				String priceSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
 				priceSt = priceSt.substring(0, priceSt.lastIndexOf("x"));
 				String quant = tempSt.substring(tempSt.lastIndexOf("x")+1);
 				
@@ -213,30 +219,32 @@ public class StockPrinter  {
 		contentStream.newLine();	
 		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
 		contentStream.setFont(PDType1Font.COURIER, 18);
-		contentStream.showText("                         Discount          � "+df.format(this.discount));
+		contentStream.showText("                         Discount          € "+df.format(this.discount));
 		contentStream.newLine();	
-		contentStream.showText("                         TOTAL            � "+df.format(this.sum));
+		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
 		
 		
 		contentStream.endText();
+//		log.logError("items table");
 
 	}
 
 	private void createItemList(String description) {
 		String des = description.trim();
-		String query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+"=\""+des+"\" union all SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+"=\""+des+"\"";
-
-		try {
-			ArrayList<String> t = DM.selectRecordArrayList(query);
-			for(String ts : t){
-				//TODO
-				//add some counter for quantity?
-				if(!stockServicesNumber.contains(ts)){
-					this.stockServicesNumber.add(ts);
-				} 
+//		log.logError("B des "+des);
+		if(!des.contains(this.fv.OTHER_STRING_CHECKUP)){
+			String query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+"=\""+des+"\" union all SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+"=\""+des+"\"";
+//			log.logError("item list q\t"+query+" des "+des);
+			try {
+				ArrayList<String> t = DM.selectRecordArrayList(query);
+				for(String ts : t){
+					if(!stockServicesNumber.contains(ts)){
+						this.stockServicesNumber.add(ts);
+					} 
+				}
+			} catch (Exception e) {
+				log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 			}
-		} catch (Exception e) {
-			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 		}
 	}
 
@@ -250,6 +258,8 @@ public class StockPrinter  {
 		contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer);
 
 		contentStream.endText();
+		log.logError("invnumManufacture");
+
 	}
 
 	private void populateInvNumManufacturerRegistration() throws IOException {
@@ -297,6 +307,7 @@ public class StockPrinter  {
 		contentStream.showText(text8);
 		
 		contentStream.endText();
+//		log.logError("comapny Deatils "+text+" "+text2+" "+text3+" "+text4+" "+text5+" "+text6+" "+text7+" "+text8);
 	}
 
 	
@@ -315,7 +326,7 @@ public class StockPrinter  {
 	
 		//TODO:
 		//add test for folder existance - create folder.
-		accPath = accPath+"/"+date+"_"+docNameCopy+" "+invNo+ext;
+		accPath = accPath+"\\"+date+"_"+docNameCopy+" "+invNo+ext;
 		customerCopyDoc.save(accPath);
 		customerCopyDoc.close();
 	}
@@ -333,10 +344,11 @@ public class StockPrinter  {
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
+		log.logError("printing");
 
         //TODO
         //Uncomment bellow
-//        job.print();
+        job.print();
         
         document.close();
    }

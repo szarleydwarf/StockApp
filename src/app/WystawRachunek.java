@@ -312,7 +312,7 @@ public class WystawRachunek {
 		tfOther1.addFocusListener(new FocusListener(){
 	        @Override
 	        public void focusGained(FocusEvent e){
-	        	tfOther1.setText("");
+	        	tfOther1.setText(fv.OTHER_STRING_CHECKUP);
 			}
 			@Override
 			public void focusLost(FocusEvent arg0) {

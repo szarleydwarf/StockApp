@@ -23,6 +23,7 @@ public class FinalVariables {
 
 	//other
 	public final String SEARCH_TEXT_FIELD_FRAZE = "wpisz szukaną nazwę";
+	public final String OTHER_STRING_CHECKUP = "O:";
 
 	
 	//Database related
