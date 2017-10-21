@@ -22,6 +22,7 @@ import utillity.Logger;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
 
 public class EdytujTowar {
 
@@ -105,6 +106,8 @@ public class EdytujTowar {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setBackground(new Color(255, 255, 0));
+		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 579, 193);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {

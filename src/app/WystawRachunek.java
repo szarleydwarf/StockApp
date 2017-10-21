@@ -42,8 +42,8 @@ import utillity.StockPrinter;
 public class WystawRachunek {
 
 	private JFrame frmNowyRachunek;
-	private JTextField textFieldProdQ;
-	private JTextField textFieldServQ;private JTextField textFieldDiscount;
+	private JTextField tfProdQ;
+	private JTextField tfServQ;private JTextField textFieldDiscount;
 	private JList<String> listChosen, listItems, listServices;
 	private JRadioButton rbPercent, rbMoney;
 	private JTextField textFieldRegistration;
@@ -78,6 +78,8 @@ public class WystawRachunek {
 
 	private ArrayList<String> defaultPaths;
 	private Map<String, Integer> nameQnt;
+	private JTextField tfServicePrice;
+	private JTextField tfItemPrice;
 
 
 	/**
@@ -133,6 +135,8 @@ public class WystawRachunek {
 	private void initialize() throws Exception {		
 		df = new DecimalFormat("#.##"); 
 		frmNowyRachunek = new JFrame();
+		frmNowyRachunek.setBackground(new Color(255, 255, 0));
+		frmNowyRachunek.getContentPane().setBackground(new Color(255, 51, 0));
 		
 		frmNowyRachunek.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frmNowyRachunek.setTitle("Nowy Rachunek - HCT");
@@ -150,15 +154,15 @@ public class WystawRachunek {
 
 		scrollPaneChosen.setViewportView(listChosen);
 		
-		textFieldProdQ = new JTextField();
-		textFieldProdQ.setColumns(10);
-		textFieldProdQ.setBounds(453, 317, 44, 32);
-		frmNowyRachunek.getContentPane().add(textFieldProdQ);
+		tfProdQ = new JTextField();
+		tfProdQ.setColumns(10);
+		tfProdQ.setBounds(476, 314, 42, 24);
+		frmNowyRachunek.getContentPane().add(tfProdQ);
 		
-		textFieldServQ = new JTextField();
-		textFieldServQ.setColumns(10);
-		textFieldServQ.setBounds(453, 159, 44, 32);
-		frmNowyRachunek.getContentPane().add(textFieldServQ);
+		tfServQ = new JTextField();
+		tfServQ.setColumns(10);
+		tfServQ.setBounds(476, 156, 42, 24);
+		frmNowyRachunek.getContentPane().add(tfServQ);
 		
 		JLabel labelSaleList = new JLabel("Us\u0142uga / Towar");
 		labelSaleList.setHorizontalAlignment(SwingConstants.CENTER);
@@ -257,6 +261,7 @@ public class WystawRachunek {
 		
 
 		JButton btnSubb = new JButton("-");
+		btnSubb.setForeground(new Color(255, 0, 0));
 		btnSubb.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(!listChosen.isSelectionEmpty()) {
@@ -269,7 +274,7 @@ public class WystawRachunek {
 			}
 		});
 		btnSubb.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
-		btnSubb.setBounds(906, 165, 50, 24);
+		btnSubb.setBounds(910, 165, 40, 20);
 		frmNowyRachunek.getContentPane().add(btnSubb);
 		
 		JButton btnClearAll = new JButton("Clear All");
@@ -284,6 +289,33 @@ public class WystawRachunek {
 		btnClearAll.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnClearAll.setBounds(847, 93, 109, 24);
 		frmNowyRachunek.getContentPane().add(btnClearAll);
+		
+		JLabel lblDescription = new JLabel("Opis usługi/przedmiotu");
+		lblDescription.setBounds(123, 456, 127, 14);
+		frmNowyRachunek.getContentPane().add(lblDescription);
+		
+		JLabel lblPriceOther = new JLabel("Cena");
+		lblPriceOther.setBounds(430, 456, 28, 14);
+		frmNowyRachunek.getContentPane().add(lblPriceOther);
+		
+		JLabel lblQnt = new JLabel("Qnt");
+		lblQnt.setBounds(480, 456, 28, 14);
+		frmNowyRachunek.getContentPane().add(lblQnt);
+		
+		tfServicePrice = new JTextField();
+		tfServicePrice.setColumns(10);
+		tfServicePrice.setBounds(430, 156, 42, 24);
+		frmNowyRachunek.getContentPane().add(tfServicePrice);
+		
+		JLabel lblPrice = new JLabel("Cena");
+		lblPrice.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblPrice.setBounds(430, 134, 42, 20);
+		frmNowyRachunek.getContentPane().add(lblPrice);
+		
+		tfItemPrice = new JTextField();
+		tfItemPrice.setColumns(10);
+		tfItemPrice.setBounds(430, 314, 42, 24);
+		frmNowyRachunek.getContentPane().add(tfItemPrice);
 		
 		JLabel lblQty = new JLabel("Qty");
 		lblQty.setHorizontalAlignment(SwingConstants.CENTER);
@@ -322,12 +354,12 @@ public class WystawRachunek {
 		
 		tfOtherPrice1 = new JTextField();
 		tfOtherPrice1.setColumns(10);
-		tfOtherPrice1.setBounds(430, 470, 34, 20);
+		tfOtherPrice1.setBounds(430, 470, 48, 20);
 		frmNowyRachunek.getContentPane().add(tfOtherPrice1);
 		
 		tfOtherQnt1 = new JTextField();
 		tfOtherQnt1.setColumns(10);
-		tfOtherQnt1.setBounds(466, 470, 34, 20);
+		tfOtherQnt1.setBounds(480, 470, 28, 20);
 		frmNowyRachunek.getContentPane().add(tfOtherQnt1);
 		
 		JButton btnOtherAdd1 = new JButton("+");
@@ -340,7 +372,7 @@ public class WystawRachunek {
 			}
 		});
 		btnOtherAdd1.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnOtherAdd1.setBounds(500, 470, 50, 20);
+		btnOtherAdd1.setBounds(515, 469, 44, 20);
 		frmNowyRachunek.getContentPane().add(btnOtherAdd1);
 		
 		tfSearchBox.addActionListener(new ActionListener() {
@@ -362,9 +394,9 @@ public class WystawRachunek {
 		lblRegistration.setBounds(671, 14, 84, 28);
 		frmNowyRachunek.getContentPane().add(lblRegistration);
 		
-		JLabel labelQuantity = new JLabel("Quantity");
-		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		labelQuantity.setBounds(453, 122, 61, 19);
+		JLabel labelQuantity = new JLabel("Qnt");
+		labelQuantity.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		labelQuantity.setBounds(476, 134, 37, 20);
 		frmNowyRachunek.getContentPane().add(labelQuantity);
 		
 		JButton btnBack = new JButton("Powr\u00F3t");
@@ -448,17 +480,6 @@ public class WystawRachunek {
 		btnCalculate.setBounds(578, 456, 96, 32);
 		frmNowyRachunek.getContentPane().add(btnCalculate);
 		
-		JLabel lblDescription = new JLabel("Opis usługi/przedmiotu");
-		lblDescription.setBounds(123, 456, 127, 14);
-		frmNowyRachunek.getContentPane().add(lblDescription);
-		
-		JLabel lblNewLabel = new JLabel("Cena");
-		lblNewLabel.setBounds(430, 456, 28, 14);
-		frmNowyRachunek.getContentPane().add(lblNewLabel);
-		
-		JLabel lblQnt = new JLabel("Qnt");
-		lblQnt.setBounds(466, 456, 28, 14);
-		frmNowyRachunek.getContentPane().add(lblQnt);
 	}
 
 	private void populateCarList() throws Exception {
@@ -538,18 +559,29 @@ public class WystawRachunek {
 					
 					int index = listOfItems.indexOf(element2model);
 					String tempString = listOfItems.get(index+1);
-					productPrice = tempString;
+					
+					if(!tfItemPrice.getText().isEmpty())
+						productPrice = tfItemPrice.getText();
+					else
+						productPrice = tempString;
+
 					element2model = helper.paddStringRight(element2model, paddingLength, ch);
 					
-					element2model += " €"+tempString;
+					element2model += " €"+productPrice;
 					
-					String productQuantity = textFieldProdQ.getText(); 
-					System.out.println(listOfItems.get(index+2));
+					String productQuantity = "";
+					if(!tfProdQ.getText().isEmpty())
+						productQuantity = tfProdQ.getText(); 
+					else
+						productQuantity = "1";
+					
 					element2model+="x";
 					int qnt = 0, qntForDatabase = 0;
 					int qntInList = Integer.parseInt(listOfItems.get(index+2));
 					if(!productQuantity.isEmpty())
 						qnt = Integer.parseInt(productQuantity);
+					else
+						qnt = 1;
 					
 					while(qnt > qntInList){
 						JOptionPane.showMessageDialog(frmNowyRachunek, "Dostępnych "+qntInList+"szt.");
@@ -566,7 +598,7 @@ public class WystawRachunek {
 				}
 			}
 		});
-		btnAddItem.setBounds(507, 314, 50, 24);
+		btnAddItem.setBounds(520, 314, 44, 24);
 		frmNowyRachunek.getContentPane().add(btnAddItem);
 	}
 
@@ -611,12 +643,22 @@ public class WystawRachunek {
 					
 					int index = listOfServices.indexOf(element2model);
 					String tempString = listOfServices.get(index+1);
-					servicePrice = tempString;
+					
+					if(!tfServicePrice.getText().isEmpty())
+						servicePrice = tfServicePrice.getText();
+					else
+						servicePrice = tempString;
+					
 					element2model = helper.paddStringRight(element2model, paddingLength, ch);
 					
-					element2model += " €"+tempString;
+					element2model += " €"+servicePrice;
 					
-					String productQuantity = textFieldServQ.getText(); 
+					String productQuantity = "";
+					if(!tfServQ.getText().isEmpty())
+						productQuantity = tfServQ.getText(); 
+					else
+						productQuantity = "1";
+					
 					element2model+="x"+productQuantity;
 					
 					model2Add.addElement(element2model);
@@ -624,7 +666,7 @@ public class WystawRachunek {
 				}
 			}
 		});
-		btnAddService.setBounds(507, 156, 50, 24);
+		btnAddService.setBounds(520, 156, 44, 24);
 		frmNowyRachunek.getContentPane().add(btnAddService);
 	}
 }

@@ -76,10 +76,11 @@ public class SqliteTestAppV {
 	 */
 	private void initialize() {
 		frmHctApp = new JFrame();
+		frmHctApp.getContentPane().setBackground(new Color(255, 51, 0));
 		frmHctApp.setTitle("HCT APP");
 		frmHctApp.setResizable(false);
 		frmHctApp.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
-		frmHctApp.setBackground(Color.RED);
+		frmHctApp.setBackground(new Color(255, 255, 0));
 		frmHctApp.setBounds(100, 100, 450, 243);
 		frmHctApp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmHctApp.getContentPane().setLayout(null);
@@ -115,7 +116,7 @@ public class SqliteTestAppV {
 			}
 		});
 		login_btn.setForeground(Color.YELLOW);
-		login_btn.setBackground(Color.BLUE);
+		login_btn.setBackground(new Color(51, 153, 255));
 		login_btn.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		login_btn.setBounds(162, 171, 112, 23);
 		frmHctApp.getContentPane().add(login_btn);

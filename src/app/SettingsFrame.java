@@ -26,6 +26,7 @@ import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
+import java.awt.Color;
 
 public class SettingsFrame {
 
@@ -111,6 +112,8 @@ public class SettingsFrame {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setBackground(new Color(255, 255, 0));
+		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.setBounds(100, 100, 722, 271);
 		frame.getContentPane().setLayout(null);
 		
