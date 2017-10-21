@@ -54,6 +54,8 @@ public class FinalVariables {
 	
 	public final int DEFAULT_FOLDER_DATABASE_ROW_ID = 1;
 	public final int PRINTER_DATABASE_ROW_ID = 2;
+	public final int SETTINGS_TABLE_LAST_DATABASE_BACKUP = 3;
+	
 	public final int DEFAULT_FOLDER_ARRAYLIST_INDEX = 0;
 	public final int PRINTER__ARRAYLIST_INDEX = 1;
 

@@ -652,7 +652,6 @@ public class DatabaseManager {
 		}
 		return false;
 		}
-
 	
 	public ArrayList<Invoice> getInvoiceList(String query) {
 		conn = this.connect();

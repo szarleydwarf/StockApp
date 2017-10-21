@@ -13,9 +13,12 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import dbase.DatabaseManager;
+
 public class Helper {
 	public final String PIRELLI_ST = "Pirelli";
 	private FinalVariables fv;
+	private DatabaseManager dm;
 	
 	public Helper() {
 		this.fv = new FinalVariables();
@@ -178,4 +181,32 @@ public class Helper {
 
 	}
 
+	public void databaseBackUp(){
+
+	}
+
+	public boolean checkDatesOfLastBackup(){
+		this.dm = new DatabaseManager(this.fv.LOGGER_FOLDER_NAME);
+		String query = "SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"="+this.fv.SETTINGS_TABLE_LAST_DATABASE_BACKUP+"";
+		String today = this.getFormatedDate();
+		String lastBackup = this.dm.getPath(query);
+
+		return this.compareDates(lastBackup, today);
+	}
+	
+	public boolean compareDates(String oldDate, String newDate){
+		char find = '-';
+		int nDD = Integer.parseInt(newDate.substring(0, newDate.indexOf(find)));
+		int nMM = Integer.parseInt(newDate.substring(newDate.indexOf(find)+1, newDate.indexOf(find)+3));
+		int nYYYY = Integer.parseInt(newDate.substring(newDate.indexOf(find)+4));
+
+		int oDD = Integer.parseInt(oldDate.substring(0, oldDate.indexOf(find)));
+		int oMM = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+1, oldDate.indexOf(find)+3));
+		int oYYYY = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+4));
+		
+		if((nYYYY == oYYYY) && (nMM == oMM) && (nDD == oDD)){
+			return true;
+		}		
+		return false;
+	}
 }

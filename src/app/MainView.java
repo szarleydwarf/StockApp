@@ -62,7 +62,10 @@ public class MainView {
 		this.helper = new Helper();
 		this.fv = new FinalVariables();
 		this.loggerFolderPath = this.fv.SAVE_FOLDER_DEFAULT_PATH+"\\"+this.fv.LOGGER_FOLDER_NAME;
-		DM = new DatabaseManager(loggerFolderPath);
+		this.DM = new DatabaseManager(loggerFolderPath);
+		
+		if(!this.helper.checkDatesOfLastBackup())
+			this.helper.databaseBackUp();
 
 		defaultPaths = new ArrayList<String>();
 		
