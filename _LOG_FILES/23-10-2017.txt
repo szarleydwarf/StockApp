@@ -1,0 +1,1 @@
+23-10-2017 dbase.DatabaseManager	path to 'SQLite\theDBase.sqlite': 'D:\@Development\EclipseJavaProjects\sqliteTestApp\StockApp\SQLite' does not exist

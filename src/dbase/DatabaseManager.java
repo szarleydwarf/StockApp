@@ -222,6 +222,8 @@ public class DatabaseManager {
 		
 	public ArrayList<Item> getItemsList(String query){
 		conn = this.connect();
+		PreparedStatement pst = null;
+		ResultSet rs = null;
 		ArrayList<Item> list = new ArrayList<Item>();
 		boolean isItem = false;
 		if(query.contains(this.fv.STOCK_TABLE)){
@@ -231,9 +233,9 @@ public class DatabaseManager {
 		}
 //		System.out.println(query);
 		try {
-			PreparedStatement pst = conn.prepareStatement(query);		
+			pst = conn.prepareStatement(query);		
 			
-			ResultSet rs = pst.executeQuery();
+			rs = pst.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnsNumber = rsmd.getColumnCount();
 			while (rs.next()){
@@ -249,8 +251,12 @@ public class DatabaseManager {
 			log.logError(date+" "+this.getClass().getName()+"\tGET ITEMS LIST\tE1 "+e1.getMessage());
 		} finally {
 			try{
-				rs.close();
-				pst.close();
+				if (rs != null) {
+                    rs.close();
+                }
+                if (pst != null) {
+                    pst.close();
+                }
 			} catch (Exception e2){
 				log.logError(date+" "+this.getClass().getName()+"\tGET ITEMS LIST\tE2 "+e2.getMessage());
 			}

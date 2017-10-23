@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.Icon;
@@ -64,9 +65,6 @@ public class MainView {
 		this.loggerFolderPath = this.fv.SAVE_FOLDER_DEFAULT_PATH+"\\"+this.fv.LOGGER_FOLDER_NAME;
 		this.DM = new DatabaseManager(loggerFolderPath);
 		
-		if(!this.helper.checkDatesOfLastBackup())
-			this.helper.databaseBackUp();
-
 		defaultPaths = new ArrayList<String>();
 		
 		if(this.defaultPaths.isEmpty())
@@ -77,7 +75,23 @@ public class MainView {
 			loggerFolderPath = defaultPaths.get(0)+"\\"+this.fv.LOGGER_FOLDER_NAME;
 		
 		this.logger = new Logger(loggerFolderPath);
-;
+		
+		if(!this.helper.checkDatesOfLastBackup()){
+			try {
+				String date = this.helper.getFormatedDate();
+				String t = this.fv.DATABASE_DEFAULT_PATH.substring(this.fv.DATABASE_DEFAULT_PATH.lastIndexOf('\\')+1);
+				String dbbName = date+"_"+t;
+				boolean jobDone = this.helper.databaseBackUp(this.fv.DATABASE_DEFAULT_PATH, this.fv.DATABASE_BACKUP_DEFAULT_PATH+"\\"+dbbName);
+				if(jobDone){
+					String query = "UPDATE \""+fv.SETTINGS_TABLE+"\" SET "+fv.SETTINGS_TABLE_PATH+"='"+date+"'" + " WHERE " + fv.ROW_ID+ "='"+this.fv.SETTINGS_TABLE_LAST_DATABASE_BACKUP+"'";
+					this.DM.editRecord(query);
+				} else {
+					JOptionPane.showMessageDialog(frmHctMagazyn, "Nie wykonałem kopii bazy danych.");
+				}
+			} catch (IOException e) {
+				this.logger.logError("MAIN VIEW DATABASE BACKUP FAIL "+this.getClass().getName()+"\t"+e.getMessage());
+			}
+		}
 		
 		initialize();
 	}
@@ -90,9 +104,9 @@ public class MainView {
 	 */
 	private void initialize() {
 //		if(this.frmHctMagazyn == null)
-			frmHctMagazyn = new JFrame();
-			frmHctMagazyn.setBackground(new Color(255, 255, 0));
-			frmHctMagazyn.getContentPane().setBackground(new Color(255, 51, 0));
+		frmHctMagazyn = new JFrame();
+		frmHctMagazyn.setBackground(new Color(255, 255, 0));
+		frmHctMagazyn.getContentPane().setBackground(new Color(255, 51, 0));
 		
 		frmHctMagazyn.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frmHctMagazyn.setTitle("HCT MAGAZYN");

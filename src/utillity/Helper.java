@@ -2,7 +2,12 @@ package utillity;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -181,8 +186,27 @@ public class Helper {
 
 	}
 
-	public void databaseBackUp(){
-
+	public boolean databaseBackUp(String source, String dest) throws IOException{
+		try {
+//            System.out.println("Reading..." + source+"\n"+dest);
+            File sourceFile = new File(source);
+            File destinationFile = new File(dest);
+            InputStream in = new FileInputStream(sourceFile);
+            OutputStream out = new FileOutputStream(destinationFile);
+ 
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+            in.close();
+            out.close();
+            return true;
+//            System.out.println("Copied: " + source);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
 	}
 
 	public boolean checkDatesOfLastBackup(){
