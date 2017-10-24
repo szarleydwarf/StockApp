@@ -53,6 +53,8 @@ public class WystawRachunek {
 	private JTextField tfOtherPrice1;
 	private JTextField tfSearchBox;
 	private JTextField tfOther1;
+	private JTextField tfServicePrice;
+	private JTextField tfItemPrice;
 	private DefaultListModel<String> model2Add;
 	
 	private StockPrinter sPrinter;
@@ -66,7 +68,7 @@ public class WystawRachunek {
 	protected static String date;
 	protected static String loggerFolderPath;
 	
-	private String lblCarManufacturerTxt = "Car manufacturer";
+	private String lblCarManufacturerTxt = "CAR";
 	private String stockSearchText="";
 	private String carManufacturer, registration, servicePrice, productPrice ;
 	private final String lblTotalSt = "TOTAL";
@@ -78,8 +80,7 @@ public class WystawRachunek {
 
 	private ArrayList<String> defaultPaths;
 	private Map<String, Integer> nameQnt;
-	private JTextField tfServicePrice;
-	private JTextField tfItemPrice;
+
 
 
 	/**
@@ -153,6 +154,12 @@ public class WystawRachunek {
 		model2Add = new DefaultListModel<>();
 
 		scrollPaneChosen.setViewportView(listChosen);
+		
+
+		if(this.defaultPaths.size() == 4){
+			this.model2Add.addElement(this.defaultPaths.get(this.defaultPaths.size()-1));
+			this.listChosen.setModel(model2Add);
+		}
 		
 		tfProdQ = new JTextField();
 		tfProdQ.setColumns(10);

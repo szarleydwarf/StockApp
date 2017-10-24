@@ -49,6 +49,9 @@ public class WyswietlMagazyn {
 	private ArrayList<Item> listOfItems, listOfServices;
 	private FinalVariables fv;
 	private static Logger log;
+	private JTextField tfQnt4Invoice;
+	private String lblQntLabel = "Ile sztuk ";
+	private int selectedQnt, count = 0;;
 	/**
 	 * Launch the application.
 	 */
@@ -116,7 +119,7 @@ public class WyswietlMagazyn {
 		frame.setBackground(new Color(255, 255, 0));
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
-		frame.setBounds(100, 100, 587, 600);
+		frame.setBounds(100, 100, 799, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -145,13 +148,13 @@ public class WyswietlMagazyn {
 		label.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		label.setBorder(border);
 		label.setVerticalAlignment(SwingConstants.TOP);
-		label.setBounds(10, 89, 551, 461);
+		label.setBounds(10, 89, 762, 461);
 		
 		label.setVerticalAlignment(SwingConstants.TOP);
 		frame.getContentPane().add(label);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(21, 138, 421, 400);
+		scrollPane.setBounds(21, 138, 552, 400);
 		frame.getContentPane().add(scrollPane);
 				
 		JLabel lblPrice = new JLabel("Cena");
@@ -195,6 +198,7 @@ public class WyswietlMagazyn {
 			}
 		});
 		
+	
 		
 		JButton btnSearch = new JButton("Szukaj");
 		btnSearch.addActionListener(new ActionListener() {
@@ -227,20 +231,9 @@ public class WyswietlMagazyn {
 			}
 		});
 		btnDelete.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		btnDelete.setBounds(468, 490, 71, 20);
+		btnDelete.setBounds(675, 490, 71, 20);
 		frame.getContentPane().add(btnDelete);
 		
-		this.list.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent listSelectionEvent) {
-				if(!list.isSelectionEmpty()){
-					helper.toggleJButton(btnDelete, Color.RED, Color.ORANGE, true);
-				} else {
-					helper.toggleJButton(btnDelete, Color.DARK_GRAY, Color.lightGray, false);
-				}
-			}
-			
-		});
 		
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
@@ -262,10 +255,82 @@ public class WyswietlMagazyn {
 				MainView.main(null);
 			}
 		});
-		btnBack.setBounds(452, 515, 100, 23);
+		btnBack.setBounds(659, 515, 100, 23);
 		frame.getContentPane().add(btnBack);
+		
+		JButton btnAddToInvoice = new JButton("do Rachunku");
+		btnAddToInvoice.setEnabled(false);
+		btnAddToInvoice.setBounds(665, 102, 94, 23);
+		btnAddToInvoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addToInvoice();
+			}
+		});
+		frame.getContentPane().add(btnAddToInvoice);
+		
+		tfQnt4Invoice = new JTextField();
+		tfQnt4Invoice.setBounds(594, 103, 60, 20);
+		frame.getContentPane().add(tfQnt4Invoice);
+		tfQnt4Invoice.setColumns(10);
+		
+		JLabel lblQnt2Invoice = new JLabel(lblQntLabel );
+		lblQnt2Invoice.setForeground(Color.YELLOW);
+		lblQnt2Invoice.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		lblQnt2Invoice.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblQnt2Invoice.setBounds(290, 106, 300, 14);
+		frame.getContentPane().add(lblQnt2Invoice);
+
+		list.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent listSelectionEvent) {
+count=0;
+				if(!list.isSelectionEmpty()){
+					helper.toggleJButton(btnDelete, Color.RED, Color.ORANGE, true);
+					helper.toggleJButton(btnAddToInvoice, Color.GREEN, Color.WHITE, true);
+
+					if(count == 0){
+						getSelectedItem();
+						System.out.println("QNT 2 "+selectedQnt);
+						if(selectedQnt != 0)
+							lblQntLabel =lblQntLabel+" z dostępnych "+ selectedQnt;
+						else
+							lblQntLabel = lblQntLabel;
+						lblQnt2Invoice.setText(lblQntLabel);
+						count++;
+					}
+				} else {
+					helper.toggleJButton(btnDelete, Color.DARK_GRAY, Color.lightGray, false);
+					helper.toggleJButton(btnAddToInvoice, Color.LIGHT_GRAY, Color.GRAY, false);
+				}
+			}
+			
+		});		
 	}
 	
+	protected void addToInvoice() {
+		this.frame.dispose();
+		ArrayList<String> defaultPaths = new ArrayList<String>();
+		defaultPaths = this.DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+		String itemForList = getSelectedItem();
+		defaultPaths.add(itemForList);
+		
+		WystawRachunek.main(defaultPaths);
+	}
+
+	private String getSelectedItem() {
+		Item i = getItemFromLists();
+		String str = "";
+		if(i != null){
+			str = i.getName()+" €"+i.getPrice();
+			if(i instanceof StockItem){
+				str += " x"+((StockItem) i).getQnt();
+				selectedQnt = ((StockItem) i).getQnt();
+				System.out.println("QNT 1 "+selectedQnt);
+			}
+		}
+		return str;
+	}
+
 	private void deleteRocordFromDatabase() {
 		if(!list.isSelectionEmpty()){
 			Item i = getItemFromLists();
@@ -327,8 +392,6 @@ public class WyswietlMagazyn {
 	}
 
 	private void searchInDatabase() {
-		//"SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+"=\""+des+"\" 
-		//union all SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+"=\""+des+"\""
 		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
 		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
 			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";

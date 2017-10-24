@@ -60,19 +60,20 @@ public class StockPrinter  {
 	public StockPrinter(ArrayList<String> defaultPaths){
 		this.fv = new FinalVariables();
 		this.printerName = "";
+		String slash = "\\";
 		for(int i=0; i<defaultPaths.size();i++)
 //		System.out.println("Printer "+defaultPaths.get(i)+" "+defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX));
 		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty()){
-			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
-			loggerFolderPath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+"\\";//+this.fv.LOGGER_FOLDER_NAME;
+			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash;
+			loggerFolderPath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash;//+this.fv.LOGGER_FOLDER_NAME;
 		}else{
 			m_defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
 			if(this.m_defaultPaths != null){
-				this.savePath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX);
-				loggerFolderPath = m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+"\\"+this.fv.LOGGER_FOLDER_NAME;
+				this.savePath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash;
+				loggerFolderPath = m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+"\\"+this.fv.LOGGER_FOLDER_NAME+slash;
 			}else {
-				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH;
-				loggerFolderPath = "\\"+this.fv.LOGGER_FOLDER_NAME;
+				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH+slash;
+				loggerFolderPath = "\\"+this.fv.LOGGER_FOLDER_NAME+slash;
 			}
 		}
 		DM = new DatabaseManager(loggerFolderPath);
@@ -84,8 +85,8 @@ public class StockPrinter  {
 		else
 			this.printerName = this.fv.PRINTER_NAME;
 		
-		this.savePath+="\\";
-		log.logError("folder "+this.loggerFolderPath+"\t savepath "+this.savePath);
+//		this.savePath;
+//		log.logError("folder "+this.loggerFolderPath+"\t savepath "+this.savePath);
 		this.stockServicesNumber = new ArrayList<String>();
 	}
 	
@@ -152,7 +153,7 @@ public class StockPrinter  {
 		PDPage page = new PDPage();
 		customerCopyDoc.addPage(page);
 		contentStream = new PDPageContentStream(customerCopyDoc, page);
-		log.logError("start creating pdf");
+//		log.logError("start creating pdf");
 		addLogo(customerCopyDoc);
 		fillCompanyDetails();
 		populateInvNumManufacturer();
@@ -162,7 +163,8 @@ public class StockPrinter  {
 		this.fileName =  date+" "+invNo+ext; 
 		this.invoiceFileName = date+"\\"+this.fileName;
 		docPath = savePath+this.fileName;
-		log.logError("docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
+		//TODO
+//		log.logError("docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
@@ -241,7 +243,7 @@ public class StockPrinter  {
 	private void populateInvNumManufacturer() throws IOException {
 		contentStream.beginText();
 		contentStream.setLeading(20.5f);
-		contentStream.setFont(PDType1Font.COURIER_BOLD, 20);
+		contentStream.setFont(PDType1Font.COURIER_BOLD, 16);
 		
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.newLineAtOffset(140, 520);
@@ -253,11 +255,12 @@ public class StockPrinter  {
 	private void populateInvNumManufacturerRegistration() throws IOException {
 		contentStream.beginText();
 		contentStream.setLeading(20.5f);
-		contentStream.setFont(PDType1Font.COURIER_BOLD, 20);
+		contentStream.setFont(PDType1Font.COURIER_BOLD, 16);
 		
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.newLineAtOffset(120, 520);
-		contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer+ " reg "+carRegistration);
+		contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer);
+		contentStream.showText( "    reg "+carRegistration);
 
 		contentStream.endText();
 	}
@@ -331,11 +334,11 @@ public class StockPrinter  {
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
-		log.logError("printing");
+//		log.logError("printing");
 
         //TODO
         //Uncomment bellow
-//        job.print();
+        job.print();
         
         document.close();
    }
