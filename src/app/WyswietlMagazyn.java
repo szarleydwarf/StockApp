@@ -50,8 +50,9 @@ public class WyswietlMagazyn {
 	private FinalVariables fv;
 	private static Logger log;
 	private JTextField tfQnt4Invoice;
-	private String lblQntLabel = "Ile sztuk ";
-	private int selectedQnt, count = 0;;
+	private String lblQntLabel = "Dostepnych ";
+	private int selectedQnt, count = 0;
+	protected String lblQntText = "Dostepnych ";
 	/**
 	 * Launch the application.
 	 */
@@ -283,38 +284,68 @@ public class WyswietlMagazyn {
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent listSelectionEvent) {
-count=0;
+
 				if(!list.isSelectionEmpty()){
 					helper.toggleJButton(btnDelete, Color.RED, Color.ORANGE, true);
 					helper.toggleJButton(btnAddToInvoice, Color.GREEN, Color.WHITE, true);
+					lblQntLabel = lblQntText;
+					getSelectedItem();
 
-					if(count == 0){
-						getSelectedItem();
-						System.out.println("QNT 2 "+selectedQnt);
-						if(selectedQnt != 0)
-							lblQntLabel =lblQntLabel+" z dostępnych "+ selectedQnt;
-						else
-							lblQntLabel = lblQntLabel;
-						lblQnt2Invoice.setText(lblQntLabel);
+					if(selectedQnt != 0 && count == 0){
+						lblQntLabel = lblQntLabel+" "+ selectedQnt;
 						count++;
+						lblQnt2Invoice.setText(lblQntLabel);
 					}
+					count = 0;
+
 				} else {
 					helper.toggleJButton(btnDelete, Color.DARK_GRAY, Color.lightGray, false);
 					helper.toggleJButton(btnAddToInvoice, Color.LIGHT_GRAY, Color.GRAY, false);
 				}
-			}
-			
-		});		
+			}			
+		});	
 	}
 	
 	protected void addToInvoice() {
-		this.frame.dispose();
+		String itemForList = getSelectedItem();
+		String test="";
+		do{
+			test = checkQnt(itemForList);
+			if(test.isEmpty())
+				return;
+		}while (test =="");
+		itemForList = test;
+
 		ArrayList<String> defaultPaths = new ArrayList<String>();
 		defaultPaths = this.DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
-		String itemForList = getSelectedItem();
 		defaultPaths.add(itemForList);
+		this.frame.dispose();
 		
 		WystawRachunek.main(defaultPaths);
+	}
+
+	private String checkQnt(String itemForList) {
+		String str = itemForList.substring(itemForList.lastIndexOf("x")+1);
+		int qnt=0;
+		int qntInList=0;
+		if(!str.isEmpty() && (str.matches("[0-9]+")))
+			qntInList = Integer.parseInt(str);
+		else
+			qntInList = 1;
+
+		if(!tfQnt4Invoice.getText().isEmpty() ){
+			qnt = Integer.parseInt(tfQnt4Invoice.getText());
+
+			while(qnt > qntInList ){
+				JOptionPane.showMessageDialog(this.frame, "Dostępnych "+qntInList+"szt.");
+				if(qnt > qntInList)
+					return "";
+			}
+			str = itemForList.replace(itemForList.substring(itemForList.lastIndexOf("x")+1), tfQnt4Invoice.getText());
+		} else
+			str = itemForList;
+		System.out.println(str);
+		return str;
 	}
 
 	private String getSelectedItem() {
@@ -325,7 +356,6 @@ count=0;
 			if(i instanceof StockItem){
 				str += " x"+((StockItem) i).getQnt();
 				selectedQnt = ((StockItem) i).getQnt();
-				System.out.println("QNT 1 "+selectedQnt);
 			}
 		}
 		return str;
