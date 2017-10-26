@@ -52,6 +52,7 @@ public class StockPrinter  {
 	private String fileName;
 	private String printerName;
 	private ArrayList<String> m_defaultPaths;
+	private String slash = "\\";
 	
 	protected static String loggerFolderPath;
 	private static Logger log;
@@ -60,8 +61,8 @@ public class StockPrinter  {
 	public StockPrinter(ArrayList<String> defaultPaths){
 		this.fv = new FinalVariables();
 		this.printerName = "";
-		String slash = "\\";
-		for(int i=0; i<defaultPaths.size();i++)
+	
+//		for(int i=0; i<defaultPaths.size();i++)
 //		System.out.println("Printer "+defaultPaths.get(i)+" "+defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX));
 		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty()){
 			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash;
@@ -70,12 +71,16 @@ public class StockPrinter  {
 			m_defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
 			if(this.m_defaultPaths != null){
 				this.savePath = this.m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash;
-				loggerFolderPath = m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+"\\"+this.fv.LOGGER_FOLDER_NAME+slash;
+				loggerFolderPath = m_defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash+this.fv.LOGGER_FOLDER_NAME+slash;
 			}else {
 				this.savePath = this.fv.SAVE_FOLDER_DEFAULT_PATH+slash;
-				loggerFolderPath = "\\"+this.fv.LOGGER_FOLDER_NAME+slash;
+				loggerFolderPath = slash+this.fv.LOGGER_FOLDER_NAME+slash;
 			}
 		}
+		
+		if(!loggerFolderPath.contains(this.fv.LOGGER_FOLDER_NAME))
+			loggerFolderPath = slash+this.fv.LOGGER_FOLDER_NAME+slash;
+		
 		DM = new DatabaseManager(loggerFolderPath);
 		helper = new Helper();
 		log = new Logger(loggerFolderPath);
@@ -86,7 +91,7 @@ public class StockPrinter  {
 			this.printerName = this.fv.PRINTER_NAME;
 		
 //		this.savePath;
-//		log.logError("folder "+this.loggerFolderPath+"\t savepath "+this.savePath);
+//		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
 		this.stockServicesNumber = new ArrayList<String>();
 	}
 	
@@ -96,7 +101,7 @@ public class StockPrinter  {
 		savePath = savePath.concat(this.date);
 		helper.createFolderIfNotExist(savePath);
 		
-		accPath = savePath + "accountacy copy";
+		accPath = savePath+slash + "_accountacy copy"+slash;
 		helper.createFolderIfNotExist(accPath);
 
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
@@ -153,7 +158,6 @@ public class StockPrinter  {
 		PDPage page = new PDPage();
 		customerCopyDoc.addPage(page);
 		contentStream = new PDPageContentStream(customerCopyDoc, page);
-//		log.logError("start creating pdf");
 		addLogo(customerCopyDoc);
 		fillCompanyDetails();
 		populateInvNumManufacturer();
@@ -162,9 +166,9 @@ public class StockPrinter  {
 		contentStream.close();
 		this.fileName =  date+" "+invNo+ext; 
 		this.invoiceFileName = date+"\\"+this.fileName;
-		docPath = savePath+this.fileName;
+		docPath = savePath+slash+this.fileName;
 		//TODO
-//		log.logError("docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
+//		log.logError("save path "+savePath +"docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
@@ -219,6 +223,9 @@ public class StockPrinter  {
 		contentStream.showText("                         Discount          € "+df.format(this.discount));
 		contentStream.newLine();	
 		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
+		contentStream.newLine();	
+		contentStream.newLine();	
+		contentStream.showText("                         Free  tire paint, air freshener");
 			
 		contentStream.endText();
 	}
@@ -260,6 +267,7 @@ public class StockPrinter  {
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.newLineAtOffset(120, 520);
 		contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer);
+		contentStream.newLine();
 		contentStream.showText( "    reg "+carRegistration);
 
 		contentStream.endText();
@@ -317,12 +325,13 @@ public class StockPrinter  {
 		//TODO:
 		//add test for folder existance - create folder.
 		accPath = accPath+"\\"+date+"_"+docNameCopy+" "+invNo+ext;
+//		log.logError("acc path "+accPath);
 		customerCopyDoc.save(accPath);
 		customerCopyDoc.close();
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{
-		System.out.println(docPath);
+//		System.out.println(docPath);
 		PDDocument document = PDDocument.load(new File(docPath));
 
 		if(this.printerName.isEmpty() || this.printerName == "")
@@ -334,7 +343,6 @@ public class StockPrinter  {
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
-//		log.logError("printing");
 
         //TODO
         //Uncomment bellow
