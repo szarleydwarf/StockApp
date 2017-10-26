@@ -25,6 +25,7 @@ public class FinalVariables {
 	//other
 	public final String SEARCH_TEXT_FIELD_FRAZE = "wpisz szukaną nazwę";
 	public final String OTHER_STRING_CHECKUP = "O:";
+	public final String MAX_SERVIS_QNT = "9999";
 
 	
 	//Database related

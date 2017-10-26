@@ -308,6 +308,7 @@ public class WyswietlMagazyn {
 	
 	protected void addToInvoice() {
 		String itemForList = getSelectedItem();
+//		System.out.println("item "+itemForList);
 		String test="";
 		do{
 			test = checkQnt(itemForList);
@@ -344,7 +345,7 @@ public class WyswietlMagazyn {
 			str = itemForList.replace(itemForList.substring(itemForList.lastIndexOf("x")+1), tfQnt4Invoice.getText());
 		} else
 			str = itemForList;
-		System.out.println(str);
+//		System.out.println(str);
 		return str;
 	}
 
@@ -356,6 +357,11 @@ public class WyswietlMagazyn {
 			if(i instanceof StockItem){
 				str += " x"+((StockItem) i).getQnt();
 				selectedQnt = ((StockItem) i).getQnt();
+			} else {
+				if(!str.contains("*"))
+					str += " x"+1;
+				else
+					str+=" x"+this.fv.MAX_SERVIS_QNT;
 			}
 		}
 		return str;
