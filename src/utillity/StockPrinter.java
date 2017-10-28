@@ -64,6 +64,7 @@ public class StockPrinter  {
 	
 //		for(int i=0; i<defaultPaths.size();i++)
 //		System.out.println("Printer "+defaultPaths.get(i)+" "+defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX));
+		
 		if(!defaultPaths.isEmpty() && defaultPaths != null && !defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX).isEmpty()){
 			this.savePath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash;
 			loggerFolderPath = defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX)+slash;//+this.fv.LOGGER_FOLDER_NAME;
@@ -93,6 +94,20 @@ public class StockPrinter  {
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
 		this.stockServicesNumber = new ArrayList<String>();
+	}
+	
+	public void printCleanPDF() throws Exception {
+		PDDocument empty = new PDDocument();
+		PDPage page = new PDPage();
+		empty.addPage(page);
+		contentStream = new PDPageContentStream(empty, page);
+		contentStream.close();
+		String path = savePath+loggerFolderPath+"empty.pdf";
+//		log.logError("print empty pdf "+path);
+		empty.save(path);
+		empty.close();
+		
+		this.printPDF(path);
 	}
 	
 	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
@@ -225,7 +240,7 @@ public class StockPrinter  {
 		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
 		contentStream.newLine();	
 		contentStream.newLine();	
-		contentStream.showText("                         Free  tire paint, air freshener");
+		contentStream.showText("           Free  tire paint, air freshener");
 			
 		contentStream.endText();
 	}
@@ -288,7 +303,7 @@ public class StockPrinter  {
 				text6 = "hctballinamore@gmail.com",
 				text7 = "hct-ireland.business.site",
 				text8 = "FB @hct.irl";
-		contentStream.showText(text + "                                     " + date);
+		contentStream.showText(text + "                                       " + date);
 		contentStream.newLine();
 		contentStream.setFont(PDType1Font.COURIER, 12);
 		contentStream.showText(text2);
@@ -307,7 +322,6 @@ public class StockPrinter  {
 		
 		contentStream.endText();
 	}
-
 	
 	private void createAccountancCopy() throws IOException {
 		PDDocument customerCopyDoc = new PDDocument();
@@ -331,7 +345,7 @@ public class StockPrinter  {
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{
-//		System.out.println(docPath);
+		System.out.println("printpdf "+docPath);
 		PDDocument document = PDDocument.load(new File(docPath));
 
 		if(this.printerName.isEmpty() || this.printerName == "")

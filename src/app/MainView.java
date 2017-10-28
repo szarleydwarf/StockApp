@@ -19,6 +19,7 @@ import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
+import utillity.StockPrinter;
 
 public class MainView {
 
@@ -90,6 +91,12 @@ public class MainView {
 				}
 			} catch (IOException e) {
 				this.logger.logError("MAIN VIEW DATABASE BACKUP FAIL "+this.getClass().getName()+"\t"+e.getMessage());
+			}
+			StockPrinter stPrinter = new StockPrinter(defaultPaths);
+			try {
+				stPrinter.printCleanPDF();
+			} catch (Exception e) {
+				this.logger.logError("MAIN VIEW EMPTY PDF PRINT FAIL "+this.getClass().getName()+"\t"+e.getMessage());
 			}
 		}
 		

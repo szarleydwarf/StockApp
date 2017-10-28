@@ -500,11 +500,10 @@ public class WystawRachunek {
 		DefaultListModel<String> modelCars = new DefaultListModel<>();
 	
 		ArrayList<String> listOfCars = DM.selectRecordArrayList(queryCars);
-		
-		for(int i = 0; i < listOfCars.size(); i+=2) {
+		for(int i = 0; i < listOfCars.size(); i++) {
 			String tempString = listOfCars.get(i);
 			modelCars.addElement(tempString);
-//			System.out.println("ST: "+alist.get(i));
+//			System.out.println(i+ " ST: "+listOfCars.get(i));
 		}
 		JLabel labelClient = new JLabel("Klient");
 		labelClient.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
