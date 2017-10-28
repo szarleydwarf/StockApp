@@ -11,7 +11,7 @@ public class FinalVariables {
 	public final String INVOICE_LOGO_PATH = "resources\\img\\Logo HCT 245x84.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
 	public final String DATABASE_DEFAULT_PATH = "SQLite\\theDBase.sqlite";
 //	public final String DATABASE_DEFAULT_PATH = "D:\\@Development\\__TEMP\\SQLite\\theDBase.sqlite";
-	public final String DATABASE_BACKUP_DEFAULT_PATH = "C:\\Users\\hctba\\OneDrive\\HCT - Dokumenty\\BackUpy\\database";
+	public final String DATABASE_BACKUP_DEFAULT_PATH = "C:\\Users\\hctba\\OneDrive\\HCT - Dokumenty\\BackUpy\\database";//C:\Users\hctba\OneDrive\HCT - Dokumenty\BackUpy\database
 	public String PRINTER_NAME = "Canon MP620 series Printer WS";
 	public String SAVE_FOLDER_DEFAULT_PATH = "D:\\@Development\\__TEMP";
 	public  final String LOGGER_FOLDER_NAME = "_LOG_FILES";
@@ -57,6 +57,7 @@ public class FinalVariables {
 	public final int DEFAULT_FOLDER_DATABASE_ROW_ID = 1;
 	public final int PRINTER_DATABASE_ROW_ID = 2;
 	public final int SETTINGS_TABLE_LAST_DATABASE_BACKUP = 3;
+	public final int DATABASE_BACKUP_PATH_ROW_ID = 4;
 	
 	public final int DEFAULT_FOLDER_ARRAYLIST_INDEX = 0;
 	public final int PRINTER__ARRAYLIST_INDEX = 1;

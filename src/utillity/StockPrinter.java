@@ -198,6 +198,7 @@ public class StockPrinter  {
 	}
 
 	private void populateItemsTable() throws IOException {
+		boolean isService = false;
 		contentStream.beginText();
 		contentStream.setNonStrokingColor(Color.WHITE);
 		contentStream.setLeading(20.5f);
@@ -213,6 +214,9 @@ public class StockPrinter  {
 			for(int i = 0; i < md.size(); i++){
 				String tempSt = md.getElementAt(i).toString();
 				String description = tempSt.substring(0, tempSt.lastIndexOf("€"));
+				
+				if(description.contains("Wash"))
+					isService=true;
 				
 				createItemList(description);
 				
@@ -238,9 +242,15 @@ public class StockPrinter  {
 		contentStream.showText("                         Discount          € "+df.format(this.discount));
 		contentStream.newLine();	
 		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
+		
+		String freebie = "tire paint, ";
+		
 		contentStream.newLine();	
 		contentStream.newLine();	
-		contentStream.showText("           Free  tire paint, air freshener");
+		contentStream.showText("           Free ");
+		if(isService)
+			contentStream.showText(freebie);
+		contentStream.showText("air freshener");
 			
 		contentStream.endText();
 	}
@@ -345,7 +355,7 @@ public class StockPrinter  {
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{
-		System.out.println("printpdf "+docPath);
+//		System.out.println("printpdf "+docPath);
 		PDDocument document = PDDocument.load(new File(docPath));
 
 		if(this.printerName.isEmpty() || this.printerName == "")
@@ -360,7 +370,7 @@ public class StockPrinter  {
 
         //TODO
         //Uncomment bellow
-        job.print();
+//        job.print();
         
         document.close();
    }
