@@ -156,14 +156,19 @@ public class WystawRachunek {
 		scrollPaneChosen.setViewportView(listChosen);
 		
 
-		if(this.defaultPaths.size() == 4){
+		if(this.defaultPaths.size() >= 4){
 			String t = this.defaultPaths.get(this.defaultPaths.size()-1);
+//System.out.println("Before "+t);
+			if(!t.contains(":\\")){
+//System.out.println("middle "+t);
+				if(t.contains(fv.MAX_SERVIS_QNT))
+					t = t.replace(t.substring(t.lastIndexOf("x")+1), "1");;
 
-			if(t.contains(fv.MAX_SERVIS_QNT))
-				t = t.replace(t.substring(t.lastIndexOf("x")+1), "1");;
+//System.out.println("after "+t);
 
-			this.model2Add.addElement(t);//this.defaultPaths.get(this.defaultPaths.size()-1));
-			this.listChosen.setModel(model2Add);
+				this.model2Add.addElement(t);//this.defaultPaths.get(this.defaultPaths.size()-1));
+				this.listChosen.setModel(model2Add);
+			}
 		}
 		
 		tfProdQ = new JTextField();

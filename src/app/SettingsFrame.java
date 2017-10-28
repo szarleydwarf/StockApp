@@ -311,7 +311,7 @@ public class SettingsFrame {
             } else {
             	newDir = current;
             }
-        	System.out.println(fc.getCurrentDirectory()+" "+newDir.getAbsoluteFile()+" "+current.getAbsoluteFile());
+//        	System.out.println(fc.getCurrentDirectory()+" "+newDir.getAbsoluteFile()+" "+current.getAbsoluteFile());
             fc.setCurrentDirectory(newDir.getAbsoluteFile());
             (lblSaveFolderPath).setText(""+newDir.getAbsoluteFile());
 
@@ -335,7 +335,7 @@ public class SettingsFrame {
             } else {
             	newDir = current;
             }
-        	System.out.println(fcDB.getCurrentDirectory()+" "+newDir.getAbsoluteFile()+" "+current.getAbsoluteFile());
+//        	System.out.println(fcDB.getCurrentDirectory()+" "+newDir.getAbsoluteFile()+" "+current.getAbsoluteFile());
         	fcDB.setCurrentDirectory(newDir.getAbsoluteFile());
             (lblDatabaseBackupPath).setText(""+newDir.getAbsoluteFile());
 
