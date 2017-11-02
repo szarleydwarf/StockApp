@@ -33,6 +33,7 @@ import hct_speciale.StockItem;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
+import javax.swing.JComboBox;
 
 public class WyswietlMagazyn {
 
@@ -53,6 +54,9 @@ public class WyswietlMagazyn {
 	private String lblQntLabel = "Dostepnych ";
 	private int selectedQnt, count = 0;
 	protected String lblQntText = "Dostepnych ";
+	private JComboBox sortComboBox;
+	private String stockSortBy="item_name";
+	private Object servicesSortBy="service_name";
 	/**
 	 * Launch the application.
 	 */
@@ -91,8 +95,9 @@ public class WyswietlMagazyn {
 	}
 
 	private void populateList() {
-		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+this.fv.STOCK_TABLE_ITEM_NAME+" ASC";//item_name, cost, price,quantity
-		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+this.fv.SERVICES_TABLE_SERVICE_NAME+" ASC";//item_name, cost, price,quantity
+		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
+		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+servicesSortBy+" ASC";//item_name, cost, price,quantity
+//System.out.println("Q "+query+"\n"+queryServices);
 		DefaultListModel<String> modelItems = new DefaultListModel<>();
 		
 		listOfItems = DM.getItemsList(query);
@@ -280,6 +285,23 @@ public class WyswietlMagazyn {
 		lblQnt2Invoice.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblQnt2Invoice.setBounds(290, 106, 300, 14);
 		frame.getContentPane().add(lblQnt2Invoice);
+		
+		sortComboBox = new JComboBox(this.fv.SORT_BY);
+		sortComboBox.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		sortComboBox.setBounds(622, 47, 150, 20);
+//		sortComboBox.setSelectedIndex(1);
+		sortComboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sortListBy(e);
+			}
+		});
+		frame.getContentPane().add(sortComboBox);
+		
+		JLabel lblSortBy = new JLabel("Sortuj :");
+		lblSortBy.setLabelFor(sortComboBox);
+		lblSortBy.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblSortBy.setBounds(576, 50, 46, 14);
+		frame.getContentPane().add(lblSortBy);
 
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -306,6 +328,29 @@ public class WyswietlMagazyn {
 		});	
 	}
 	
+	protected void sortListBy(ActionEvent e) {
+//		{"Nazwa", "Cena", "Qnt", "Rozmiar"};
+		if(e.getSource() == this.sortComboBox) {
+			JComboBox cb = (JComboBox) e.getSource();
+			String s = (String) cb.getSelectedItem();
+			if(s == this.fv.SORT_BY[0]){
+				stockSortBy = this.fv.STOCK_TABLE_ITEM_NAME;//" substr("+this.fv.STOCK_TABLE_ITEM_NAME+", length("+this.fv.STOCK_TABLE_ITEM_NAME+")-11);";
+				servicesSortBy = this.fv.SERVICES_TABLE_SERVICE_NAME;
+			} else if (s == this.fv.SORT_BY[1]) {
+				stockSortBy = this.fv.STOCK_TABLE_PRICE;
+				servicesSortBy = this.fv.STOCK_TABLE_PRICE;
+			} else if (s == this.fv.SORT_BY[2]) {
+				stockSortBy = this.fv.STOCK_TABLE_QNT;
+				servicesSortBy = this.fv.SERVICES_TABLE_SERVICE_NAME;
+			} else {
+				stockSortBy = this.fv.STOCK_TABLE_ITEM_NAME;
+				servicesSortBy = this.fv.SERVICES_TABLE_SERVICE_NAME;
+			}
+//System.out.println("Sortuje "+s+" "+stockSortBy+" "+servicesSortBy);
+		}
+		this.populateList();
+	}
+
 	protected void addToInvoice() {
 		String itemForList = getSelectedItem();
 //		System.out.println("item "+itemForList);

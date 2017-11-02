@@ -154,7 +154,7 @@ public class MainView {
 				WyswietlRachunki.main(loggerFolderPath);
 			}
 		});
-		invoiceBtn.setBounds(208, 171, 200, 36);
+		invoiceBtn.setBounds(60, 171, 200, 36);
 		frmHctMagazyn.getContentPane().add(invoiceBtn);
 
 
@@ -205,5 +205,18 @@ public class MainView {
 		btnSettings.setBounds(574, 180, 52, 52);
 		
 		frmHctMagazyn.getContentPane().add(btnSettings);
+		
+		JButton btnSalesReports = new JButton("Raporty sprzedaży");
+		btnSalesReports.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		btnSalesReports.setBackground(new Color(135, 206, 235));
+		btnSalesReports.setBounds(358, 171, 200, 36);
+		btnSalesReports.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frmHctMagazyn.dispose();
+				SalesReports.main(defaultPaths);
+			}
+		});
+		
+		frmHctMagazyn.getContentPane().add(btnSalesReports);
 	}
 }

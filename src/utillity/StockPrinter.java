@@ -101,13 +101,16 @@ public class StockPrinter  {
 		PDPage page = new PDPage();
 		empty.addPage(page);
 		contentStream = new PDPageContentStream(empty, page);
+		addLogo(empty);
+		fillCompanyDetails();
+
 		contentStream.close();
 		String path = savePath+loggerFolderPath+"empty.pdf";
 //		log.logError("print empty pdf "+path);
 		empty.save(path);
 		empty.close();
-		
-		this.printPDF(path);
+// TODO
+//		this.printPDF(path);
 	}
 	
 	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
@@ -215,7 +218,7 @@ public class StockPrinter  {
 				String tempSt = md.getElementAt(i).toString();
 				String description = tempSt.substring(0, tempSt.lastIndexOf("€"));
 				
-				if(description.contains("Wash"))
+				if(description.contains("Wash") || description.contains("wash"))
 					isService=true;
 				
 				createItemList(description);

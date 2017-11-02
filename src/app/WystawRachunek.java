@@ -165,7 +165,6 @@ public class WystawRachunek {
 					t = t.replace(t.substring(t.lastIndexOf("x")+1), "1");;
 
 //System.out.println("after "+t);
-
 				this.model2Add.addElement(t);//this.defaultPaths.get(this.defaultPaths.size()-1));
 				this.listChosen.setModel(model2Add);
 			}
