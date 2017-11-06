@@ -97,7 +97,7 @@ public class WyswietlRachunki {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.getContentPane().setBackground(new Color(240, 230, 140));
+		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Lista wystawionych rachunkow");
@@ -196,7 +196,7 @@ public class WyswietlRachunki {
 		frame.getContentPane().add(btnPrintOne);
 		
 		
-		frame.setBackground(new Color(135, 206, 235));
+		frame.setBackground(new Color(255, 255, 0));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 760, 606);
 		

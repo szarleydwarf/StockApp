@@ -9,8 +9,9 @@ public class FinalVariables {
 	//paths - consider to allow to specify this by user
 	public final String ICON_PATH = "resources\\img\\icon_hct.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
 	public final String INVOICE_LOGO_PATH = "resources\\img\\Logo HCT 245x84.png";//D:\\@Development\\EclipseJavaProjects\\sqliteTestApp\\StockApp\\
-//	public final String DATABASE_DEFAULT_PATH = "dbase\\theDBase.sqlite";
-	public final String DATABASE_DEFAULT_PATH = "D:\\@Development\\__TEMP\\SQLite\\theDBase.sqlite";
+	public final String DATABASE_DEFAULT_PATH = "SQLite\\theDBase.sqlite";
+//	public final String DATABASE_DEFAULT_PATH = "D:\\@Development\\__TEMP\\SQLite\\theDBase.sqlite";
+	public final String DATABASE_BACKUP_DEFAULT_PATH = "C:\\Users\\hctba\\OneDrive\\HCT - Dokumenty\\BackUpy\\database";//C:\Users\hctba\OneDrive\HCT - Dokumenty\BackUpy\database
 	public String PRINTER_NAME = "Canon MP620 series Printer WS";
 	public String SAVE_FOLDER_DEFAULT_PATH = "D:\\@Development\\__TEMP";
 	public  final String LOGGER_FOLDER_NAME = "_LOG_FILES";
@@ -23,6 +24,9 @@ public class FinalVariables {
 
 	//other
 	public final String SEARCH_TEXT_FIELD_FRAZE = "wpisz szukaną nazwę";
+	public final String OTHER_STRING_CHECKUP = "O:";
+	public final String MAX_SERVIS_QNT = "9999";
+	public final String[] SORT_BY = {"Nazwa", "Cena", "Qnt"};//, "Rozmiar"
 
 	
 	//Database related
@@ -31,6 +35,10 @@ public class FinalVariables {
 	public final String EDIT_SUCCESS = "Edycja zakończona pomyślnie";
 	public final String DELETE_SUCCESS = "Usuwanie zakończone pomyślnie";
 	//Database table names
+	public static final String[] MONTHS_2017 = {"01-2017", "02-2017", "03-2017", "04-2017", "05-2017", "06-2017", "07-2017", "08-2017", "09-2017", "10-2017", "11-2017", "12-2017"};
+	
+	public static final String TOTAL = "total";
+	public static final String COST = "cost";
 	public final String INVOCE_TABLE = "invoice_list";
 	public final String MANUFACTURER_LIST_TABLE = "manufacturers";
 	public final String SERVICES_TABLE = "services";
@@ -42,6 +50,7 @@ public class FinalVariables {
 	public final String SERVICES_TABLE_SERVICE_NAME = "service_name";
 	public final String STOCK_TABLE_NUMBER = "stock_number";
 	public final String STOCK_TABLE_ITEM_NAME = "item_name";
+	public final String STOCK_TABLE_QNT = "quantity";
 	public final String MANUFACTURER_TABLE_NAME = "manufacturer";
 	public final String STOCK_TABLE_PRICE = "price";
 	public final String INVOCE_TABLE_INVOICE_NUMBER = "invoice_number";
@@ -52,6 +61,9 @@ public class FinalVariables {
 	
 	public final int DEFAULT_FOLDER_DATABASE_ROW_ID = 1;
 	public final int PRINTER_DATABASE_ROW_ID = 2;
+	public final int SETTINGS_TABLE_LAST_DATABASE_BACKUP = 3;
+	public final int DATABASE_BACKUP_PATH_ROW_ID = 4;
+	
 	public final int DEFAULT_FOLDER_ARRAYLIST_INDEX = 0;
 	public final int PRINTER__ARRAYLIST_INDEX = 1;
 

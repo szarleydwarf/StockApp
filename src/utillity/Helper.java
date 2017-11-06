@@ -2,10 +2,17 @@ package utillity;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,9 +20,12 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import dbase.DatabaseManager;
+
 public class Helper {
 	public final String PIRELLI_ST = "Pirelli";
 	private FinalVariables fv;
+	private DatabaseManager dm;
 	
 	public Helper() {
 		this.fv = new FinalVariables();
@@ -178,4 +188,63 @@ public class Helper {
 
 	}
 
+	public boolean databaseBackUp(String source, String dest) throws IOException{
+		try {
+//            System.out.println("Reading..." + source+"\n"+dest);
+            File sourceFile = new File(source);
+            File destinationFile = new File(dest);
+            InputStream in = new FileInputStream(sourceFile);
+            OutputStream out = new FileOutputStream(destinationFile);
+ 
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+            in.close();
+            out.close();
+            return true;
+//            System.out.println("Copied: " + source);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+	}
+
+	public boolean checkDatesOfLastBackup(){
+		this.dm = new DatabaseManager(this.fv.LOGGER_FOLDER_NAME);
+		String query = "SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE+" WHERE "+this.fv.ROW_ID+"="+this.fv.SETTINGS_TABLE_LAST_DATABASE_BACKUP+"";
+		String today = this.getFormatedDate();
+		String lastBackup = this.dm.getPath(query);
+
+		return this.compareDates(lastBackup, today);
+	}
+	
+	public boolean compareDates(String oldDate, String newDate){
+		char find = '-';
+		int nDD = Integer.parseInt(newDate.substring(0, newDate.indexOf(find)));
+		int nMM = Integer.parseInt(newDate.substring(newDate.indexOf(find)+1, newDate.indexOf(find)+3));
+		int nYYYY = Integer.parseInt(newDate.substring(newDate.indexOf(find)+4));
+
+		int oDD = Integer.parseInt(oldDate.substring(0, oldDate.indexOf(find)));
+		int oMM = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+1, oldDate.indexOf(find)+3));
+		int oYYYY = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+4));
+		
+		if((nYYYY == oYYYY) && (nMM == oMM) && (nDD == oDD)){
+			return true;
+		}		
+		return false;
+	}
+	
+	/* Function copied from
+	 * https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
+	*/
+	public static void printMap(Map mp) {
+	    Iterator it = mp.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        System.out.println(pair.getKey() + " = " + pair.getValue());
+	        it.remove(); // avoids a ConcurrentModificationException
+	    }
+	}
 }
