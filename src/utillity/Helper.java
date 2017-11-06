@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -232,5 +234,17 @@ public class Helper {
 			return true;
 		}		
 		return false;
+	}
+	
+	/* Function copied from
+	 * https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
+	*/
+	public static void printMap(Map mp) {
+	    Iterator it = mp.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        System.out.println(pair.getKey() + " = " + pair.getValue());
+	        it.remove(); // avoids a ConcurrentModificationException
+	    }
 	}
 }

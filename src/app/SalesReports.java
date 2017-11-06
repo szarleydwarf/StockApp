@@ -2,6 +2,9 @@ package app;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import java.awt.Color;
@@ -13,16 +16,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
+import dbase.DatabaseManager;
+import hct_speciale.Item;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 
 public class SalesReports {
 
 	private JFrame frame;
 	private JLabel lblMonth;
+	private DatabaseManager DM;
+	private HashMap<String, Double> stocksCosts;
+	private HashMap<String, Double> servicesCosts;
 	protected static String date;
 	protected static String loggerFolderPath;
 	
@@ -55,9 +67,23 @@ public class SalesReports {
 	 * Create the application.
 	 */
 	public SalesReports() {
-
+		this.DM = new DatabaseManager(this.loggerFolderPath);
+		stocksCosts = new HashMap<String, Double>();
+		servicesCosts = new HashMap<String, Double>();
+		
+		String q1 = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.COST+" FROM "+ this.fv.SERVICES_TABLE;
+		this.servicesCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q1);
+//		printMap(servicesCosts);
+		System.out.println("\n\n!");
+		String q2 = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.COST+" FROM "+ this.fv.STOCK_TABLE;
+		this.stocksCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q2);
+//		printMap(stocksCosts);
+	
+		
+		
 		initialize();
 	}
+
 
 	/**
 	 * Initialize the contents of the frame.
@@ -101,6 +127,16 @@ public class SalesReports {
 		JButton btnBack = new JButton("Powr\u00F3t");
 		btnBack.setBounds(631, 227, 89, 23);
 		frame.getContentPane().add(btnBack);
+		
+		JLabel lblBorder = new JLabel("");
+		Border b = BorderFactory.createLineBorder(Color.CYAN);
+		lblBorder.setBorder(b);
+
+		lblBorder.setBounds(42, 50, 560, 30);
+		frame.getContentPane().add(lblBorder);
+		
+		populateTable();
+		
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
@@ -121,5 +157,43 @@ public class SalesReports {
 		        }
 		    }
 		});
+	}
+
+	private void populateTable() {
+		String query = "";
+		for(int j = this.fv.MONTHS_2017.length-1; j >= 0; j--) {
+			query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.STOCK_TABLE_NUMBER+","+this.fv.TOTAL+" FROM "+this.fv.INVOCE_TABLE+" WHERE "+this.fv.INVOCE_TABLE_DATE+" LIKE '%"+this.fv.MONTHS_2017[j]+"%'";
+			ArrayList<String> list = new ArrayList<String>();
+			list = this.DM.selectRecordArrayList(query);
+			if(!list.isEmpty()) {
+				for(int i = 0; i < list.size(); i++) {
+					if(!list.get(i).equals("") && ((i != 2) && (i != 5))){
+						String[] tokens = list.get(i).split(",", -1);
+						double monthlySum = sumCosts(tokens);
+//						if(monthlySum > 0)
+						System.out.println(i + " monthlySum " + monthlySum);
+					}
+				}
+			}
+		}
+	}
+
+	private double sumCosts(String[] tokens) {
+		double sum = 0;
+		for (String token : tokens) {
+			String query = "SELECT "+this.fv.COST+" FROM ";
+			if(token.contains("AAS"))
+				query += this.fv.SERVICES_TABLE + " WHERE " + this.fv.SERVICE_TABLE_NUMBER;
+			else if(token.contains("AAA"))
+				query += this.fv.STOCK_TABLE + " WHERE " + this.fv.STOCK_TABLE_NUMBER;
+			
+			query += " = '"+token+"'";
+//			System.out.println("token " + token);//+ "\n"+query+"\n"
+			
+			double d = 1;
+			sum += d;
+		}
+//		System.out.println("Sum "+sum);
+		return sum;
 	}
 }

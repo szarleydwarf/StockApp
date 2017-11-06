@@ -183,7 +183,7 @@ public class DatabaseManager {
 				item.print();
 			}
 		} catch (SQLException e) {
-			System.out.println("get one item E "+e.getMessage());
+//			System.out.println("get one item E "+e.getMessage());
 			log.logError(date+" "+this.getClass().getName()+"\tget one item\t"+e.getMessage());
 		} finally {
 			try{
@@ -413,8 +413,6 @@ public class DatabaseManager {
 				rs = pst.executeQuery();
 				
 				while(rs.next()){
-					
-//					System.out.println("inv db "+rs.getInt("invoice_number"));
 					return rs.getInt(1);
 				}
 			} catch (SQLException e1) {
@@ -442,6 +440,43 @@ public class DatabaseManager {
 				}
 			}
 		return 0;
+	}
+	
+	public Map<String, Double> getAllCostsPrices(String query){
+		Map<String, Double> toReturn = new HashMap<String, Double>();
+		
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		if(conn == null)
+			conn = this.connect();
+		try {
+			pst = conn.prepareStatement(query);
+			rs = pst.executeQuery();		
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();   
+			
+			while(rs.next()) {			
+				for(int i = 0 ; i <= columnsNumber; i++){
+					if(i % 2 != 0){
+						toReturn.put(rs.getString(i), rs.getDouble(i+1));
+//						System.out.println("getAllCostsPrices "+ rs.getString(i) + " "+rs.getDouble(i+1)); 
+					}
+				}        
+			}
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
+		} finally {
+			try{
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+			} catch (Exception e){
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
+			}
+		}
+
+		return toReturn;
 	}
 	
 	public ResultSet selectRecord(String query) throws SQLException{
