@@ -36,6 +36,7 @@ public class FinalVariables {
 	public final String DELETE_SUCCESS = "Usuwanie zakończone pomyślnie";
 	//Database table names
 	public static final String[] MONTHS_2017 = {"01-2017", "02-2017", "03-2017", "04-2017", "05-2017", "06-2017", "07-2017", "08-2017", "09-2017", "10-2017", "11-2017", "12-2017"};
+	public static final String[] SALES_REPORT_TB_HEADINGS = {"Miesiąc", "Koszty", "Przychód", "Zysk"};
 	
 	public static final String TOTAL = "total";
 	public static final String COST = "cost";

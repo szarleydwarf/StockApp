@@ -8,8 +8,11 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 import java.awt.Color;
+import java.awt.Dimension;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -18,6 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.TableColumn;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
@@ -27,6 +31,7 @@ import utillity.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JTable;
 
 public class SalesReports {
 
@@ -41,6 +46,7 @@ public class SalesReports {
 	private static FinalVariables fv;
 	private static Logger log;
 	private static Helper helper;
+	private JTable table;
 
 	/**
 	 * Launch the application.
@@ -92,7 +98,7 @@ public class SalesReports {
 		frame = new JFrame();
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
-		frame.setBounds(100, 100, 746, 300);
+		frame.setBounds(100, 100, 748, 426);
 
 		JLabel lblTitle = new JLabel("Raporty sprzeda\u017Cy");
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -125,7 +131,7 @@ public class SalesReports {
 		frame.getContentPane().add(lblSale);
 		
 		JButton btnBack = new JButton("Powr\u00F3t");
-		btnBack.setBounds(631, 227, 89, 23);
+		btnBack.setBounds(633, 53, 89, 23);
 		frame.getContentPane().add(btnBack);
 		
 		JLabel lblBorder = new JLabel("");
@@ -134,6 +140,7 @@ public class SalesReports {
 
 		lblBorder.setBounds(42, 50, 560, 30);
 		frame.getContentPane().add(lblBorder);
+		
 		
 		populateTable();
 		
@@ -161,39 +168,48 @@ public class SalesReports {
 
 	private void populateTable() {
 		String query = "";
+		Object data[][] = {};
 		for(int j = this.fv.MONTHS_2017.length-1; j >= 0; j--) {
 			query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.STOCK_TABLE_NUMBER+","+this.fv.TOTAL+" FROM "+this.fv.INVOCE_TABLE+" WHERE "+this.fv.INVOCE_TABLE_DATE+" LIKE '%"+this.fv.MONTHS_2017[j]+"%'";
 			ArrayList<String> list = new ArrayList<String>();
 			list = this.DM.selectRecordArrayList(query);
+			
+			data[0][0] = this.fv.MONTHS_2017[0];
+			
 			if(!list.isEmpty()) {
 				for(int i = 0; i < list.size(); i++) {
 					if(!list.get(i).equals("") && ((i != 2) && (i != 5))){
 						String[] tokens = list.get(i).split(",", -1);
-						double monthlySum = sumCosts(tokens);
-//						if(monthlySum > 0)
-						System.out.println(i + " monthlySum " + monthlySum);
+						
+						double monthlyCosts = sumCosts(tokens);
+						System.out.println(i + " monthlySum " + monthlyCosts);
+						data[0][1] = monthlyCosts;
 					}
 				}
 			}
 		}
+		table = new JTable(data, this.fv.SALES_REPORT_TB_HEADINGS);
+		table.setBounds(42, 87, 560, 288);
+		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+		table.setFillsViewportHeight(true);
+		JScrollPane scrollPane = new JScrollPane(table);
+		
+		frame.getContentPane().add(scrollPane);
+		
 	}
 
 	private double sumCosts(String[] tokens) {
 		double sum = 0;
 		for (String token : tokens) {
-			String query = "SELECT "+this.fv.COST+" FROM ";
-			if(token.contains("AAS"))
-				query += this.fv.SERVICES_TABLE + " WHERE " + this.fv.SERVICE_TABLE_NUMBER;
-			else if(token.contains("AAA"))
-				query += this.fv.STOCK_TABLE + " WHERE " + this.fv.STOCK_TABLE_NUMBER;
+			System.out.println("token " + token);
+			double d = 0;
+			if(this.servicesCosts.containsKey(token))
+				d = this.servicesCosts.get(token);
+			else if(this.stocksCosts.containsKey(token))
+				d = this.stocksCosts.get(token);
 			
-			query += " = '"+token+"'";
-//			System.out.println("token " + token);//+ "\n"+query+"\n"
-			
-			double d = 1;
 			sum += d;
 		}
-//		System.out.println("Sum "+sum);
 		return sum;
 	}
 }
