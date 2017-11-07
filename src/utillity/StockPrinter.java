@@ -128,7 +128,8 @@ public class StockPrinter  {
 		this.applyDiscount = applyDiscount;
 		this.carManufacturer = carManufacturer;
 		if(!registration.isEmpty())
-			this.carRegistration = registration.toUpperCase();
+			this.carRegistration = registration;
+		this.carRegistration.toUpperCase();
 		this.invNo = invoiceNum;
 		
 		generatePDF();
