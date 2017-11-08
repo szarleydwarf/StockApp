@@ -22,6 +22,7 @@ import java.text.DecimalFormat;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
 import dbase.DatabaseManager;
@@ -33,11 +34,11 @@ import utillity.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JTable;
+import javax.swing.border.LineBorder;
 
 public class SalesReports {
 
 	private JFrame frame;
-	private JLabel lblMonth;
 	private DatabaseManager DM;
 	private HashMap<String, Double> stocksCosts;
 	private HashMap<String, Double> servicesCosts;
@@ -103,39 +104,17 @@ public class SalesReports {
 		lblTitle.setBounds(0, 11, 730, 26);
 		frame.getContentPane().add(lblTitle);
 		
-		lblMonth = new JLabel("Miesi\u0105c");
-		lblMonth.setHorizontalAlignment(SwingConstants.CENTER);
-		lblMonth.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblMonth.setBounds(52, 56, 60, 20);
-		frame.getContentPane().add(lblMonth);
-		
-		JLabel lblCosts = new JLabel("Koszty");
-		lblCosts.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCosts.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblCosts.setBounds(175, 56, 60, 20);
-		frame.getContentPane().add(lblCosts);
-		
-		JLabel lblIncome = new JLabel("Zysk");
-		lblIncome.setHorizontalAlignment(SwingConstants.CENTER);
-		lblIncome.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblIncome.setBounds(500, 56, 60, 20);
-		frame.getContentPane().add(lblIncome);
-		
-		JLabel lblSale = new JLabel("Sprzeda\u017C");
-		lblSale.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSale.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblSale.setBounds(333, 56, 60, 20);
-		frame.getContentPane().add(lblSale);
-		
 		JButton btnBack = new JButton("Powr\u00F3t");
 		btnBack.setBounds(633, 53, 89, 23);
 		frame.getContentPane().add(btnBack);
 		
 		JLabel lblBorder = new JLabel("");
-		Border b = BorderFactory.createLineBorder(Color.CYAN);
-		lblBorder.setBorder(b);
+		lblBorder.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBorder.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		Border b = BorderFactory.createLineBorder(Color.yellow);
+		lblBorder.setBorder(new LineBorder(new Color(255, 255, 0), 2));
 
-		lblBorder.setBounds(42, 50, 560, 30);
+		lblBorder.setBounds(42, 50, 560, 20);
 		frame.getContentPane().add(lblBorder);
 		
 		
@@ -199,9 +178,14 @@ public class SalesReports {
 		table.setBounds(42, 87, 560, 288);
 		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
 		table.setFillsViewportHeight(true);
+		
+		JTableHeader header = table.getTableHeader();
+		header.setBackground(Color.black);
+		header.setForeground(Color.yellow);
+	      
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setLocation(42, 95);
-		scrollPane.setSize(560, 240);
+		scrollPane.setLocation(42, 48);
+		scrollPane.setSize(560, 287);
 		
 		frame.getContentPane().add(scrollPane);
 		
