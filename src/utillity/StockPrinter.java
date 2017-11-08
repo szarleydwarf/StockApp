@@ -110,7 +110,7 @@ public class StockPrinter  {
 		empty.save(path);
 		empty.close();
 // TODO
-//		this.printPDF(path);
+		this.printPDF(path);
 	}
 	
 	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
