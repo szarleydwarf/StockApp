@@ -29,6 +29,8 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.JTableHeader;
 
 import dbase.DatabaseManager;
@@ -63,6 +65,10 @@ public class WyswietlMagazyn {
 	private Object servicesSortBy="service_name";
 	private JTable table;
 	private String[][] data;
+	private JButton btnAddToInvoice;
+	protected String itemString;
+	private	boolean isItem = false;
+
 	/**
 	 * Launch the application.
 	 */
@@ -104,7 +110,7 @@ public class WyswietlMagazyn {
 		int j = 0;
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
 		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+servicesSortBy+" ASC";//item_name, cost, price,quantity
-System.out.println("Q "+query);
+//System.out.println("Q "+query);
 		
 		listOfItems = DM.getItemsList(query);
 		listOfServices = DM.getItemsList(queryServices);
@@ -132,6 +138,15 @@ System.out.println("Q "+query);
 		table.setFillsViewportHeight(true);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.getColumnModel().getColumn(0).setPreferredWidth(320);
+		
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				helper.toggleJButton(btnAddToInvoice, Color.yellow, Color.darkGray, true);
+				getSelectedItem();
+			}
+	    });
 		
 		JTableHeader header = table.getTableHeader();
 		header.setBackground(Color.black);
@@ -263,7 +278,7 @@ System.out.println("Q "+query);
 		btnBack.setBounds(609, 515, 100, 23);
 		frame.getContentPane().add(btnBack);
 		
-		JButton btnAddToInvoice = new JButton("do Rachunku");
+		btnAddToInvoice = new JButton("do Rachunku");
 		btnAddToInvoice.setEnabled(false);
 		btnAddToInvoice.setBounds(615, 102, 94, 23);
 		btnAddToInvoice.addActionListener(new ActionListener() {
@@ -304,19 +319,17 @@ System.out.println("Q "+query);
 	}
 
 	protected void addToInvoice() {
-		String itemForList = getSelectedItem();
-//		System.out.println("item "+itemForList);
-		String test="";
+ 		String test="";
 		do{
-			test = checkQnt(itemForList);
+			test = checkQnt(itemString);
 			if(test.isEmpty())
 				return;
 		}while (test =="");
-		itemForList = test;
+		itemString = test;
 
 		ArrayList<String> defaultPaths = new ArrayList<String>();
 		defaultPaths = this.DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
-		defaultPaths.add(itemForList);
+		defaultPaths.add(itemString);
 		this.frame.dispose();
 		
 		WystawRachunek.main(defaultPaths);
@@ -324,12 +337,14 @@ System.out.println("Q "+query);
 
 	private String checkQnt(String itemForList) {
 		String str = itemForList.substring(itemForList.lastIndexOf("x")+1);
+	    System.out.println("B: "+str);
 		int qnt=0;
 		int qntInList=0;
 		if(!str.isEmpty() && (str.matches("[0-9]+")))
 			qntInList = Integer.parseInt(str);
 		else
 			qntInList = 1;
+	    System.out.println("A: "+qntInList);
 
 		if(!tfQnt4Invoice.getText().isEmpty() ){
 			qnt = Integer.parseInt(tfQnt4Invoice.getText());
@@ -340,42 +355,54 @@ System.out.println("Q "+query);
 					return "";
 			}
 			str = itemForList.replace(itemForList.substring(itemForList.lastIndexOf("x")+1), tfQnt4Invoice.getText());
-		} else
-			str = itemForList;
-//		System.out.println(str);
-		return str;
-	}
-
-	private String getSelectedItem() {
-		Item i = getItemFromLists();
-		String str = "";
-		if(i != null){
-			str = i.getName()+" €"+i.getPrice();
-			if(i instanceof StockItem){
-				str += " x"+((StockItem) i).getQnt();
-				selectedQnt = ((StockItem) i).getQnt();
-			} else {
-				if(!str.contains("*"))
-					str += " x"+1;
-				else
-					str+=" x"+this.fv.MAX_SERVIS_QNT;
+		} else {
+			if(isItem) {
+				if(qntInList == 0){
+					JOptionPane.showMessageDialog(this.frame, "Dostępnych "+qntInList+"szt.");
+					helper.toggleJButton(btnAddToInvoice, Color.gray, Color.darkGray, false);
+					return "";
+				}
 			}
+			str = itemForList;
 		}
+		System.out.println(str);
 		return str;
 	}
 
-	private Item getItemFromLists() {
-		int listsLength = this.listOfItems.size() + this.listOfServices.size();
-		int index = table.getSelectedRow();
-		System.out.println("index "+index);
-		if(index < this.listOfItems.size())
-			return this.listOfItems.get(index);
-		else if(index < listsLength){
-			index -= this.listOfItems.size();
-			return this.listOfServices.get(index);
+	private void getSelectedItem() {
+		itemString = "";
+		itemString = table.getValueAt(table.getSelectedRow(), 0).toString()+" €"+table.getValueAt(table.getSelectedRow(), 2).toString();
+		
+		for(int i = 0; i < listOfItems.size(); i++) {
+			if(listOfItems.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
+				itemString += " x"+table.getValueAt(table.getSelectedRow(), 3).toString();
+				isItem = true;
+				break;
+			} 
 		}
-		return null;
+
+		if(!isItem){
+			if(!itemString.contains("*"))
+				itemString += " x"+1;
+			else
+				itemString+=" x"+fv.MAX_SERVIS_QNT;
+			
+		}
+
 	}
+
+//	private Item getItemFromLists() {
+//		int listsLength = this.listOfItems.size() + this.listOfServices.size();
+//		int index = table.getSelectedRow();
+//		System.out.println("index "+index);
+//		if(index < this.listOfItems.size())
+//			return this.listOfItems.get(index);
+//		else if(index < listsLength){
+//			index -= this.listOfItems.size();
+//			return this.listOfServices.get(index);
+//		}
+//		return null;
+//	}
 
 	private void deleteRocordFromDatabase() {
 
