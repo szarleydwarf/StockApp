@@ -31,6 +31,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import dbase.DatabaseManager;
@@ -60,7 +61,7 @@ public class WyswietlMagazyn {
 	private String lblQntLabel = "Dostepnych ";
 	private int selectedQnt, count = 0;
 	protected String lblQntText = "Dostepnych ";
-	private JComboBox sortComboBox;
+	private JComboBox<String> sortComboBox;
 	private String stockSortBy="item_name";
 	private Object servicesSortBy="service_name";
 	private JTable table;
@@ -68,6 +69,9 @@ public class WyswietlMagazyn {
 	private JButton btnAddToInvoice;
 	protected String itemString;
 	private	boolean isItem = false;
+	private JButton btnDelete;
+	private JButton btnEdit;
+
 
 	/**
 	 * Launch the application.
@@ -139,15 +143,15 @@ public class WyswietlMagazyn {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.getColumnModel().getColumn(0).setPreferredWidth(320);
 		
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		int rowCount= table.getModel().getRowCount();
 
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				helper.toggleJButton(btnAddToInvoice, Color.yellow, Color.darkGray, true);
-				getSelectedItem();
-			}
-	    });
-		
+		   System.out.println(rowCount);
+
+		   for(int i=0;i<rowCount;i++ ){
+//			   (table.removeRow(0);
+		        System.out.println(i);
+		   }
+		   
 		JTableHeader header = table.getTableHeader();
 		header.setBackground(Color.black);
 		header.setForeground(Color.yellow);
@@ -155,7 +159,18 @@ public class WyswietlMagazyn {
 		scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(21, 138, 566, 400);
 		frame.getContentPane().add(scrollPane);
-
+		
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
+				helper.toggleJButton(btnDelete, Color.red, Color.gray, true);
+				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);
+				getSelectedItemtoString();
+			}
+	    });
+		
+	
 	}
 
 	/**
@@ -179,6 +194,10 @@ public class WyswietlMagazyn {
 		JButton btnRefresh = new JButton("Od\u015Bwie\u017C");
 		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				helper.toggleJButton(btnAddToInvoice, Color.gray, Color.darkGray, false);
+				helper.toggleJButton(btnDelete, Color.gray, Color.darkGray, false);
+				helper.toggleJButton(btnEdit, Color.gray, Color.darkGray, false);
+	
 				populateList();
 			}
 		});
@@ -232,19 +251,20 @@ public class WyswietlMagazyn {
 		btnSearch.setBounds(525, 45, 89, 24);
 		frame.getContentPane().add(btnSearch);
 		
-		JButton btnEdit = new JButton("Edytuj zaznaczone");
+		btnEdit = new JButton("Edytuj zaznaczone");
 		btnEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				editRecordInDatabase();
 			}
 		});
 		btnEdit.setForeground(new Color(255, 255, 255));
-		btnEdit.setBackground(new Color(255, 215, 0));
+		btnEdit.setBackground(Color.GRAY);
 		btnEdit.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnEdit.setBounds(624, 44, 124, 24);
+		btnEdit.setEnabled(false);
 		frame.getContentPane().add(btnEdit);
 		
-		JButton btnDelete = new JButton("Usuń");
+		btnDelete = new JButton("Usuń");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				deleteRocordFromDatabase();
@@ -252,6 +272,7 @@ public class WyswietlMagazyn {
 		});
 		btnDelete.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
 		btnDelete.setBounds(625, 490, 71, 20);
+		btnDelete.setEnabled(false);
 		frame.getContentPane().add(btnDelete);
 		
 		
@@ -337,14 +358,12 @@ public class WyswietlMagazyn {
 
 	private String checkQnt(String itemForList) {
 		String str = itemForList.substring(itemForList.lastIndexOf("x")+1);
-	    System.out.println("B: "+str);
 		int qnt=0;
 		int qntInList=0;
 		if(!str.isEmpty() && (str.matches("[0-9]+")))
 			qntInList = Integer.parseInt(str);
 		else
 			qntInList = 1;
-	    System.out.println("A: "+qntInList);
 
 		if(!tfQnt4Invoice.getText().isEmpty() ){
 			qnt = Integer.parseInt(tfQnt4Invoice.getText());
@@ -365,11 +384,12 @@ public class WyswietlMagazyn {
 			}
 			str = itemForList;
 		}
-		System.out.println(str);
+//		System.out.println(str);
 		return str;
 	}
 
-	private void getSelectedItem() {
+
+	private void getSelectedItemtoString() {
 		itemString = "";
 		itemString = table.getValueAt(table.getSelectedRow(), 0).toString()+" €"+table.getValueAt(table.getSelectedRow(), 2).toString();
 		
@@ -391,23 +411,54 @@ public class WyswietlMagazyn {
 
 	}
 
-//	private Item getItemFromLists() {
-//		int listsLength = this.listOfItems.size() + this.listOfServices.size();
-//		int index = table.getSelectedRow();
-//		System.out.println("index "+index);
-//		if(index < this.listOfItems.size())
-//			return this.listOfItems.get(index);
-//		else if(index < listsLength){
-//			index -= this.listOfItems.size();
-//			return this.listOfServices.get(index);
-//		}
-//		return null;
-//	}
-
 	private void deleteRocordFromDatabase() {
-
+		Item it = getSelectedItem();
+		if(it != null){
+			String tableName = "", columnName = "", column2Name = "";
+			if(it instanceof StockItem){
+				tableName = this.fv.STOCK_TABLE;
+				columnName = this.fv.STOCK_TABLE_NUMBER;
+				column2Name = this.fv.STOCK_TABLE_ITEM_NAME;
+			}else{
+				tableName = this.fv.SERVICES_TABLE;
+				columnName = this.fv.SERVICE_TABLE_NUMBER;
+				column2Name = this.fv.SERVICES_TABLE_SERVICE_NAME;
+			}
+			
+			String query = "DELETE FROM '"+tableName+"' WHERE "+columnName+"='"+it.getStockNumber()+"' AND "+column2Name+"='"+it.getName()+"'";
+			try {
+				boolean success = this.DM.deleteRecord(query);
+				if(success) {
+					JOptionPane.showMessageDialog(null, this.fv.DELETE_SUCCESS);
+					frame.dispose();
+					MainView.main(null);
+				} else
+					JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
+				log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+			}
+		} else {
+			this.log.logError("Could not find item to delete - "+this.getClass().getName() + " - deleteRocordFromDatabase");
+			JOptionPane.showMessageDialog(null, this.fv.WINDOW_ERROR);
+		}
 	}
 	
+	private Item getSelectedItem() {
+		for(int i = 0; i < listOfItems.size(); i++) {
+			if(listOfItems.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
+				return listOfItems.get(i);			
+			} 
+		}
+		
+		for(int i = 0; i < this.listOfServices.size(); i++) {
+			if(listOfServices.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
+				return listOfServices.get(i);
+			} 
+		}
+		return null;
+	}
+
 	private void editRecordInDatabase() {
 
 	}
@@ -419,7 +470,7 @@ public class WyswietlMagazyn {
 	
 	protected void sortListBy(ActionEvent e) {
 		if(e.getSource() == this.sortComboBox) {
-			JComboBox cb = (JComboBox) e.getSource();
+			JComboBox<String> cb = (JComboBox<String>) e.getSource();
 			String s = (String) cb.getSelectedItem();
 			if(s == this.fv.SORT_BY[0]){
 				stockSortBy = this.fv.STOCK_TABLE_ITEM_NAME;//" substr("+this.fv.STOCK_TABLE_ITEM_NAME+", length("+this.fv.STOCK_TABLE_ITEM_NAME+")-11);";
