@@ -71,6 +71,7 @@ public class WyswietlMagazyn {
 	private	boolean isItem = false;
 	private JButton btnDelete;
 	private JButton btnEdit;
+	private ListSelectionListener listener;
 
 
 	/**
@@ -105,8 +106,22 @@ public class WyswietlMagazyn {
 		DecimalFormat df;
 		df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 
+		createTableListener();
 		initialize();
 		populateList();
+		
+	}
+
+	private void createTableListener() {
+		listener = new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
+				helper.toggleJButton(btnDelete, Color.red, Color.gray, true);
+				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);
+				getSelectedItemtoString();
+			}
+	    };
 		
 	}
 
@@ -115,6 +130,8 @@ public class WyswietlMagazyn {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
 		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+servicesSortBy+" ASC";//item_name, cost, price,quantity
 //System.out.println("Q "+query);
+		this.listOfItems = new ArrayList<Item>();
+		this.listOfServices = new ArrayList<Item>();
 		
 		listOfItems = DM.getItemsList(query);
 		listOfServices = DM.getItemsList(queryServices);
@@ -123,18 +140,21 @@ public class WyswietlMagazyn {
 		data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
+//			System.out.println(i+" Item: "+listOfItems.get(i).getName());
 			data[i][0] = listOfItems.get(i).getName();
 			data[i][1] = ""+listOfItems.get(i).getCost();
 			data[i][2] = ""+listOfItems.get(i).getPrice();
 			data[i][3] = ""+((StockItem) listOfItems.get(i)).getQnt();
 		}
 		for(int i = listOfItems.size(); i < rowNumber; i++) {
+//			System.out.println(i+"-"+j+" Serv: "+listOfServices.get(j).getName());
 			data[i][0] = listOfServices.get(j).getName();
 			data[i][1] = ""+listOfServices.get(j).getCost();
 			data[i][2] = ""+listOfServices.get(j).getPrice();
 			data[i][3] = ""+0;
 			j++;
 		}
+//System.out.println("\n\n!!!!!!!!!!!!!!!!!!!!!!11");
 		
 		table = new JTable(data, this.fv.STOCK_TB_HEADINGS);
 		table.setBounds(42, 87, 560, 288);
@@ -142,15 +162,6 @@ public class WyswietlMagazyn {
 		table.setFillsViewportHeight(true);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.getColumnModel().getColumn(0).setPreferredWidth(320);
-		
-		int rowCount= table.getModel().getRowCount();
-
-		   System.out.println(rowCount);
-
-		   for(int i=0;i<rowCount;i++ ){
-//			   (table.removeRow(0);
-		        System.out.println(i);
-		   }
 		   
 		JTableHeader header = table.getTableHeader();
 		header.setBackground(Color.black);
@@ -160,16 +171,8 @@ public class WyswietlMagazyn {
 		scrollPane.setBounds(21, 138, 566, 400);
 		frame.getContentPane().add(scrollPane);
 		
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
-				helper.toggleJButton(btnDelete, Color.red, Color.gray, true);
-				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);
-				getSelectedItemtoString();
-			}
-	    });
 		
+		table.getSelectionModel().addListSelectionListener(listener);
 	
 	}
 
@@ -391,7 +394,12 @@ public class WyswietlMagazyn {
 
 	private void getSelectedItemtoString() {
 		itemString = "";
-		itemString = table.getValueAt(table.getSelectedRow(), 0).toString()+" €"+table.getValueAt(table.getSelectedRow(), 2).toString();
+		int selectedRow = table.getSelectedRow();
+	    if(selectedRow == -1) {
+			table.getSelectionModel().removeListSelectionListener(listener);
+	        return;
+	    }
+		itemString = table.getValueAt(table.getSelectedRow(), 1).toString();//+" €"+table.getValueAt(table.getSelectedRow(), 2).toString();
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
 			if(listOfItems.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
@@ -406,9 +414,7 @@ public class WyswietlMagazyn {
 				itemString += " x"+1;
 			else
 				itemString+=" x"+fv.MAX_SERVIS_QNT;
-			
 		}
-
 	}
 
 	private void deleteRocordFromDatabase() {
