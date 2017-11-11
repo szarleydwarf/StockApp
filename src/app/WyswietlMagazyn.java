@@ -65,7 +65,7 @@ public class WyswietlMagazyn {
 	private String stockSortBy="item_name";
 	private Object servicesSortBy="service_name";
 	private JTable table;
-	private String[][] data;
+	
 	private JButton btnAddToInvoice;
 	protected String itemString;
 	private	boolean isItem = false;
@@ -90,7 +90,6 @@ public class WyswietlMagazyn {
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Coś poszło nie tak\n"+e.getMessage());
 					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
-//					e.printStackTrace();
 				}
 			}
 		});
@@ -126,7 +125,6 @@ public class WyswietlMagazyn {
 	}
 
 	private void populateList() {
-		int j = 0;
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
 		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+servicesSortBy+" ASC";//item_name, cost, price,quantity
 //System.out.println("Q "+query);
@@ -136,16 +134,17 @@ public class WyswietlMagazyn {
 		listOfItems = DM.getItemsList(query);
 		listOfServices = DM.getItemsList(queryServices);
 		int rowNumber = listOfItems.size() + listOfServices.size();
-
-		data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
+		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
+		int j = 0;
 		
 		for(int i = 0; i < listOfItems.size(); i++) {
-//			System.out.println(i+" Item: "+listOfItems.get(i).getName());
+	//			System.out.println(i+" Item: "+listOfItems.get(i).getName());
 			data[i][0] = listOfItems.get(i).getName();
 			data[i][1] = ""+listOfItems.get(i).getCost();
 			data[i][2] = ""+listOfItems.get(i).getPrice();
 			data[i][3] = ""+((StockItem) listOfItems.get(i)).getQnt();
 		}
+		
 		for(int i = listOfItems.size(); i < rowNumber; i++) {
 //			System.out.println(i+"-"+j+" Serv: "+listOfServices.get(j).getName());
 			data[i][0] = listOfServices.get(j).getName();
@@ -154,9 +153,21 @@ public class WyswietlMagazyn {
 			data[i][3] = ""+0;
 			j++;
 		}
-//System.out.println("\n\n!!!!!!!!!!!!!!!!!!!!!!11");
+		createTable(data);
+	}
+
+	private void createTable(String[][] data) {
+System.out.println("create table B");		
+		DefaultTableModel dataModel = null;;
+		if (table != null && table.getModel() != null) {
+			dataModel  = (DefaultTableModel) table.getModel();
 		
-		table = new JTable(data, this.fv.STOCK_TB_HEADINGS);
+			dataModel.setRowCount(0);
+		}
+		dataModel = new DefaultTableModel(data, this.fv.STOCK_TB_HEADINGS);
+		System.out.println("create table A "+dataModel.getRowCount());		
+		table.setModel(dataModel);
+//		table = new JTable(data, this.fv.STOCK_TB_HEADINGS);
 		table.setBounds(42, 87, 560, 288);
 		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
 		table.setFillsViewportHeight(true);
@@ -171,9 +182,7 @@ public class WyswietlMagazyn {
 		scrollPane.setBounds(21, 138, 566, 400);
 		frame.getContentPane().add(scrollPane);
 		
-		
 		table.getSelectionModel().addListSelectionListener(listener);
-	
 	}
 
 	/**
@@ -343,7 +352,9 @@ public class WyswietlMagazyn {
 	}
 
 	protected void addToInvoice() {
- 		String test="";
+		getSelectedItemtoString();
+		String test="";
+System.out.println("add "+itemString);		
 		do{
 			test = checkQnt(itemString);
 			if(test.isEmpty())
@@ -395,14 +406,17 @@ public class WyswietlMagazyn {
 	private void getSelectedItemtoString() {
 		itemString = "";
 		int selectedRow = table.getSelectedRow();
+		System.out.println(selectedRow+" get "+itemString);		
 	    if(selectedRow == -1) {
 			table.getSelectionModel().removeListSelectionListener(listener);
 	        return;
 	    }
-		itemString = table.getValueAt(table.getSelectedRow(), 1).toString();//+" €"+table.getValueAt(table.getSelectedRow(), 2).toString();
-		
+		itemString = table.getValueAt(table.getSelectedRow(), 0).toString()+" €"+table.getValueAt(table.getSelectedRow(), 2).toString();
+System.out.println(selectedRow+" get2 "+itemString);		
+	
 		for(int i = 0; i < listOfItems.size(); i++) {
 			if(listOfItems.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
+				System.out.println(i+" get3 "+itemString);		
 				itemString += " x"+table.getValueAt(table.getSelectedRow(), 3).toString();
 				isItem = true;
 				break;
@@ -470,7 +484,37 @@ public class WyswietlMagazyn {
 	}
 
 	private void searchInDatabase() {
+		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
+		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
+			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+					
+		ArrayList<Item> listOfItems = DM.getItemsList(query);
+		System.out.println("1 Q: "+query);		
+		if(listOfItems.size() <= 0){
+			query = "SELECT * FROM "+this.fv.SERVICES_TABLE+"";
+			if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
+				query += " WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+			
+			System.out.println("2 Q: "+query);		
 
+			listOfItems = DM.getItemsList(query);
+		}
+		
+		int rowNumber = listOfItems.size();
+		String[][]  data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
+		
+		for(int i = 0; i < rowNumber; i++) {
+			System.out.println(i+" I: "+listOfItems.get(i).getName());		
+			data[i][0] = listOfItems.get(i).getName();
+			data[i][1] = ""+listOfItems.get(i).getCost();
+			data[i][2] = ""+listOfItems.get(i).getPrice();
+			if(listOfItems.get(i) instanceof StockItem)
+				data[i][3] = ""+((StockItem) listOfItems.get(i)).getQnt();
+			else
+				data[i][3] = ""+0;	
+		}
+		
+		createTable(data);
 	}
 	
 	
