@@ -33,6 +33,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
@@ -45,7 +46,6 @@ import javax.swing.JComboBox;
 public class WyswietlMagazyn {
 
 	private JFrame frame;
-	private JScrollPane scrollPane ;
 	
 	private static String loggerFolderPath;
 	private static String date;
@@ -53,26 +53,20 @@ public class WyswietlMagazyn {
 	private static Helper helper;
 	private DatabaseManager DM;	
 	private JTextField tfSearch;
-	ArrayList<Item> listOfItems;
-	private ArrayList<Item> listOfServices;
 	private FinalVariables fv;
 	private static Logger log;
 	private JTextField tfQnt4Invoice;
 	private String lblQntLabel = "Dostepnych ";
-	private int selectedQnt, count = 0;
 	protected String lblQntText = "Dostepnych ";
 	private JComboBox<String> sortComboBox;
 	private String stockSortBy="item_name";
-	private Object servicesSortBy="service_name";
-	private JTable table;
+	private String servicesSortBy="service_name";
 	
 	private JButton btnAddToInvoice;
 	protected String itemString;
 	private	boolean isItem = false;
 	private JButton btnDelete;
 	private JButton btnEdit;
-	private ListSelectionListener listener;
-
 
 	/**
 	 * Launch the application.
@@ -90,6 +84,7 @@ public class WyswietlMagazyn {
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Coś poszło nie tak\n"+e.getMessage());
 					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		});
@@ -100,94 +95,13 @@ public class WyswietlMagazyn {
 	 */
 	public WyswietlMagazyn() {
 		DM = new DatabaseManager(loggerFolderPath);
-		this.listOfItems = new ArrayList<Item>();
 		this.fv = new FinalVariables();
 		DecimalFormat df;
 		df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-
-		createTableListener();
+	
 		initialize();
-		populateList();
-		
 	}
 
-	private void createTableListener() {
-		listener = new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
-				helper.toggleJButton(btnDelete, Color.red, Color.gray, true);
-				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);
-				getSelectedItemtoString();
-			}
-	    };
-		
-	}
-
-	private void populateList() {
-		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
-		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+servicesSortBy+" ASC";//item_name, cost, price,quantity
-//System.out.println("Q "+query);
-		this.listOfItems = new ArrayList<Item>();
-		this.listOfServices = new ArrayList<Item>();
-		
-		listOfItems = DM.getItemsList(query);
-		listOfServices = DM.getItemsList(queryServices);
-		int rowNumber = listOfItems.size() + listOfServices.size();
-		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
-		int j = 0;
-		
-		for(int i = 0; i < listOfItems.size(); i++) {
-	//			System.out.println(i+" Item: "+listOfItems.get(i).getName());
-			data[i][0] = listOfItems.get(i).getName();
-			data[i][1] = ""+listOfItems.get(i).getCost();
-			data[i][2] = ""+listOfItems.get(i).getPrice();
-			data[i][3] = ""+((StockItem) listOfItems.get(i)).getQnt();
-		}
-		
-		for(int i = listOfItems.size(); i < rowNumber; i++) {
-//			System.out.println(i+"-"+j+" Serv: "+listOfServices.get(j).getName());
-			data[i][0] = listOfServices.get(j).getName();
-			data[i][1] = ""+listOfServices.get(j).getCost();
-			data[i][2] = ""+listOfServices.get(j).getPrice();
-			data[i][3] = ""+0;
-			j++;
-		}
-		createTable(data);
-	}
-
-	private void createTable(String[][] data) {
-System.out.println("create table B");		
-		DefaultTableModel dataModel = null;;
-		if (table != null && table.getModel() != null) {
-			dataModel  = (DefaultTableModel) table.getModel();
-		
-			dataModel.setRowCount(0);
-		}
-		dataModel = new DefaultTableModel(data, this.fv.STOCK_TB_HEADINGS);
-		System.out.println("create table A "+dataModel.getRowCount());		
-		table.setModel(dataModel);
-//		table = new JTable(data, this.fv.STOCK_TB_HEADINGS);
-		table.setBounds(42, 87, 560, 288);
-		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
-		table.setFillsViewportHeight(true);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		table.getColumnModel().getColumn(0).setPreferredWidth(320);
-		   
-		JTableHeader header = table.getTableHeader();
-		header.setBackground(Color.black);
-		header.setForeground(Color.yellow);
-	      
-		scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(21, 138, 566, 400);
-		frame.getContentPane().add(scrollPane);
-		
-		table.getSelectionModel().addListSelectionListener(listener);
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBackground(new Color(255, 255, 0));
@@ -209,8 +123,6 @@ System.out.println("create table B");
 				helper.toggleJButton(btnAddToInvoice, Color.gray, Color.darkGray, false);
 				helper.toggleJButton(btnDelete, Color.gray, Color.darkGray, false);
 				helper.toggleJButton(btnEdit, Color.gray, Color.darkGray, false);
-	
-				populateList();
 			}
 		});
 		btnRefresh.setBackground(new Color(255, 255, 153));
@@ -349,25 +261,120 @@ System.out.println("create table B");
 		lblSortBy.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		lblSortBy.setBounds(109, 49, 46, 14);
 		frame.getContentPane().add(lblSortBy);
+
+		getWholeStock();	
+	}
+
+	private ListSelectionListener createTableListener() {
+		ListSelectionListener listener = new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
+				helper.toggleJButton(btnDelete, Color.red, Color.gray, true);
+				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);
+			}
+	    };
+	    return listener;
+	}
+
+	private void getWholeStock() {
+		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
+		ArrayList<Item> listOfItems = new ArrayList<Item>();
+		listOfItems = DM.getItemsList(query);
+		
+		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+servicesSortBy+" ASC";//item_name, cost, price,quantity
+		ArrayList<Item> listOfServices = new ArrayList<Item>();
+		listOfServices = DM.getItemsList(queryServices);
+
+		int rowNumber = listOfItems.size() + listOfServices.size();
+
+		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
+		data = populateDataArray(listOfItems, data, 0, listOfItems.size());
+		data = populateDataArray(listOfServices, data, listOfItems.size(), rowNumber);
+		
+		createTable(data);	
+	}
+	
+	private String[][] populateDataArray(ArrayList<Item> list, String[][] data, int startIndex, int rowNumber){
+		int j = 0;
+		for(int i = startIndex; i < rowNumber; i++) {
+//System.out.println(i+" Item: "+list.get(j).getName());
+			data[i][0] = list.get(j).getName();
+			data[i][1] = ""+list.get(j).getCost();
+			data[i][2] = ""+list.get(j).getPrice();
+			if(list.get(j) instanceof StockItem)
+				data[i][3] = ""+((StockItem) list.get(j)).getQnt();
+			else
+				data[i][3] = ""+0;
+			j++;
+		}		
+		return data;
+	}
+	
+	private void createTable(String[][] data){
+		ListSelectionListener listener = createTableListener();
+		DefaultTableModel dm = new DefaultTableModel(data, this.fv.STOCK_TB_HEADINGS);
+		JTable table = new JTable();
+		table.getSelectionModel().addListSelectionListener(listener);
+		table.setModel(dm);
+		
+		table.setBounds(42, 87, 560, 288);
+		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+		table.setFillsViewportHeight(true);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
+		table.getColumnModel().getColumn(0).setPreferredWidth(320);
+		   
+		JTableHeader header = table.getTableHeader();
+		header.setBackground(Color.black);
+		header.setForeground(Color.yellow);
+		
+	      
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setBounds(21, 138, 566, 400);
+		frame.getContentPane().add(scrollPane);
+	}
+
+	protected void searchInDatabase() {
+		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
+		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
+			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+					
+		ArrayList<Item> listOfItems = DM.getItemsList(query);
+
+		if(listOfItems.size() <= 0){
+			query = "SELECT * FROM "+this.fv.SERVICES_TABLE+"";
+			if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
+				query += " WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
+
+			listOfItems = DM.getItemsList(query);
+		}
+		
+		int rowNumber = listOfItems.size();
+		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
+
+		data = populateDataArray(listOfItems, data, 0, rowNumber);
+		createTable(data);
+	}
+
+	protected void editRecordInDatabase() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void deleteRocordFromDatabase() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	protected void addToInvoice() {
-		getSelectedItemtoString();
-		String test="";
-System.out.println("add "+itemString);		
-		do{
-			test = checkQnt(itemString);
-			if(test.isEmpty())
-				return;
-		}while (test =="");
-		itemString = test;
-
-		ArrayList<String> defaultPaths = new ArrayList<String>();
-		defaultPaths = this.DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
-		defaultPaths.add(itemString);
-		this.frame.dispose();
+		// TODO Auto-generated method stub
 		
-		WystawRachunek.main(defaultPaths);
+	}
+
+	protected void sortListBy(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private String checkQnt(String itemForList) {
@@ -402,140 +409,4 @@ System.out.println("add "+itemString);
 		return str;
 	}
 
-
-	private void getSelectedItemtoString() {
-		itemString = "";
-		int selectedRow = table.getSelectedRow();
-		System.out.println(selectedRow+" get "+itemString);		
-	    if(selectedRow == -1) {
-			table.getSelectionModel().removeListSelectionListener(listener);
-	        return;
-	    }
-		itemString = table.getValueAt(table.getSelectedRow(), 0).toString()+" €"+table.getValueAt(table.getSelectedRow(), 2).toString();
-System.out.println(selectedRow+" get2 "+itemString);		
-	
-		for(int i = 0; i < listOfItems.size(); i++) {
-			if(listOfItems.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
-				System.out.println(i+" get3 "+itemString);		
-				itemString += " x"+table.getValueAt(table.getSelectedRow(), 3).toString();
-				isItem = true;
-				break;
-			} 
-		}
-
-		if(!isItem){
-			if(!itemString.contains("*"))
-				itemString += " x"+1;
-			else
-				itemString+=" x"+fv.MAX_SERVIS_QNT;
-		}
-	}
-
-	private void deleteRocordFromDatabase() {
-		Item it = getSelectedItem();
-		if(it != null){
-			String tableName = "", columnName = "", column2Name = "";
-			if(it instanceof StockItem){
-				tableName = this.fv.STOCK_TABLE;
-				columnName = this.fv.STOCK_TABLE_NUMBER;
-				column2Name = this.fv.STOCK_TABLE_ITEM_NAME;
-			}else{
-				tableName = this.fv.SERVICES_TABLE;
-				columnName = this.fv.SERVICE_TABLE_NUMBER;
-				column2Name = this.fv.SERVICES_TABLE_SERVICE_NAME;
-			}
-			
-			String query = "DELETE FROM '"+tableName+"' WHERE "+columnName+"='"+it.getStockNumber()+"' AND "+column2Name+"='"+it.getName()+"'";
-			try {
-				boolean success = this.DM.deleteRecord(query);
-				if(success) {
-					JOptionPane.showMessageDialog(null, this.fv.DELETE_SUCCESS);
-					frame.dispose();
-					MainView.main(null);
-				} else
-					JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
-			} catch (SQLException e) {
-				JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
-				log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
-			}
-		} else {
-			this.log.logError("Could not find item to delete - "+this.getClass().getName() + " - deleteRocordFromDatabase");
-			JOptionPane.showMessageDialog(null, this.fv.WINDOW_ERROR);
-		}
-	}
-	
-	private Item getSelectedItem() {
-		for(int i = 0; i < listOfItems.size(); i++) {
-			if(listOfItems.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
-				return listOfItems.get(i);			
-			} 
-		}
-		
-		for(int i = 0; i < this.listOfServices.size(); i++) {
-			if(listOfServices.get(i).getName().equals(table.getValueAt(table.getSelectedRow(), 0).toString())) {
-				return listOfServices.get(i);
-			} 
-		}
-		return null;
-	}
-
-	private void editRecordInDatabase() {
-
-	}
-
-	private void searchInDatabase() {
-		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
-		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
-			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
-					
-		ArrayList<Item> listOfItems = DM.getItemsList(query);
-		System.out.println("1 Q: "+query);		
-		if(listOfItems.size() <= 0){
-			query = "SELECT * FROM "+this.fv.SERVICES_TABLE+"";
-			if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
-				query += " WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
-			
-			System.out.println("2 Q: "+query);		
-
-			listOfItems = DM.getItemsList(query);
-		}
-		
-		int rowNumber = listOfItems.size();
-		String[][]  data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
-		
-		for(int i = 0; i < rowNumber; i++) {
-			System.out.println(i+" I: "+listOfItems.get(i).getName());		
-			data[i][0] = listOfItems.get(i).getName();
-			data[i][1] = ""+listOfItems.get(i).getCost();
-			data[i][2] = ""+listOfItems.get(i).getPrice();
-			if(listOfItems.get(i) instanceof StockItem)
-				data[i][3] = ""+((StockItem) listOfItems.get(i)).getQnt();
-			else
-				data[i][3] = ""+0;	
-		}
-		
-		createTable(data);
-	}
-	
-	
-	protected void sortListBy(ActionEvent e) {
-		if(e.getSource() == this.sortComboBox) {
-			JComboBox<String> cb = (JComboBox<String>) e.getSource();
-			String s = (String) cb.getSelectedItem();
-			if(s == this.fv.SORT_BY[0]){
-				stockSortBy = this.fv.STOCK_TABLE_ITEM_NAME;//" substr("+this.fv.STOCK_TABLE_ITEM_NAME+", length("+this.fv.STOCK_TABLE_ITEM_NAME+")-11);";
-				servicesSortBy = this.fv.SERVICES_TABLE_SERVICE_NAME;
-			} else if (s == this.fv.SORT_BY[1]) {
-				stockSortBy = this.fv.STOCK_TABLE_PRICE;
-				servicesSortBy = this.fv.STOCK_TABLE_PRICE;
-			} else if (s == this.fv.SORT_BY[2]) {
-				stockSortBy = this.fv.STOCK_TABLE_QNT;
-				servicesSortBy = this.fv.SERVICES_TABLE_SERVICE_NAME;
-			} else {
-				stockSortBy = this.fv.STOCK_TABLE_ITEM_NAME;
-				servicesSortBy = this.fv.SERVICES_TABLE_SERVICE_NAME;
-			}
-		}
-		this.populateList();
-	}
 }
