@@ -61,7 +61,7 @@ public class StockPrinter  {
 	public StockPrinter(ArrayList<String> defaultPaths){
 		this.fv = new FinalVariables();
 		this.printerName = "";
-	
+
 //		for(int i=0; i<defaultPaths.size();i++)
 //		System.out.println("Printer "+defaultPaths.get(i)+" "+defaultPaths.get(this.fv.DEFAULT_FOLDER_ARRAYLIST_INDEX));
 		
@@ -90,7 +90,9 @@ public class StockPrinter  {
 			this.printerName = defaultPaths.get(this.fv.PRINTER__ARRAYLIST_INDEX);
 		else
 			this.printerName = this.fv.PRINTER_NAME;
-		
+
+		this.date = helper.getFormatedDate();
+
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
 		this.stockServicesNumber = new ArrayList<String>();
@@ -114,7 +116,6 @@ public class StockPrinter  {
 	}
 	
 	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
-		this.date = helper.getFormatedDate();
 		
 		savePath = savePath.concat(this.date);
 		helper.createFolderIfNotExist(savePath);
@@ -129,7 +130,11 @@ public class StockPrinter  {
 		this.carManufacturer = carManufacturer;
 		if(!registration.isEmpty())
 			this.carRegistration = registration;
+<<<<<<< HEAD
 		this.carRegistration.toUpperCase();
+=======
+		this.carRegistration = this.carRegistration.toUpperCase();
+>>>>>>> try_item_class
 		this.invNo = invoiceNum;
 		
 		generatePDF();
