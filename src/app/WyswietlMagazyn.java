@@ -1,6 +1,7 @@
 package app;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -12,6 +13,7 @@ import java.awt.event.FocusListener;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -24,16 +26,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
@@ -67,6 +74,10 @@ public class WyswietlMagazyn {
 	private	boolean isItem = false;
 	private JButton btnDelete;
 	private JButton btnEdit;
+
+	private JTable table;
+
+	private TableRowSorter rowSorter;
 
 	/**
 	 * Launch the application.
@@ -160,20 +171,35 @@ public class WyswietlMagazyn {
 			public void focusLost(FocusEvent arg0) {
 			}
 		});
-		
-	
-		
-		JButton btnSearch = new JButton("Szukaj");
-		btnSearch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				searchInDatabase();
-			}
-		});
-		btnSearch.setForeground(new Color(255, 255, 204));
-		btnSearch.setBackground(new Color(0, 153, 255));
-		btnSearch.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnSearch.setBounds(525, 45, 89, 24);
-		frame.getContentPane().add(btnSearch);
+		tfSearch.getDocument().addDocumentListener(new DocumentListener(){
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                String text = tfSearch.getText();
+
+                if (text.trim().length() == 0) {
+                    rowSorter.setRowFilter(null);
+                } else {
+                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                }
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                String text = tfSearch.getText();
+
+                if (text.trim().length() == 0) {
+                    rowSorter.setRowFilter(null);
+                } else {
+                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                }
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
 		
 		btnEdit = new JButton("Edytuj zaznaczone");
 		btnEdit.addActionListener(new ActionListener() {
@@ -314,7 +340,9 @@ public class WyswietlMagazyn {
 	private void createTable(String[][] data){
 		ListSelectionListener listener = createTableListener();
 		DefaultTableModel dm = new DefaultTableModel(data, this.fv.STOCK_TB_HEADINGS);
-		JTable table = new JTable();
+		
+		table = new JTable();
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		table.getSelectionModel().addListSelectionListener(listener);
 		table.setModel(dm);
 		
@@ -324,7 +352,10 @@ public class WyswietlMagazyn {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		table.getColumnModel().getColumn(0).setPreferredWidth(320);
-		   
+		
+		rowSorter = new TableRowSorter<>(table.getModel());
+		table.setRowSorter(rowSorter);
+		
 		JTableHeader header = table.getTableHeader();
 		header.setBackground(Color.black);
 		header.setForeground(Color.yellow);
@@ -335,27 +366,6 @@ public class WyswietlMagazyn {
 		frame.getContentPane().add(scrollPane);
 	}
 
-	protected void searchInDatabase() {
-		String query = "SELECT * FROM "+this.fv.STOCK_TABLE+"";
-		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
-			query += " WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
-					
-		ArrayList<Item> listOfItems = DM.getItemsList(query);
-
-		if(listOfItems.size() <= 0){
-			query = "SELECT * FROM "+this.fv.SERVICES_TABLE+"";
-			if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
-				query += " WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.STOCK_TABLE_PRICE+" ASC";
-
-			listOfItems = DM.getItemsList(query);
-		}
-		
-		int rowNumber = listOfItems.size();
-		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
-
-		data = populateDataArray(listOfItems, data, 0, rowNumber);
-		createTable(data);
-	}
 
 	protected void editRecordInDatabase() {
 		// TODO Auto-generated method stub

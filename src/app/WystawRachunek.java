@@ -500,7 +500,7 @@ public class WystawRachunek {
 
 	private void populateCarList() throws Exception {
 		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_LIST_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
-		carManufacturer = "Car manufacturer";
+		carManufacturer = "CAR";
 		DefaultListModel<String> modelCars = new DefaultListModel<>();
 	
 		ArrayList<String> listOfCars = DM.selectRecordArrayList(queryCars);
