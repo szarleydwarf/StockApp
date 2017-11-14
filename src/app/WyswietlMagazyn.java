@@ -70,7 +70,6 @@ public class WyswietlMagazyn {
 	private String servicesSortBy="service_name";
 	
 	private JButton btnAddToInvoice;
-	protected String itemString;
 	private	boolean isItem = false;
 	private JButton btnDelete;
 	private JButton btnEdit;
@@ -78,6 +77,8 @@ public class WyswietlMagazyn {
 	private JTable table;
 
 	private TableRowSorter rowSorter;
+
+	private ArrayList<Item> wholeList;
 
 	/**
 	 * Launch the application.
@@ -158,7 +159,7 @@ public class WyswietlMagazyn {
 		tfSearch = new JTextField();
 		tfSearch.setHorizontalAlignment(SwingConstants.CENTER);
 		tfSearch.setText(this.fv.SEARCH_TEXT_FIELD_FRAZE );
-		tfSearch.setBounds(331, 45, 195, 24);
+		tfSearch.setBounds(130, 45, 195, 24);
 		frame.getContentPane().add(tfSearch);
 		tfSearch.setColumns(10);
 		
@@ -171,6 +172,7 @@ public class WyswietlMagazyn {
 			public void focusLost(FocusEvent arg0) {
 			}
 		});
+		
 		tfSearch.getDocument().addDocumentListener(new DocumentListener(){
 
             @Override
@@ -270,23 +272,6 @@ public class WyswietlMagazyn {
 		lblQnt2Invoice.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblQnt2Invoice.setBounds(240, 106, 300, 14);
 		frame.getContentPane().add(lblQnt2Invoice);
-		
-		sortComboBox = new JComboBox(this.fv.SORT_BY);
-		sortComboBox.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		sortComboBox.setBounds(155, 46, 150, 20);
-//		sortComboBox.setSelectedIndex(1);
-		sortComboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				sortListBy(e);
-			}
-		});
-		frame.getContentPane().add(sortComboBox);
-		
-		JLabel lblSortBy = new JLabel("Sortuj :");
-		lblSortBy.setLabelFor(sortComboBox);
-		lblSortBy.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblSortBy.setBounds(109, 49, 46, 14);
-		frame.getContentPane().add(lblSortBy);
 
 		getWholeStock();	
 	}
@@ -298,11 +283,13 @@ public class WyswietlMagazyn {
 				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
 				helper.toggleJButton(btnDelete, Color.red, Color.gray, true);
 				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);
+				
 			}
 	    };
 	    return listener;
 	}
 
+	
 	private void getWholeStock() {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
 		ArrayList<Item> listOfItems = new ArrayList<Item>();
@@ -317,10 +304,14 @@ public class WyswietlMagazyn {
 		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
 		data = populateDataArray(listOfItems, data, 0, listOfItems.size());
 		data = populateDataArray(listOfServices, data, listOfItems.size(), rowNumber);
-		
+		wholeList = new ArrayList<Item>();
+		wholeList.addAll(listOfItems);
+		wholeList.addAll(listOfServices);
+
 		createTable(data);	
 	}
 	
+
 	private String[][] populateDataArray(ArrayList<Item> list, String[][] data, int startIndex, int rowNumber){
 		int j = 0;
 		for(int i = startIndex; i < rowNumber; i++) {
@@ -337,6 +328,7 @@ public class WyswietlMagazyn {
 		return data;
 	}
 	
+
 	private void createTable(String[][] data){
 		ListSelectionListener listener = createTableListener();
 		DefaultTableModel dm = new DefaultTableModel(data, this.fv.STOCK_TB_HEADINGS);
@@ -366,7 +358,38 @@ public class WyswietlMagazyn {
 		frame.getContentPane().add(scrollPane);
 	}
 
+	//TODO SSSS
+	private Item getSelectedItem () {
+		int row = table.getSelectedRow();
 
+		if(row > -1){
+			int j = 0;
+			for(Item ih : wholeList){
+				if(ih.getName().equals(table.getValueAt(row, 0).toString())){
+					if(ih instanceof StockItem)
+						return (StockItem)ih;
+					else
+						return ih;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private String getSelectedItem2String (Item i) {
+		String itemString = "";
+		itemString = i.getName()+" €"+i.getPrice();
+		if(i instanceof StockItem)
+			itemString +=  " x"+((StockItem) i).getQnt();
+		else{
+			if(!itemString.contains("*"))
+				itemString += " x"+1;
+			else
+				itemString+=" x"+fv.MAX_SERVIS_QNT;
+		}
+		return itemString;
+	}
+	
 	protected void editRecordInDatabase() {
 		// TODO Auto-generated method stub
 		
@@ -377,15 +400,34 @@ public class WyswietlMagazyn {
 		
 	}
 
+
 	protected void addToInvoice() {
-		// TODO Auto-generated method stub
-		
+		Item i = getSelectedItem();
+		String itemForList;
+		if(i != null)
+			itemForList = this.getSelectedItem2String(i);
+		else
+			return;
+System.out.println("toInvoice "+itemForList);
+		if(itemForList != ""){
+			String test="";
+			do{
+				test = checkQnt(itemForList);
+				if(test.isEmpty())
+					return;
+			}while (test =="");
+			itemForList = test;
+
+			ArrayList<String> defaultPaths = new ArrayList<String>();
+			defaultPaths = this.DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+			defaultPaths.add(itemForList);
+			this.frame.dispose();
+			
+			WystawRachunek.main(defaultPaths);		}
+			
 	}
 
-	protected void sortListBy(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 	private String checkQnt(String itemForList) {
 		String str = itemForList.substring(itemForList.lastIndexOf("x")+1);
