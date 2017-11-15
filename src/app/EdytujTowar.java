@@ -118,7 +118,7 @@ public class EdytujTowar {
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//		        	MainView.main(null);
+		        	MainView.main(null);
 		        }
 		    }
 		});
@@ -204,7 +204,7 @@ public class EdytujTowar {
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame.dispose();
-				MainView.main(null);
+				WyswietlMagazyn.main(loggerFolderPath);
 			}
 		});
 		btnBack.setBounds(459, 120, 89, 23);
@@ -232,6 +232,7 @@ public class EdytujTowar {
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Edycja zakończona pomyślnie");
 			this.frame.dispose();
+			WyswietlMagazyn.main(loggerFolderPath);
 		} else
 			JOptionPane.showMessageDialog(null, "Błąd zapisu");
 
@@ -243,25 +244,25 @@ public class EdytujTowar {
 //			JOptionPane.showMessageDialog(null, "Błędny numer magazynowy.");
 //			return true;
 //		}
-
+		boolean allGood = false;
 		this.productName = this.tfName.getText();
 		if(this.productName.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Wpisz nazwe produktu");
-			return true;
+			allGood = true;
 		}
 		
 		this.cost = this.tfCost.getText();
 		if(!this.cost.isEmpty()){
 			this.dCost = this.helper.checkDouble("Wpisz koszt",  "Niepoprawny format kosztu", this.cost);
 			if(this.dCost == 0)
-				return true;
+				allGood = true;
 		}
 	
 		this.price = this.tfPrice.getText();
 		if(!this.price.isEmpty()) {
 			this.dPrice = helper.checkDouble("Wpisz cene", "Niepoprawny format ceny", this.price);
 			if(this.dPrice == 0)
-				return true;
+				allGood = true;
 		}
 	
 		if(this.item instanceof StockItem) {
@@ -269,10 +270,10 @@ public class EdytujTowar {
 			if(!this.qnt.isEmpty()){
 				this.iQnt = this.helper.checkInteger("Wpisz ilość","Niepoprawny format ilosci", this.qnt);
 				if(this.iQnt == 0)
-					return true;
+					allGood = true;
 			}
 		}
-		return false;	
+		return allGood;	
 	}
 
 }

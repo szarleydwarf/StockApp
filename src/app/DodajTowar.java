@@ -189,31 +189,33 @@ public class DodajTowar {
 	}
 	
 	private boolean getVariableForQuery() {
+		boolean allGood = false;
+
 		this.productName = this.textFieldProductName.getText();
 		if(this.productName.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Wpisz nazwe produktu");
-			return true;
+			allGood = true;
 		}
 		
 		this.cost = this.tfCost.getText();
 		if(this.dCost == 0.0){
 			this.dCost = this.helper.checkDouble("Wpisz koszt",  "Niepoprawny format kosztu", this.cost);
-			return true;
-		}
+			allGood = true;
+	}
 	
 		this.price = this.tfPrice.getText();
 		if(this.dPrice == 0.0) {
 			this.dPrice = helper.checkDouble("Wpisz cene", "Niepoprawny format ceny", this.price);
-			return true;
+			allGood = true;
 		}
 	
 		this.qnt = this.tfQnt.getText();
 		if(this.iQnt == 0){
 			this.iQnt = this.helper.checkInteger("Wpisz ilość","Niepoprawny format ilosci", this.qnt);
-			return true;
+			allGood = true;
 		}
 	
-		return false;	
+		return allGood;	
 	}
 
 	private void displayStockNumber() {
