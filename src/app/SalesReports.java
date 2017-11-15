@@ -81,9 +81,10 @@ public class SalesReports {
 		
 		String q1 = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.COST+" FROM "+ this.fv.SERVICES_TABLE;
 		this.servicesCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q1);
-		
+//		this.helper.printMap(servicesCosts);
 		String q2 = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.COST+" FROM "+ this.fv.STOCK_TABLE;
 		this.stocksCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q2);
+
 		
 		initialize();
 	}
@@ -116,8 +117,7 @@ public class SalesReports {
 
 		lblBorder.setBounds(42, 50, 560, 20);
 		frame.getContentPane().add(lblBorder);
-		
-		
+
 		populateTable();
 		
 		btnBack.addActionListener(new ActionListener() {
@@ -147,6 +147,7 @@ public class SalesReports {
 		df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 		String query = "";
 		String[][] data = new String [this.fv.MONTHS_2017.length][this.fv.SALES_REPORT_TB_HEADINGS.length];
+
 		for(int j = 0; j < this.fv.MONTHS_2017.length; j++) {
 			query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.STOCK_TABLE_NUMBER+","+this.fv.TOTAL+" FROM "+this.fv.INVOCE_TABLE+" WHERE "+this.fv.INVOCE_TABLE_DATE+" LIKE '%"+this.fv.MONTHS_2017[j]+"%'";
 			ArrayList<String> list = new ArrayList<String>();
@@ -195,13 +196,16 @@ public class SalesReports {
 		double sum = 0;
 		for (String token : tokens) {
 			double d = 0;
-			if(this.servicesCosts.containsKey(token))
+			if(this.servicesCosts.containsKey(token)) {
 				d = this.servicesCosts.get(token);
-			else if(this.stocksCosts.containsKey(token))
+//				System.out.println("found service :"+d);
+			} else if(this.stocksCosts.containsKey(token)) {
 				d = this.stocksCosts.get(token);
-			
+//				System.out.println("found stock :"+d);
+			}
 			sum += d;
 		}
+//		System.out.println("sum :"+sum);
 		return (sum);
 	}
 }

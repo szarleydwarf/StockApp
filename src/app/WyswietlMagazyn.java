@@ -427,7 +427,6 @@ public class WyswietlMagazyn {
 
 	}
 
-
 	protected void addToInvoice() {
 		Item i = getSelectedItem();
 		String itemForList;
@@ -453,8 +452,6 @@ public class WyswietlMagazyn {
 			WystawRachunek.main(defaultPaths);		
 		}
 	}
-
-
 
 	private String checkQnt(String itemForList) {
 		String str = itemForList.substring(itemForList.lastIndexOf("x")+1);
