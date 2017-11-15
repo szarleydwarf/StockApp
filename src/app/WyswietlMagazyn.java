@@ -135,6 +135,7 @@ public class WyswietlMagazyn {
 				helper.toggleJButton(btnAddToInvoice, Color.gray, Color.darkGray, false);
 				helper.toggleJButton(btnDelete, Color.gray, Color.darkGray, false);
 				helper.toggleJButton(btnEdit, Color.gray, Color.darkGray, false);
+				getWholeStock();
 			}
 		});
 		btnRefresh.setBackground(new Color(255, 255, 153));
@@ -282,14 +283,12 @@ public class WyswietlMagazyn {
 			public void valueChanged(ListSelectionEvent e) {
 				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
 				helper.toggleJButton(btnDelete, Color.red, Color.gray, true);
-				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);
-				
+				helper.toggleJButton(btnEdit, Color.yellow, Color.gray, true);	
 			}
 	    };
 	    return listener;
 	}
 
-	
 	private void getWholeStock() {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+stockSortBy+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
 		ArrayList<Item> listOfItems = new ArrayList<Item>();
@@ -311,11 +310,9 @@ public class WyswietlMagazyn {
 		createTable(data);	
 	}
 	
-
 	private String[][] populateDataArray(ArrayList<Item> list, String[][] data, int startIndex, int rowNumber){
 		int j = 0;
 		for(int i = startIndex; i < rowNumber; i++) {
-//System.out.println(i+" Item: "+list.get(j).getName());
 			data[i][0] = list.get(j).getName();
 			data[i][1] = ""+list.get(j).getCost();
 			data[i][2] = ""+list.get(j).getPrice();
@@ -328,7 +325,6 @@ public class WyswietlMagazyn {
 		return data;
 	}
 	
-
 	private void createTable(String[][] data){
 		ListSelectionListener listener = createTableListener();
 		DefaultTableModel dm = new DefaultTableModel(data, this.fv.STOCK_TB_HEADINGS);
@@ -358,7 +354,6 @@ public class WyswietlMagazyn {
 		frame.getContentPane().add(scrollPane);
 	}
 
-	//TODO SSSS
 	private Item getSelectedItem () {
 		int row = table.getSelectedRow();
 
@@ -376,7 +371,7 @@ public class WyswietlMagazyn {
 		return null;
 	}
 	
-	private String getSelectedItem2String (Item i) {
+	private String selectedItem2String (Item i) {
 		String itemString = "";
 		itemString = i.getName()+" €"+i.getPrice();
 		if(i instanceof StockItem)
@@ -391,13 +386,45 @@ public class WyswietlMagazyn {
 	}
 	
 	protected void editRecordInDatabase() {
-		// TODO Auto-generated method stub
+		Item i = getSelectedItem();
+		if(i != null){
+			frame.dispose();
+			EdytujTowar.main(i, this.loggerFolderPath);
+		}else
+			JOptionPane.showMessageDialog(frame, this.fv.WINDOW_ERROR);
+
 		
 	}
 
 	protected void deleteRocordFromDatabase() {
-		// TODO Auto-generated method stub
+		Item i = getSelectedItem();
+		String tableName = "", columnName = "", column2Name = "";
+		if(i instanceof StockItem){
+			tableName = this.fv.STOCK_TABLE;
+			columnName = this.fv.STOCK_TABLE_NUMBER;
+			column2Name = this.fv.STOCK_TABLE_ITEM_NAME;
+		}else{
+			tableName = this.fv.SERVICES_TABLE;
+			columnName = this.fv.SERVICE_TABLE_NUMBER;
+			column2Name = this.fv.SERVICES_TABLE_SERVICE_NAME;
+		}
 		
+		if(i != null){
+			String query = "DELETE FROM '"+tableName+"' WHERE "+columnName+"='"+i.getStockNumber()+"' AND "+column2Name+"='"+i.getName()+"'";
+			try {
+				boolean success = this.DM.deleteRecord(query);
+				if(success)
+					JOptionPane.showMessageDialog(null, this.fv.DELETE_SUCCESS);
+				else
+					JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, this.fv.DELETING_ERROR);
+				log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+			}		
+		}else
+			JOptionPane.showMessageDialog(null, this.fv.WINDOW_ERROR);
+
+
 	}
 
 
@@ -405,10 +432,10 @@ public class WyswietlMagazyn {
 		Item i = getSelectedItem();
 		String itemForList;
 		if(i != null)
-			itemForList = this.getSelectedItem2String(i);
+			itemForList = this.selectedItem2String(i);
 		else
 			return;
-System.out.println("toInvoice "+itemForList);
+		
 		if(itemForList != ""){
 			String test="";
 			do{
@@ -421,10 +448,10 @@ System.out.println("toInvoice "+itemForList);
 			ArrayList<String> defaultPaths = new ArrayList<String>();
 			defaultPaths = this.DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
 			defaultPaths.add(itemForList);
+			
 			this.frame.dispose();
-			
-			WystawRachunek.main(defaultPaths);		}
-			
+			WystawRachunek.main(defaultPaths);		
+		}
 	}
 
 
@@ -457,7 +484,6 @@ System.out.println("toInvoice "+itemForList);
 			}
 			str = itemForList;
 		}
-//		System.out.println(str);
 		return str;
 	}
 
