@@ -80,6 +80,12 @@ public class WystawRachunek {
 
 	private ArrayList<String> defaultPaths;
 	private Map<String, Integer> nameQnt;
+	private JTextField tfCompanyName;
+	private JTextField tfCompanyAddress;
+	private JTextField tfVATRegNum;
+	private String stringAddress = "Adres Firmy";
+	private String stringComName = "Nazwa firmy";
+	private String stringVATReg = "VAT / Tax No.";
 
 
 
@@ -145,7 +151,7 @@ public class WystawRachunek {
 		frmNowyRachunek.getContentPane().setLayout(null);
 		
 		JScrollPane scrollPaneChosen = new JScrollPane();
-		scrollPaneChosen.setBounds(578, 171, 318, 234);
+		scrollPaneChosen.setBounds(578, 192, 318, 234);
 		frmNowyRachunek.getContentPane().add(scrollPaneChosen);
 		
 		listChosen = new JList<String>();
@@ -182,23 +188,32 @@ public class WystawRachunek {
 		
 		JLabel labelSaleList = new JLabel("Us\u0142uga / Towar");
 		labelSaleList.setHorizontalAlignment(SwingConstants.CENTER);
-		labelSaleList.setBounds(578, 151, 96, 19);
+		labelSaleList.setBounds(578, 170, 96, 19);
 		frmNowyRachunek.getContentPane().add(labelSaleList);
 		
 		JLabel lblWystawRachunek = new JLabel("Wybierz us\u0142ugi/produkty");
-		lblWystawRachunek.setBounds(70, 122, 194, 19);
-		lblWystawRachunek.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		lblWystawRachunek.setForeground(Color.DARK_GRAY);
+		lblWystawRachunek.setBounds(10, 128, 220, 22);
+		lblWystawRachunek.setFont(new Font("Segoe UI Black", Font.PLAIN, 16));
 		frmNowyRachunek.getContentPane().add(lblWystawRachunek);
 		
 		
 		JLabel lblWybrane = new JLabel("");
-		Border b = BorderFactory.createLineBorder(Color.BLUE);
-		TitledBorder border = BorderFactory.createTitledBorder(b, "WYBRANE");
-		lblWybrane.setBorder(border);
+		Border b1 = BorderFactory.createLineBorder(Color.BLUE);
+		TitledBorder border1 = BorderFactory.createTitledBorder(b1, "WYBRANE");
+		lblWybrane.setBorder(border1);
 		lblWybrane.setVerticalAlignment(SwingConstants.TOP);
-		lblWybrane.setBounds(567, 122, 339, 292);
+		lblWybrane.setBounds(567, 150, 339, 292);
 		frmNowyRachunek.getContentPane().add(lblWybrane);
-
+		
+		JLabel lblCompanyDet = new JLabel();
+		Border b2 = BorderFactory.createLineBorder(Color.yellow);
+		TitledBorder border2 = BorderFactory.createTitledBorder(b2, "Firma:");
+		lblCompanyDet.setBorder(border2);
+		lblCompanyDet.setForeground(Color.DARK_GRAY);
+		lblCompanyDet.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		lblCompanyDet.setBounds(567, 22, 387, 100);
+		frmNowyRachunek.getContentPane().add(lblCompanyDet);
 		
 		textFieldDiscount = new JTextField();
 		textFieldDiscount.setBounds(515, 382, 50, 23);
@@ -237,7 +252,7 @@ public class WystawRachunek {
 		
 		JLabel lblCena = new JLabel("Cena");
 		lblCena.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCena.setBounds(787, 151, 50, 19);
+		lblCena.setBounds(787, 170, 50, 19);
 		frmNowyRachunek.getContentPane().add(lblCena);
 				
 		JButton btnPrint = new JButton("Drukuj rachunek");
@@ -245,29 +260,8 @@ public class WystawRachunek {
 		btnPrint.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
-				
-				sPrinter = new StockPrinter(defaultPaths);
-				try {
-					invoiceNum += 1;
-					registration = textFieldRegistration.getText();
-					if(!lblTotal.getText().equals(lblTotalSt)) {
-						printed = sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
-						if(printed){
-							for (String key : nameQnt.keySet()){
-								String query = "UPDATE \""+fv.STOCK_TABLE+"\" SET "+fv.STOCK_TABLE_QNT+"='"+nameQnt.get(key)+"'" + " WHERE " + fv.STOCK_TABLE_ITEM_NAME + "='"+key+"'";
-//								System.out.println("Query: "+query);
-								DM.editRecord(query);
-							}
-							frmNowyRachunek.dispose();
-							MainView.main(null);
-						}
-					} else
-						JOptionPane.showMessageDialog(frmNowyRachunek, "Nie przeliczyles wyniku");
-				} catch (IOException e) {
-					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
-				} catch (Exception e) {
-					log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
-				}
+				printDocument();
+
 			}
 		});
 		btnPrint.setForeground(Color.BLACK);
@@ -303,7 +297,7 @@ public class WystawRachunek {
 		btnClearAll.setBackground(new Color(255, 182, 193));
 		btnClearAll.setForeground(Color.RED);
 		btnClearAll.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnClearAll.setBounds(847, 93, 109, 24);
+		btnClearAll.setBounds(847, 126, 109, 24);
 		frmNowyRachunek.getContentPane().add(btnClearAll);
 		
 		JLabel lblDescription = new JLabel("Opis usługi/przedmiotu");
@@ -333,13 +327,13 @@ public class WystawRachunek {
 		tfItemPrice.setBounds(430, 314, 42, 24);
 		frmNowyRachunek.getContentPane().add(tfItemPrice);
 		
-		JLabel lblQty = new JLabel("Qty");
+		JLabel lblQty = new JLabel("Qnt");
 		lblQty.setHorizontalAlignment(SwingConstants.CENTER);
-		lblQty.setBounds(847, 151, 37, 19);
+		lblQty.setBounds(847, 170, 37, 19);
 		frmNowyRachunek.getContentPane().add(lblQty);
 		
 		textFieldRegistration = new JTextField();
-		textFieldRegistration.setBounds(671, 53, 127, 28);
+		textFieldRegistration.setBounds(327, 89, 127, 28);
 		frmNowyRachunek.getContentPane().add(textFieldRegistration);
 		textFieldRegistration.setColumns(10);
 		
@@ -378,6 +372,69 @@ public class WystawRachunek {
 		tfOtherQnt1.setBounds(480, 470, 28, 20);
 		frmNowyRachunek.getContentPane().add(tfOtherQnt1);
 		
+		
+		tfCompanyName = new JTextField();
+		tfCompanyName.setHorizontalAlignment(SwingConstants.CENTER);
+		tfCompanyName.setText(stringComName );
+		tfCompanyName.setBackground(Color.LIGHT_GRAY);
+		tfCompanyName.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		tfCompanyName.setBounds(578, 40, 366, 20);
+		frmNowyRachunek.getContentPane().add(tfCompanyName);
+		tfCompanyName.setColumns(10);
+		tfCompanyName.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfCompanyName.setText(fv.COMPANY_STRING);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(tfCompanyName.getText().equals(fv.COMPANY_STRING))
+					tfCompanyName.setText(stringComName);
+			}
+		});
+		
+		tfCompanyAddress = new JTextField();
+		tfCompanyAddress.setHorizontalAlignment(SwingConstants.CENTER);
+		tfCompanyAddress.setText(stringAddress );
+		tfCompanyAddress.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		tfCompanyAddress.setColumns(10);
+		tfCompanyAddress.setBackground(Color.LIGHT_GRAY);
+		tfCompanyAddress.setBounds(578, 67, 366, 20);
+		frmNowyRachunek.getContentPane().add(tfCompanyAddress);
+		tfCompanyAddress.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfCompanyAddress.setText(fv.COMPANY_STRING);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(tfCompanyAddress.getText().equals(fv.COMPANY_STRING))
+					tfCompanyAddress.setText(stringAddress);
+			}
+		});
+		
+		
+		tfVATRegNum = new JTextField();
+		tfVATRegNum.setHorizontalAlignment(SwingConstants.CENTER);
+		tfVATRegNum.setText(stringVATReg );
+		tfVATRegNum.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		tfVATRegNum.setColumns(10);
+		tfVATRegNum.setBackground(Color.LIGHT_GRAY);
+		tfVATRegNum.setBounds(578, 93, 366, 20);
+		frmNowyRachunek.getContentPane().add(tfVATRegNum);
+		tfVATRegNum.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfVATRegNum.setText(fv.COMPANY_STRING);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(tfVATRegNum.getText().equals(fv.COMPANY_STRING))
+					tfVATRegNum.setText(stringVATReg);
+			}
+		});
+
+
 		JButton btnOtherAdd1 = new JButton("+");
 		btnOtherAdd1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -407,7 +464,7 @@ public class WystawRachunek {
 
 		JLabel lblRegistration = new JLabel("Registration");
 		lblRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblRegistration.setBounds(671, 14, 84, 28);
+		lblRegistration.setBounds(327, 64, 84, 24);
 		frmNowyRachunek.getContentPane().add(lblRegistration);
 		
 		JLabel labelQuantity = new JLabel("Qnt");
@@ -445,6 +502,40 @@ public class WystawRachunek {
 		});
 	}
 	
+	private void printDocument(){
+		sPrinter = new StockPrinter(defaultPaths);
+		try {
+			invoiceNum += 1;
+			registration = textFieldRegistration.getText();
+			if(!lblTotal.getText().equals(lblTotalSt)) {
+				if((!tfCompanyName.getText().equals(stringComName) || !this.tfCompanyAddress.getText().equals(stringAddress) || !this.tfVATRegNum.getText().equals(stringVATReg))){
+					String str = "";
+					if(!tfCompanyName.getText().equals(fv.COMPANY_STRING))
+						str += " " + tfCompanyName.getText();
+					if(!tfCompanyAddress.getText().equals(fv.COMPANY_STRING))
+						str += " " + tfCompanyAddress.getText();
+					if(!tfVATRegNum.getText().equals(fv.COMPANY_STRING))
+						str += " " + tfVATRegNum.getText();
+					carManufacturer+=str;
+				}
+				printed = sPrinter.printDoc(listChosen, discount, applyDiscount, carManufacturer, registration, invoiceNum);
+				if(printed){
+					for (String key : nameQnt.keySet()){
+						String query = "UPDATE \""+fv.STOCK_TABLE+"\" SET "+fv.STOCK_TABLE_QNT+"='"+nameQnt.get(key)+"'" + " WHERE " + fv.STOCK_TABLE_ITEM_NAME + "='"+key+"'";
+//						System.out.println("Query: "+query);
+						DM.editRecord(query);
+					}
+					frmNowyRachunek.dispose();
+					MainView.main(null);
+				}
+			} else
+				JOptionPane.showMessageDialog(frmNowyRachunek, "Nie przeliczyles wyniku");
+		} catch (IOException e) {
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+		} catch (Exception e) {
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+		}
+	}
 
 	private void addItemToList(JTextField tfOther, JTextField tfOtherPrice, JTextField tfOtherQnt) {
 		String element2model =	tfOther.getText();
@@ -494,8 +585,7 @@ public class WystawRachunek {
 		btnCalculate.setForeground(new Color(0, 0, 0));
 		btnCalculate.setBackground(new Color(220, 20, 60));
 		btnCalculate.setBounds(578, 456, 96, 32);
-		frmNowyRachunek.getContentPane().add(btnCalculate);
-		
+		frmNowyRachunek.getContentPane().add(btnCalculate);		
 	}
 
 	private void populateCarList() throws Exception {
@@ -511,17 +601,21 @@ public class WystawRachunek {
 		}
 		JLabel labelClient = new JLabel("Klient");
 		labelClient.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		labelClient.setBounds(71, 11, 61, 36);
+		labelClient.setBounds(23, 12, 50, 36);
 		frmNowyRachunek.getContentPane().add(labelClient);
 		
 		JScrollPane scrollPaneCarList = new JScrollPane();
-		scrollPaneCarList.setBounds(164, 11, 194, 100);
+		scrollPaneCarList.setBounds(75, 17, 242, 100);
 		frmNowyRachunek.getContentPane().add(scrollPaneCarList);
 
 		JLabel lblCarManufacturer = new JLabel(lblCarManufacturerTxt );
+		Border b = BorderFactory.createLineBorder(Color.BLUE);
+		TitledBorder border = BorderFactory.createTitledBorder(b, lblCarManufacturerTxt);
+		lblCarManufacturer.setBorder(border);
+
 		lblCarManufacturer.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
 		lblCarManufacturer.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCarManufacturer.setBounds(388, 40, 242, 45);
+		lblCarManufacturer.setBounds(320, 20, 220, 44);
 	
 		frmNowyRachunek.getContentPane().add(lblCarManufacturer);
 			
@@ -636,11 +730,11 @@ public class WystawRachunek {
 				
 		JLabel lblChoseServiceitem = new JLabel("Wybierz us\u0142ug\u0119");
 		lblChoseServiceitem.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblChoseServiceitem.setBounds(10, 151, 109, 36);
+		lblChoseServiceitem.setBounds(10, 156, 109, 36);
 		frmNowyRachunek.getContentPane().add(lblChoseServiceitem);
 		
 		JScrollPane scrollPaneServiceList = new JScrollPane();
-		scrollPaneServiceList.setBounds(123, 152, 300, 96);
+		scrollPaneServiceList.setBounds(123, 160, 300, 96);
 		frmNowyRachunek.getContentPane().add(scrollPaneServiceList);
 		
 		scrollPaneServiceList.setViewportView(listServices);
