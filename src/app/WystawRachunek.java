@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -39,9 +40,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
+import hct_speciale.StockItem;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
@@ -95,11 +99,11 @@ public class WystawRachunek {
 	private String stringAddress = "Adres Firmy";
 	private String stringComName = "Nazwa firmy";
 	private String stringVATReg = "VAT / Tax No.";
-	private JTextField tfSearchService;
+	private JTextField tfSearchItem;
 	private JTextField tfSearchCar;
 	private JTable tableCars;
-	private TableRowSorter rowSorterCars;
-
+	private TableRowSorter rowSorterCars, stockRowSorter;
+	
 
 
 	/**
@@ -170,7 +174,7 @@ public class WystawRachunek {
 		frame.getContentPane().add(scrollPaneChosen);
 		
 		listChosen = new JList<String>();
-		listChosen.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		listChosen.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		listServices = new JList<String>();
 		listServices.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
 		listItems = new JList<String>();
@@ -217,7 +221,11 @@ public class WystawRachunek {
 		lblWystawRachunek.setFont(new Font("Segoe UI Black", Font.PLAIN, 16));
 		frame.getContentPane().add(lblWystawRachunek);
 		
-		
+		JLabel lblChoseServiceitem = new JLabel("Wybierz us\u0142ug\u0119");
+		lblChoseServiceitem.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		lblChoseServiceitem.setBounds(10, 207, 109, 36);
+		frame.getContentPane().add(lblChoseServiceitem);
+
 		JLabel lblWybrane = new JLabel("");
 		Border b1 = BorderFactory.createLineBorder(Color.BLUE);
 		TitledBorder border1 = BorderFactory.createTitledBorder(b1, "WYBRANE");
@@ -356,7 +364,7 @@ public class WystawRachunek {
 		frame.getContentPane().add(lblQty);
 		
 		textFieldRegistration = new JTextField();
-		textFieldRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		textFieldRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		textFieldRegistration.setBounds(392, 91, 213, 28);
 		frame.getContentPane().add(textFieldRegistration);
 		textFieldRegistration.setColumns(10);
@@ -366,11 +374,11 @@ public class WystawRachunek {
 		lblWybierzPrzedmiot.setBounds(10, 364, 109, 36);
 		frame.getContentPane().add(lblWybierzPrzedmiot);
 		
-		tfSearchBox = new JTextField();
-		tfSearchBox.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		tfSearchBox.setBounds(123, 345, 436, 20);
-		frame.getContentPane().add(tfSearchBox);
-		tfSearchBox.setColumns(10);
+//		tfSearchBox = new JTextField();
+//		tfSearchBox.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+//		tfSearchBox.setBounds(123, 345, 436, 20);
+//		frame.getContentPane().add(tfSearchBox);
+//		tfSearchBox.setColumns(10);
 		
 		tfOther1 = new JTextField();
 		tfOther1.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
@@ -405,7 +413,7 @@ public class WystawRachunek {
 		tfCompanyName.setText(stringComName );
 		tfCompanyName.setBackground(Color.LIGHT_GRAY);
 		tfCompanyName.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		tfCompanyName.setBounds(655, 37, 489, 20);
+		tfCompanyName.setBounds(655, 37, 476, 20);
 		frame.getContentPane().add(tfCompanyName);
 		tfCompanyName.setColumns(10);
 		tfCompanyName.addFocusListener(new FocusListener(){
@@ -426,7 +434,7 @@ public class WystawRachunek {
 		tfCompanyAddress.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfCompanyAddress.setColumns(10);
 		tfCompanyAddress.setBackground(Color.LIGHT_GRAY);
-		tfCompanyAddress.setBounds(655, 64, 489, 20);
+		tfCompanyAddress.setBounds(655, 64, 476, 20);
 		frame.getContentPane().add(tfCompanyAddress);
 		tfCompanyAddress.addFocusListener(new FocusListener(){
 	        @Override
@@ -447,7 +455,7 @@ public class WystawRachunek {
 		tfVATRegNum.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfVATRegNum.setColumns(10);
 		tfVATRegNum.setBackground(Color.LIGHT_GRAY);
-		tfVATRegNum.setBounds(655, 90, 489, 20);
+		tfVATRegNum.setBounds(655, 90, 476, 20);
 		frame.getContentPane().add(tfVATRegNum);
 		tfVATRegNum.addFocusListener(new FocusListener(){
 	        @Override
@@ -485,9 +493,9 @@ public class WystawRachunek {
 	        }
 	      });
 		
-		scrollPaneItemList = new JScrollPane();
-		scrollPaneItemList.setBounds(123, 365, 436, 120);
-		frame.getContentPane().add(scrollPaneItemList);
+//		scrollPaneItemList = new JScrollPane();
+//		scrollPaneItemList.setBounds(123, 365, 436, 120);
+//		frame.getContentPane().add(scrollPaneItemList);
 
 		JLabel lblRegistration = new JLabel("Registration");
 		lblRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
@@ -509,14 +517,45 @@ public class WystawRachunek {
 		btnBack.setBounds(1035, 518, 89, 23);
 		frame.getContentPane().add(btnBack);
 		
-		tfSearchService = new JTextField();
-		tfSearchService.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		tfSearchService.setColumns(10);
-		tfSearchService.setBounds(123, 213, 436, 20);
-		frame.getContentPane().add(tfSearchService);
+		tfSearchItem = new JTextField();
+		tfSearchItem.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		tfSearchItem.setColumns(10);
+		tfSearchItem.setBounds(123, 213, 436, 20);
+		frame.getContentPane().add(tfSearchItem);
+		
+		tfSearchItem.getDocument().addDocumentListener(new DocumentListener(){
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                String text = tfSearchItem.getText();
+
+                if (text.trim().length() == 0) {
+                	stockRowSorter.setRowFilter(null);
+                } else {
+                	stockRowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                }
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                String text = tfSearchItem.getText();
+
+                if (text.trim().length() == 0) {
+                	stockRowSorter.setRowFilter(null);
+                } else {
+                	stockRowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                }
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+
 		
 		tfSearchCar = new JTextField();
-		tfSearchCar.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
+		tfSearchCar.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfSearchCar.setColumns(10);
 		tfSearchCar.setBounds(75, 22, 300, 20);
 		frame.getContentPane().add(tfSearchCar);
@@ -579,10 +618,11 @@ public class WystawRachunek {
 	      
 		frame.getContentPane().add(lblCarManufacturer);
 		
-		populateServices();
-		populateItems();
+//		populateServices();
+//		populateItems();
 		populateCarList();
-
+//		getWholeStock();
+		
 		sumCosts();
 		
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -599,6 +639,105 @@ public class WystawRachunek {
 		});
 	}
 	
+
+	private void getWholeStock() {
+		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+fv.STOCK_SORT_BY+" ASC";//item_name, cost, price,quantity - this.fv.STOCK_TABLE_ITEM_NAME
+		ArrayList<Item> listOfItems = new ArrayList<Item>();
+		listOfItems = DM.getItemsList(query);
+		
+		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+fv.SERVICES_SORT_BY+" ASC";//item_name, cost, price,quantity
+		ArrayList<Item> listOfServices = new ArrayList<Item>();
+		listOfServices = DM.getItemsList(queryServices);
+
+		int rowNumber = listOfItems.size() + listOfServices.size();
+
+		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
+		data = populateDataArray(listOfItems, data, 0, listOfItems.size());
+		data = populateDataArray(listOfServices, data, listOfItems.size(), rowNumber);
+//		wholeList = new ArrayList<Item>();
+//		wholeList.addAll(listOfItems);
+//		wholeList.addAll(listOfServices);
+
+		JScrollPane  stockPane = createTable(stockRowSorter, data, this.fv.STOCK_TB_HEADINGS, 320, 120, 160, 300, 250);	
+		frame.getContentPane().add(stockPane);
+	}
+
+	private String[][] populateDataArray(ArrayList<Item> list, String[][] data, int startIndex, int rowNumber){
+		int j = 0;
+		for(int i = startIndex; i < rowNumber; i++) {
+			data[i][0] = list.get(j).getName();
+			data[i][1] = ""+list.get(j).getCost();
+			data[i][2] = ""+list.get(j).getPrice();
+			if(list.get(j) instanceof StockItem)
+				data[i][3] = ""+((StockItem) list.get(j)).getQnt();
+			else
+				data[i][3] = ""+0;
+			j++;
+		}		
+		return data;
+	}
+
+	private void populateCarList() throws Exception {
+		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_LIST_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
+		carManufacturer = "CAR";
+	
+		ArrayList<String> listOfCars = DM.selectRecordArrayList(queryCars);
+		int rowNumber = listOfCars.size();
+		String[][] data = new String[rowNumber ][this.fv.CARS_TABLE_HEADER.length]; 
+		data = populateDataArrayString(listOfCars, data, rowNumber);
+
+		JScrollPane carsPane = createTable(rowSorterCars,data,this.fv.CARS_TABLE_HEADER, 298, 75, 44, 300, 124);
+		frame.getContentPane().add(carsPane);
+	}
+
+	private JScrollPane createTable(TableRowSorter<TableModel> rowSorter, String[][] data, String[] headings, int firstColumnWidth, int paneX, int paneY, int paneWidth, int paneHeight) {
+		ListSelectionListener listener = createTableListener();
+		DefaultTableModel dm = new DefaultTableModel(data, headings);
+		JTable table = new JTable();
+		table.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.getSelectionModel().addListSelectionListener(listener);
+		table.setModel(dm);
+		
+//		table.setBounds(0, 0, 320, 373);
+		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+		table.setFillsViewportHeight(true);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
+		table.getColumnModel().getColumn(0).setPreferredWidth(firstColumnWidth);
+		
+		rowSorter = new TableRowSorter<>(table.getModel());
+		table.setRowSorter(rowSorter);
+		
+		JTableHeader header = table.getTableHeader();
+		header.setBackground(Color.black);
+		header.setForeground(Color.yellow);
+
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBounds(paneX, paneY, paneWidth, paneHeight);
+		return scrollPane;
+	}
+
+	private ListSelectionListener createTableListener() {
+		ListSelectionListener listener = new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+//				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
+			}
+	    };
+	    return listener;
+	  }
+
+	private String[][] populateDataArrayString(ArrayList<String> list, String[][] data, int rowNumber) {
+		int j = 0;
+		for(int i = 0; i < rowNumber; i++) {
+			data[i][0] = list.get(j);
+			j++;
+		}		
+		return data;
+	}
+
 	private void printDocument(){
 		sPrinter = new StockPrinter(defaultPaths);
 		try {
@@ -685,203 +824,11 @@ public class WystawRachunek {
 		frame.getContentPane().add(btnCalculate);		
 	}
 
-	private void populateItems() throws Exception {
-		String queryItems = "SELECT "+this.fv.STOCK_TABLE_ITEM_NAME+", "+this.fv.STOCK_TABLE_PRICE+", "+this.fv.STOCK_TABLE_QNT+" FROM "+this.fv.STOCK_TABLE+"";
-		if(!this.stockSearchText.isEmpty()){
-			queryItems +=" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+" LIKE '%"+this.stockSearchText+"%'";
-		}
-		DefaultListModel<String> modelItems = new DefaultListModel<>();
-	
-		ArrayList<String> listOfItems = DM.selectRecordArrayList(queryItems);
-		
-		for(int i = 0; i < listOfItems.size(); i+=3) {
-			String tempString = listOfItems.get(i);
-			modelItems.addElement(tempString);
-		}
-		
-		scrollPaneItemList.setViewportView(listItems);
-		listItems.setModel(modelItems);
-		
-		JButton btnAddItem = new JButton("+");
-		btnAddItem.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnAddItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(!listItems.isSelectionEmpty()) {
-					
-					String element2model = (String) listItems.getSelectedValue();
-					String itemName = element2model;
-					
-					int index = listOfItems.indexOf(element2model);
-					String tempString = listOfItems.get(index+1);
-					
-					if(!tfItemPrice.getText().isEmpty())
-						productPrice = tfItemPrice.getText();
-					else
-						productPrice = tempString;
-
-					element2model = helper.paddStringRight(element2model, paddingLength, ch);
-					
-					element2model += " €"+productPrice;
-					
-					String productQuantity = "";
-					if(!tfProdQ.getText().isEmpty())
-						productQuantity = tfProdQ.getText(); 
-					else
-						productQuantity = "1";
-					
-					element2model+="x";
-					int qnt = 0, qntForDatabase = 0;
-					int qntInList = Integer.parseInt(listOfItems.get(index+2));
-					if(!productQuantity.isEmpty())
-						qnt = Integer.parseInt(productQuantity);
-					else
-						qnt = 1;
-					
-					while(qnt > qntInList){
-						JOptionPane.showMessageDialog(frame, "Dostępnych "+qntInList+"szt.");
-						if(qnt > qntInList)
-							return;
-					}
-					qntForDatabase = qntInList - qnt;
-					nameQnt.put(itemName, qntForDatabase);
-					element2model+=productQuantity;
-
-					
-					model2Add.addElement(element2model);
-					listChosen.setModel(model2Add);
-				}
-			}
-		});
-		btnAddItem.setBounds(688, 313, 44, 24);
-		frame.getContentPane().add(btnAddItem);
-	}
-
 	protected void searchInList() throws Exception {
 		stockSearchText = this.tfSearchBox.getText();
 //        System.out.println("Text in method=" + stockSearchText);
-        this.populateItems();
-	}
-
-	private void populateServices() throws Exception {
-		String queryServices = "SELECT "+this.fv.SERVICES_TABLE_SERVICE_NAME+", "+this.fv.STOCK_TABLE_PRICE+" FROM "+this.fv.SERVICES_TABLE+"";
-		DefaultListModel<String> model = new DefaultListModel<>();
-	
-		ArrayList<String> listOfServices = DM.selectRecordArrayList(queryServices);
+//        this.populateItems();
 		
-		for(int i = 0; i < listOfServices.size(); i+=2) {
-			String tempString = listOfServices.get(i);
-			model.addElement(tempString);
-		}
-				
-		JLabel lblChoseServiceitem = new JLabel("Wybierz us\u0142ug\u0119");
-		lblChoseServiceitem.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		lblChoseServiceitem.setBounds(10, 207, 109, 36);
-		frame.getContentPane().add(lblChoseServiceitem);
-		
-		JScrollPane scrollPaneServiceList = new JScrollPane();
-		scrollPaneServiceList.setBounds(123, 235, 436, 96);
-		frame.getContentPane().add(scrollPaneServiceList);
-		
-		scrollPaneServiceList.setViewportView(listServices);
-		listServices.setModel(model);
-		
-		JButton btnAddService = new JButton("+");
-		btnAddService.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-
-		
-		btnAddService.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(!listServices.isSelectionEmpty()) {
-					char ch = ' ';
-					String element2model = (String) listServices.getSelectedValue();
-					
-					int index = listOfServices.indexOf(element2model);
-					String tempString = listOfServices.get(index+1);
-					
-					if(!tfServicePrice.getText().isEmpty())
-						servicePrice = tfServicePrice.getText();
-					else
-						servicePrice = tempString;
-					
-					element2model = helper.paddStringRight(element2model, paddingLength, ch);
-					
-					element2model += " €"+servicePrice;
-					
-					String productQuantity = "";
-					if(!tfServQ.getText().isEmpty())
-						productQuantity = tfServQ.getText(); 
-					else
-						productQuantity = "1";
-					
-					element2model+="x"+productQuantity;
-					
-					model2Add.addElement(element2model);
-					listChosen.setModel(model2Add);
-				}
-			}
-		});
-		btnAddService.setBounds(688, 223, 44, 24);
-		frame.getContentPane().add(btnAddService);
-	}
-
-	private void populateCarList() throws Exception {
-		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_LIST_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
-		carManufacturer = "CAR";
-	
-		ArrayList<String> listOfCars = DM.selectRecordArrayList(queryCars);
-		int rowNumber = listOfCars.size();
-		String[][] data = new String[rowNumber ][this.fv.CARS_TABLE_HEADER.length]; 
-		data = populateDataArrayString(listOfCars, data, rowNumber);
-
-		createTable(data,this.fv.CARS_TABLE_HEADER);
-	}
-
-	private void createTable(String[][] data, String[] headings) {
-		ListSelectionListener listener = createTableListener();
-		DefaultTableModel dm = new DefaultTableModel(data, headings);
-		tableCars = new JTable();
-		frame.getContentPane().add(tableCars);
-		tableCars.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tableCars.getSelectionModel().addListSelectionListener(listener);
-		tableCars.setModel(dm);
-		
-		tableCars.setBounds(0, 0, 320, 373);
-		tableCars.setPreferredScrollableViewportSize(new Dimension(500, 150));
-		tableCars.setFillsViewportHeight(true);
-		tableCars.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		
-		tableCars.getColumnModel().getColumn(0).setPreferredWidth(299);
-		
-		rowSorterCars = new TableRowSorter<>(tableCars.getModel());
-		tableCars.setRowSorter(rowSorterCars);
-		
-		JTableHeader header = tableCars.getTableHeader();
-		header.setBackground(Color.black);
-		header.setForeground(Color.yellow);
-
-		JScrollPane scrollPaneCarList = new JScrollPane(tableCars);
-		scrollPaneCarList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPaneCarList.setBounds(75, 44, 300, 124);
-		frame.getContentPane().add(scrollPaneCarList);
-	}
-
-	private ListSelectionListener createTableListener() {
-		ListSelectionListener listener = new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-//				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
-			}
-	    };
-	    return listener;
-	  }
-
-	private String[][] populateDataArrayString(ArrayList<String> list, String[][] data, int rowNumber) {
-		int j = 0;
-		for(int i = 0; i < rowNumber; i++) {
-			data[i][0] = list.get(j);
-			j++;
-		}		
-		return data;
 	}
 
 }

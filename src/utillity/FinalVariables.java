@@ -29,6 +29,9 @@ public class FinalVariables {
 	public final String MAX_SERVIS_QNT = "9999";
 	public final String[] SORT_BY = {"Nazwa", "Cena", "Qnt"};//, "Rozmiar"
 
+	public final String STOCK_SORT_BY="item_name";
+	public final String SERVICES_SORT_BY="service_name";
+
 	
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";
