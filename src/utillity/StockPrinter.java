@@ -193,6 +193,7 @@ public class StockPrinter  {
 		docPath = savePath+slash+this.fileName;
 		//TODO
 //		log.logError("save path "+savePath +"docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
+		//TODO:
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
@@ -285,11 +286,31 @@ public class StockPrinter  {
 		contentStream.beginText();
 		contentStream.setLeading(20.5f);
 		contentStream.setFont(PDType1Font.COURIER_BOLD, 16);
-		
 		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.newLineAtOffset(140, 520);
-		contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer);
+	
+		if(!carManufacturer.contains(fv.COMPANY_STRING)){
+			System.out.println("Printer just reg ");
+			contentStream.newLineAtOffset(20, 520);
+			contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer);
+		} else {
+			int yPos = 570;
+			String temp = "";
+			contentStream.newLineAtOffset(20, yPos);
+			temp = carManufacturer.substring(0, carManufacturer.indexOf(fv.COMPANY_STRING));
+			System.out.println("1 Printer temp: "+temp);
+			contentStream.showText(invSt +" no."+invNo+" for "+temp);
+			contentStream.newLine();
+			
+			temp = carManufacturer.substring(carManufacturer.indexOf(fv.COMPANY_STRING)+2, carManufacturer.lastIndexOf(fv.COMPANY_STRING));
+			temp = temp.replaceAll(fv.COMPANY_STRING, ",");
+			contentStream.showText(temp);
+			contentStream.newLine();
+	
+			temp = carManufacturer.substring(carManufacturer.lastIndexOf(fv.COMPANY_STRING)+2);
+			contentStream.showText(temp);
+			contentStream.newLine();
 
+		}
 		contentStream.endText();
 	}
 
@@ -299,10 +320,30 @@ public class StockPrinter  {
 		contentStream.setFont(PDType1Font.COURIER_BOLD, 16);
 		
 		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.newLineAtOffset(120, 520);
-		contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer);
+		if(!carManufacturer.contains(fv.COMPANY_STRING)){
+			contentStream.newLineAtOffset(20, 520);
+			contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer + " reg "+carRegistration);
+		} else {
+			int yPos = 570;
+			String temp = "";
+			contentStream.newLineAtOffset(20, yPos);
+			temp = carManufacturer.substring(0, carManufacturer.indexOf(fv.COMPANY_STRING));
+			contentStream.showText(invSt +" no."+invNo+" for "+temp + " reg "+carRegistration);
+			contentStream.newLine();
+			
+			temp = carManufacturer.substring(carManufacturer.indexOf(fv.COMPANY_STRING)+2, carManufacturer.lastIndexOf(fv.COMPANY_STRING));
+			temp = temp.replaceAll(fv.COMPANY_STRING, ",");
+
+			contentStream.showText(temp);
+			contentStream.newLine();
+	
+			temp = carManufacturer.substring(carManufacturer.lastIndexOf(fv.COMPANY_STRING)+2);
+			contentStream.showText(temp);
+			contentStream.newLine();
+
+		}
 		contentStream.newLine();
-		contentStream.showText( "    reg "+carRegistration);
+//		contentStream.showText( );
 
 		contentStream.endText();
 	}
@@ -359,6 +400,7 @@ public class StockPrinter  {
 		//add test for folder existance - create folder.
 		accPath = accPath+"\\"+date+"_"+docNameCopy+" "+invNo+ext;
 //		log.logError("acc path "+accPath);
+		//TODO:
 		customerCopyDoc.save(accPath);
 		customerCopyDoc.close();
 	}
@@ -379,7 +421,7 @@ public class StockPrinter  {
 
         //TODO
         //Uncomment bellow
-        job.print();
+//        job.print();
         
         document.close();
    }
