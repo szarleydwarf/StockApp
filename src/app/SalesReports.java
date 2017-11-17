@@ -110,19 +110,17 @@ public class SalesReports {
 		frame.getContentPane().add(btnBack);
 		
 		JLabel lblBorder = new JLabel("");
-<<<<<<< HEAD
+
 		Border b = BorderFactory.createLineBorder(Color.CYAN);
 		lblBorder.setBorder(new LineBorder(new Color(255, 51, 0), 2, true));
 
 		lblBorder.setBounds(42, 48, 560, 22);
-=======
 		lblBorder.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBorder.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		Border b = BorderFactory.createLineBorder(Color.yellow);
+		Border b1 = BorderFactory.createLineBorder(Color.yellow);
 		lblBorder.setBorder(new LineBorder(new Color(255, 255, 0), 2));
 
 		lblBorder.setBounds(42, 50, 560, 20);
->>>>>>> try_item_class
 		frame.getContentPane().add(lblBorder);
 
 		populateTable();
@@ -189,21 +187,16 @@ public class SalesReports {
 		table.setFillsViewportHeight(true);
 		
 		JTableHeader header = table.getTableHeader();
-<<<<<<< HEAD
+
 	    header.setBackground(Color.black);
 	    header.setForeground(Color.yellow);
 	      
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setLocation(42, 48);
 		scrollPane.setSize(560, 270);
-=======
 		header.setBackground(Color.black);
 		header.setForeground(Color.yellow);
-	      
-		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setLocation(42, 48);
-		scrollPane.setSize(560, 287);
->>>>>>> try_item_class
+
 		
 		frame.getContentPane().add(scrollPane);
 		

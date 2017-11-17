@@ -130,11 +130,11 @@ public class StockPrinter  {
 		this.carManufacturer = carManufacturer;
 		if(!registration.isEmpty())
 			this.carRegistration = registration;
-<<<<<<< HEAD
+
 		this.carRegistration.toUpperCase();
-=======
+
 		this.carRegistration = this.carRegistration.toUpperCase();
->>>>>>> try_item_class
+
 		this.invNo = invoiceNum;
 		
 		generatePDF();
@@ -421,7 +421,7 @@ public class StockPrinter  {
 
         //TODO
         //Uncomment bellow
-//        job.print();
+        job.print();
         
         document.close();
    }
