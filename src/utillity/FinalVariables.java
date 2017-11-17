@@ -40,7 +40,8 @@ public class FinalVariables {
 	public static final String[] SALES_REPORT_TB_HEADINGS = {"Miesiąc", "Koszty", "Przychód", "Zysk"};
 	public static final String[] STOCK_TB_HEADINGS = {"Towar", "Koszt", "Cena", "Qnt"};
 	public static final String[] INVOICE_TB_HEADINGS = {"Inv #", "Klient", "Serwis #", "Towar #", "Total", "Data wystawienia", "Nazwa pliku"};
-	
+	public static final String[] CARS_TABLE_HEADER = {"Marka auta"};
+
 	public static final String TOTAL = "total";
 	public static final String COST = "cost";
 	public final String INVOCE_TABLE = "invoice_list";
