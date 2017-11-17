@@ -57,6 +57,7 @@ public class WyswietlListeUslug {
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 450, 300);
+		frame.setLocation(10, 10);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 

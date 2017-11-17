@@ -11,6 +11,7 @@ import dbase.UserManager;
 import utillity.FinalVariables;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,7 +25,7 @@ import java.awt.event.ActionEvent;
 
 public class SqliteTestAppV {
 
-	private JFrame frmHctApp;
+	private JFrame frame;
 	private JTextField username;
 	private JPasswordField password;
 	private static FinalVariables fv;
@@ -45,7 +46,7 @@ public class SqliteTestAppV {
 			public void run() {
 				try {
 					SqliteTestAppV window = new SqliteTestAppV();
-					window.frmHctApp.setVisible(true);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -75,39 +76,41 @@ public class SqliteTestAppV {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frmHctApp = new JFrame();
-		frmHctApp.getContentPane().setBackground(new Color(255, 51, 0));
-		frmHctApp.setTitle("HCT APP");
-		frmHctApp.setResizable(false);
-		frmHctApp.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
-		frmHctApp.setBackground(new Color(255, 255, 0));
-		frmHctApp.setBounds(100, 100, 450, 243);
-		frmHctApp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmHctApp.getContentPane().setLayout(null);
+		frame = new JFrame();
+		frame.getContentPane().setBackground(new Color(255, 51, 0));
+		frame.setTitle("HCT APP");
+		frame.setResizable(false);
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
+		frame.setBackground(new Color(255, 255, 0));
+		frame.setBounds(100, 100, 450, 243);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
+		frame.getContentPane().setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Logowanie");
 		lblNewLabel.setFont(new Font("Segoe UI Black", Font.PLAIN, 16));
 		lblNewLabel.setBounds(161, 11, 113, 44);
-		frmHctApp.getContentPane().add(lblNewLabel);
+		frame.getContentPane().add(lblNewLabel);
 		
 		JLabel lblNazwaUzytkownika = new JLabel("Nazwa uzytkownika");
 		lblNazwaUzytkownika.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
 		lblNazwaUzytkownika.setBounds(30, 73, 383, 44);
-		frmHctApp.getContentPane().add(lblNazwaUzytkownika);
+		frame.getContentPane().add(lblNazwaUzytkownika);
 		
 		JLabel lblHaslo = new JLabel("Haslo");
 		lblHaslo.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
 		lblHaslo.setBounds(30, 116, 384, 44);
-		frmHctApp.getContentPane().add(lblHaslo);
+		frame.getContentPane().add(lblHaslo);
 		
 		username = new JTextField();
 		username.setBounds(242, 85, 156, 20);
-		frmHctApp.getContentPane().add(username);
+		frame.getContentPane().add(username);
 		username.setColumns(10);
 		
 		password = new JPasswordField();
 		password.setBounds(243, 128, 156, 20);
-		frmHctApp.getContentPane().add(password);
+		frame.getContentPane().add(password);
 		
 		JButton login_btn = new JButton("Zaloguj");
 		login_btn.addActionListener(new ActionListener() {
@@ -119,7 +122,7 @@ public class SqliteTestAppV {
 		login_btn.setBackground(new Color(51, 153, 255));
 		login_btn.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		login_btn.setBounds(162, 171, 112, 23);
-		frmHctApp.getContentPane().add(login_btn);
+		frame.getContentPane().add(login_btn);
 	}
 	
 	public void zaloguj() {
@@ -131,7 +134,7 @@ public class SqliteTestAppV {
 
 		 	boolean isLogged = UM.login(username_str, pass, loggerFolderPath);
 		 	if(isLogged){
-		 		frmHctApp.setVisible(false);
+		 		frame.setVisible(false);
 		 		MainView.main(null);
 		 	}
 //			conn.close();

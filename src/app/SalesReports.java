@@ -98,6 +98,7 @@ public class SalesReports {
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
 		frame.setBounds(100, 100, 748, 426);
+		frame.setLocation(10, 10);
 
 		JLabel lblTitle = new JLabel("Raporty sprzeda\u017Cy");
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);

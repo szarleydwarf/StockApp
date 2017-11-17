@@ -130,7 +130,11 @@ public class StockPrinter  {
 		this.carManufacturer = carManufacturer;
 		if(!registration.isEmpty())
 			this.carRegistration = registration;
+
+		this.carRegistration.toUpperCase();
+
 		this.carRegistration = this.carRegistration.toUpperCase();
+
 		this.invNo = invoiceNum;
 		
 		generatePDF();
@@ -285,7 +289,6 @@ public class StockPrinter  {
 		contentStream.setNonStrokingColor(Color.BLACK);
 	
 		if(!carManufacturer.contains(fv.COMPANY_STRING)){
-			System.out.println("Printer just reg ");
 			contentStream.newLineAtOffset(20, 520);
 			contentStream.showText(invSt +" no."+invNo+" for "+carManufacturer);
 		} else {
@@ -293,7 +296,6 @@ public class StockPrinter  {
 			String temp = "";
 			contentStream.newLineAtOffset(20, yPos);
 			temp = carManufacturer.substring(0, carManufacturer.indexOf(fv.COMPANY_STRING));
-			System.out.println("1 Printer temp: "+temp);
 			contentStream.showText(invSt +" no."+invNo+" for "+temp);
 			contentStream.newLine();
 			
@@ -339,8 +341,6 @@ public class StockPrinter  {
 
 		}
 		contentStream.newLine();
-//		contentStream.showText( );
-
 		contentStream.endText();
 	}
 

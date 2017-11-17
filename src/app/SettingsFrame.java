@@ -125,6 +125,7 @@ public class SettingsFrame {
 		frame.setBackground(new Color(255, 255, 0));
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.setBounds(100, 100, 722, 333);
+		frame.setLocation(10, 10);
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblSaveFolderPathInfo = new JLabel("Folder z rachunkami:");
