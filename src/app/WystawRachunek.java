@@ -53,6 +53,7 @@ import utillity.StockPrinter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.JCheckBox;
+import java.awt.Component;
 
 public class WystawRachunek {
 
@@ -134,6 +135,7 @@ public class WystawRachunek {
 	private JLabel lblCarBrand;
 	protected Item item;
 	private ArrayList<Item> wholeStock;
+	private JTable tbChoosen;
 	
 
 
@@ -194,7 +196,7 @@ public class WystawRachunek {
 		frame.setBackground(new Color(255, 255, 0));
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
-				
+		
 		lblNewInvoice = new JLabel("Nowy Rachunek");
 		lblNewInvoice.setForeground(new Color(51, 51, 51));
 		lblNewInvoice.setBackground(new Color(102, 153, 255));
@@ -581,7 +583,6 @@ public class WystawRachunek {
 		chbCaps.setBounds(450, 412, 120, 23);
 		frame.getContentPane().add(chbCaps);
 
-	
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -595,43 +596,61 @@ public class WystawRachunek {
 		    }
 		});
 		
+		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
-	}
-	protected void addToList(Item item) {
-		String element2model = item.getName();
+	}	//END OF INIT METHOD
+
+	
+	private void createChoosenItemsTable() {
+		ArrayList<Item>emptyArray = new ArrayList<Item>();
+		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
+		data = populateDataArray(emptyArray, data, 0, 0);
+
+		tbChoosen = new JTable();
+		tbChoosen = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, 240);
 		
+		JScrollPane spChoosen = new JScrollPane(tbChoosen);
+		spChoosen.setBounds(620, 200, 400, 194);
+		frame.getContentPane().add(spChoosen);
+
+	}
+
+	protected void addToList(Item item) {		
 		if(!tfPriceListed.getText().isEmpty())
 			productPrice = Double.parseDouble(tfPriceListed.getText());
 		else
 			productPrice = item.getPrice();
 		
-		element2model = helper.paddStringRight(element2model, paddingLength, ch);
-		element2model += " €"+productPrice;
-		
-		int productQuantity = 0;
-		if(!this.tfQntListed.getText().isEmpty())
-			productQuantity = Integer.parseInt(tfQntListed.getText());
-		else
-			productQuantity = 1;
-
-		element2model+="x";
-		int qnt = 0, qntForDatabase = 0;
+		int tfQnt = 0;
 		int itemQnt = 0;
 		if(item instanceof StockItem)
 			itemQnt = ((StockItem) item).getQnt();
 		else
 			itemQnt = 1;
 		
-		while(qnt > itemQnt){
+		if(!this.tfQntListed.getText().isEmpty())
+			tfQnt = Integer.parseInt(this.tfQntListed.getText());
+		else
+			tfQnt = 1;
+		
+		while(tfQnt > itemQnt && (item instanceof StockItem)){
 			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
-			if(qnt > itemQnt)
+			if(tfQnt > itemQnt)
 				return;
 		}
-		qntForDatabase = itemQnt - qnt;
-	}
+		
+//		System.out.println("Qnt: "+tfQnt+" - "+itemQnt+" \n ");
 
-	//END OF INIT METHOD
+		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
+
+		rowData[0] = item.getName();
+		rowData[1] = ""+productPrice;
+		rowData[2] = ""+tfQnt;
+		
+		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+		model.addRow(rowData);
+	}
 
 	private void populateStockTable() {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+fv.STOCK_SORT_BY+" ASC";
@@ -719,8 +738,8 @@ public class WystawRachunek {
 					lblCarBrand.setText(table.getModel().getValueAt(row, 0).toString());
 				} else if(table.getName() == fv.STOCK_TB_NAME) {
 					item = getItem(table.getModel().getValueAt(row, 0).toString());
-					if(item != null)
-						System.out.println("Name: "+item.getName());
+//					if(item != null)
+//						System.out.println("Name: "+item.getName());
 				}
 			}
 	    };
@@ -740,6 +759,7 @@ public class WystawRachunek {
 
 	private String[][] populateDataArray(ArrayList<Item> list, String[][] data, int startIndex, int rowNumber){
 		int j = 0;
+
 		for(int i = startIndex; i < rowNumber; i++) {
 			data[i][0] = list.get(j).getName();
 //			data[i][1] = ""+list.get(j).getCost();
@@ -749,8 +769,8 @@ public class WystawRachunek {
 			else
 				data[i][2] = ""+fv.MAX_SERVIS_QNT;
 			j++;
-//System.out.println(" data "+data[i][0]);
-		}		
+//System.out.println(data[i][0]+"-"+data[i][1]+"-"+data[i][2]);
+		}	
 		return data;
 	}
 
