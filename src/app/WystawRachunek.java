@@ -360,7 +360,10 @@ public class WystawRachunek {
 		btnRemove.setBounds(1040, 200, 46, 24);
 		btnRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				if(item != null && tbChoosen.getSelectedRow() != -1){
+					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+					model.removeRow(tbChoosen.getSelectedRow());
+				}
 			}
 		});
 		frame.getContentPane().add(btnRemove);
@@ -372,7 +375,8 @@ public class WystawRachunek {
 		btnClearAll.setBounds(930, 410, 100, 18);
 		btnClearAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+				model.setRowCount(0);
 			}
 		});
 		frame.getContentPane().add(btnClearAll);
@@ -640,8 +644,6 @@ public class WystawRachunek {
 				return;
 		}
 		
-//		System.out.println("Qnt: "+tfQnt+" - "+itemQnt+" \n ");
-
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 
 		rowData[0] = item.getName();
@@ -737,6 +739,7 @@ public class WystawRachunek {
 				if(table.getName() == fv.CARS_TB_NAME) {
 					lblCarBrand.setText(table.getModel().getValueAt(row, 0).toString());
 				} else if(table.getName() == fv.STOCK_TB_NAME) {
+					//TODO
 					item = getItem(table.getModel().getValueAt(row, 0).toString());
 //					if(item != null)
 //						System.out.println("Name: "+item.getName());
@@ -746,7 +749,6 @@ public class WystawRachunek {
 	    return listener;
 	
 	}
-
 
 	protected Item getItem(String string) {
 		Item item = null;
