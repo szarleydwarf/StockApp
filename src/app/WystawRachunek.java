@@ -38,6 +38,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
@@ -136,6 +138,7 @@ public class WystawRachunek {
 	protected Item item;
 	private ArrayList<Item> wholeStock;
 	private JTable tbChoosen;
+	private double sum;
 	
 
 
@@ -281,24 +284,12 @@ public class WystawRachunek {
 			}
 		});
 		frame.getContentPane().add(btnAddOther);
-				
-		JButton btnCalculate = new JButton("Policz =");
-		btnCalculate.setForeground(new Color(255, 255, 0));
-		btnCalculate.setBackground(new Color(204, 0, 0));
-		btnCalculate.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		btnCalculate.setBounds(620, 470, 100, 30);
-		btnCalculate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		frame.getContentPane().add(btnCalculate);
 		
 		JButton btnPrint = new JButton("DRUKUJ");
 		btnPrint.setForeground(Color.YELLOW);
 		btnPrint.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		btnPrint.setBackground(new Color(204, 0, 0));
-		btnPrint.setBounds(620, 520, 160, 30);
+		btnPrint.setBounds(770, 520, 160, 30);
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -319,7 +310,7 @@ public class WystawRachunek {
 		});
 		frame.getContentPane().add(btnBack);
 		
-		JLabel lblTotal = new JLabel("TOTAL");
+		lblTotal = new JLabel("TOTAL");
 		lblTotal.setForeground(new Color(51, 51, 51));
 		lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTotal.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
@@ -562,6 +553,7 @@ public class WystawRachunek {
             }
         });
 
+
 		JLabel lblFreebies = new JLabel("");
 		lblFreebies.setBounds(436, 339, 150, 130);
 		Border b7 = BorderFactory.createLineBorder(Color.cyan);
@@ -617,8 +609,43 @@ public class WystawRachunek {
 		JScrollPane spChoosen = new JScrollPane(tbChoosen);
 		spChoosen.setBounds(620, 200, 400, 194);
 		frame.getContentPane().add(spChoosen);
+		sum = 0;
 
+		TableModel mod = tbChoosen.getModel();
+		mod.addTableModelListener(new TableModelListener(){
+//TODO
+			@Override
+			public void tableChanged(TableModelEvent arg0) {
+				int rowCount = mod.getRowCount();
+				for(int i = 0; i < rowCount;i++) {
+					System.out.println(mod.getValueAt(i, 1));
+					double price = Double.parseDouble((String) mod.getValueAt(i, 1));
+					int qnt = Integer.parseInt((String)mod.getValueAt(i, 2));
+					price = price * qnt;
+					
+					sum += price;
+				}
+//				sum = applyDiscount();
+				System.out.println("sum: "+df.format(sum));
+				lblTotal.setText("€ "+df.format(sum));
+			}			
+		});
 	}
+
+private void applyDiscount() {
+	if(!tfDiscountAmount.getText().equals(""))
+		discount = Double.parseDouble(tfDiscountAmount.getText());
+	System.out.println("disc: "+df.format(discount));
+
+	if(applyDiscount){
+		sum -= discount;
+	} else if(!applyDiscount){
+		sum -= (sum * (discount/100));
+	} else {
+		sum = sum;
+	}
+	System.out.println("app: "+df.format(sum));
+}
 
 	protected void addToList(Item item) {		
 		if(!tfPriceListed.getText().isEmpty())
