@@ -60,20 +60,8 @@ import java.awt.Component;
 public class WystawRachunek {
 
 	private JFrame frame;
-	private JTextField tfProdQ;
-	private JTextField tfServQ;private JTextField textFieldDiscount;
-	private JList<String> listChosen, listItems, listServices;
-	private JRadioButton rbPercent, rbMoney;
-	private JTextField textFieldRegistration;
+
 	private JLabel lblTotal;
-	private JScrollPane scrollPaneItemList;
-	private JTextField tfOtherQnt1;
-	private JTextField tfOtherPrice1;
-	private JTextField tfSearchBox;
-	private JTextField tfOther1;
-	private JTextField tfServicePrice;
-	private JTextField tfItemPrice;
-	private DefaultListModel<String> model2Add;
 	
 	private StockPrinter sPrinter;
 	private ButtonGroup radioGroup;
@@ -86,29 +74,12 @@ public class WystawRachunek {
 	protected static String date;
 	protected static String loggerFolderPath;
 	
-	private String lblCarManufacturerTxt = "CAR";
-	private String stockSearchText="";
-	private String carManufacturer, registration, servicePrice ;
 	private double productPrice;
-	private final String lblTotalSt = "TOTAL";
-	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
 	private boolean applyDiscount = true;
-	private boolean printed = false;
-	private char ch = ' ';
 
-	private ArrayList<String> defaultPaths;
-	private Map<String, Integer> nameQnt;
-	private JTextField tfCompanyName;
-	private JTextField tfCompanyAddress;
-	private JTextField tfVATRegNum;
-	private String stringAddress = "Adres Firmy";
-	private String stringComName = "Nazwa firmy";
-	private String stringVATReg = "VAT / Tax No.";
-	private JTextField tfSearchItem;
-	private JTextField tfSearchCar;
-	private JTable tableCars;
-	private TableRowSorter rowSorterStock,rowSorterCars;
+
+	private TableRowSorter<TableModel> rowSorterStock,rowSorterCars, rowSorterChosen;
 	private JTextField tfCarsSearchBox;
 	private JTextField tfSearch;
 	private JTextField tfOtherService;
@@ -137,8 +108,18 @@ public class WystawRachunek {
 	private JLabel lblCarBrand;
 	protected Item item;
 	private ArrayList<Item> wholeStock;
-	private JTable tbChoosen;
+//	private JTable tbChoosen;
 	private double sum;
+
+	private ArrayList<String> defaultPaths;
+
+	private HashMap<String, Integer> nameQnt;
+
+	private int invoiceNum;
+
+	private JRadioButton rbPercent;
+
+	private JRadioButton rbMoney;
 	
 
 
@@ -351,10 +332,10 @@ public class WystawRachunek {
 		btnRemove.setBounds(1040, 200, 46, 24);
 		btnRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(item != null && tbChoosen.getSelectedRow() != -1){
-					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
-					model.removeRow(tbChoosen.getSelectedRow());
-				}
+//				if(item != null && tbChoosen.getSelectedRow() != -1){
+//					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+//					model.removeRow(tbChoosen.getSelectedRow());
+//				}
 			}
 		});
 		frame.getContentPane().add(btnRemove);
@@ -366,8 +347,8 @@ public class WystawRachunek {
 		btnClearAll.setBounds(930, 410, 100, 18);
 		btnClearAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
-				model.setRowCount(0);
+//				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+//				model.setRowCount(0);
 			}
 		});
 		frame.getContentPane().add(btnClearAll);
@@ -478,7 +459,6 @@ public class WystawRachunek {
 		
 		
 		tfCarsSearchBox.getDocument().addDocumentListener(new DocumentListener(){
-
             @Override
             public void insertUpdate(DocumentEvent e) {
                 String text = tfCarsSearchBox.getText();
@@ -592,7 +572,7 @@ public class WystawRachunek {
 		    }
 		});
 		
-		createChoosenItemsTable();
+//		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
 	}	//END OF INIT METHOD
@@ -603,49 +583,51 @@ public class WystawRachunek {
 		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 		data = populateDataArray(emptyArray, data, 0, 0);
 
-		tbChoosen = new JTable();
-		tbChoosen = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, 240);
-		
-		JScrollPane spChoosen = new JScrollPane(tbChoosen);
-		spChoosen.setBounds(620, 200, 400, 194);
-		frame.getContentPane().add(spChoosen);
-		sum = 0;
-
-		TableModel mod = tbChoosen.getModel();
-		mod.addTableModelListener(new TableModelListener(){
-//TODO
-			@Override
-			public void tableChanged(TableModelEvent arg0) {
-				int rowCount = mod.getRowCount();
-				for(int i = 0; i < rowCount;i++) {
-					System.out.println(mod.getValueAt(i, 1));
-					double price = Double.parseDouble((String) mod.getValueAt(i, 1));
-					int qnt = Integer.parseInt((String)mod.getValueAt(i, 2));
-					price = price * qnt;
-					
-					sum += price;
-				}
-//				sum = applyDiscount();
-				System.out.println("sum: "+df.format(sum));
-				lblTotal.setText("€ "+df.format(sum));
-			}			
-		});
+//		tbChoosen = new JTable();
+//		tbChoosen = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, 240);
+//		TableModel mod = tbChoosen.getModel();
+//
+//		rowSorterChosen = new TableRowSorter<>(mod);
+//		
+//		JScrollPane spChoosen = new JScrollPane(tbChoosen);
+//		spChoosen.setBounds(620, 200, 400, 194);
+//		frame.getContentPane().add(spChoosen);
+//		sum = 0;
+//
+//		mod.addTableModelListener(new TableModelListener(){
+////TODO
+//			@Override
+//			public void tableChanged(TableModelEvent arg0) {
+//				int rowCount = mod.getRowCount();
+//				for(int i = 0; i < rowCount;i++) {
+//					System.out.println(mod.getValueAt(i, 1));
+//					double price = Double.parseDouble((String) mod.getValueAt(i, 1));
+//					int qnt = Integer.parseInt((String)mod.getValueAt(i, 2));
+//					price = price * qnt;
+//					
+//					sum += price;
+//				}
+////				sum = applyDiscount();
+//				System.out.println("sum: "+df.format(sum));
+//				lblTotal.setText("€ "+df.format(sum));
+//			}			
+//		});
 	}
 
-private void applyDiscount() {
-	if(!tfDiscountAmount.getText().equals(""))
-		discount = Double.parseDouble(tfDiscountAmount.getText());
-	System.out.println("disc: "+df.format(discount));
-
-	if(applyDiscount){
-		sum -= discount;
-	} else if(!applyDiscount){
-		sum -= (sum * (discount/100));
-	} else {
-		sum = sum;
+	private void applyDiscount() {
+		if(!tfDiscountAmount.getText().equals(""))
+			discount = Double.parseDouble(tfDiscountAmount.getText());
+		System.out.println("disc: "+df.format(discount));
+	
+		if(applyDiscount){
+			sum -= discount;
+		} else if(!applyDiscount){
+			sum -= (sum * (discount/100));
+		} else {
+			sum = sum;
+		}
+		System.out.println("app: "+df.format(sum));
 	}
-	System.out.println("app: "+df.format(sum));
-}
 
 	protected void addToList(Item item) {		
 		if(!tfPriceListed.getText().isEmpty())
@@ -677,8 +659,8 @@ private void applyDiscount() {
 		rowData[1] = ""+productPrice;
 		rowData[2] = ""+tfQnt;
 		
-		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
-		model.addRow(rowData);
+//		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+//		model.addRow(rowData);
 	}
 
 	private void populateStockTable() {
@@ -708,8 +690,7 @@ private void applyDiscount() {
 
 		JScrollPane spStockList = new JScrollPane(table);
 		spStockList.setBounds(16, 296, 400, 194);
-		frame.getContentPane().add(spStockList);
-		
+		frame.getContentPane().add(spStockList);	
 	}
 
 	private void populateCarTable() {
