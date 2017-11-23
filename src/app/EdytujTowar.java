@@ -110,6 +110,7 @@ public class EdytujTowar {
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 579, 193);
+		frame.setLocation(10, 10);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {

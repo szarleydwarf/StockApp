@@ -121,6 +121,7 @@ public class WyswietlMagazyn {
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 804, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocation(10, 10);
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblTitle = new JLabel("MAGAZYN");

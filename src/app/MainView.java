@@ -23,7 +23,7 @@ import utillity.StockPrinter;
 
 public class MainView {
 
-	private JFrame frmHctMagazyn;
+	private JFrame frame;
 	
 	private DatabaseManager DM;
 	private int invoiceNum;
@@ -49,7 +49,7 @@ public class MainView {
 //					window.frmHctMagazyn.setVisible(true);
 //					window.frmHctMagazyn.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 //					window.frmHctMagazyn.setUndecorated(true);
-					window.frmHctMagazyn.setVisible(true);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -87,7 +87,7 @@ public class MainView {
 					String query = "UPDATE \""+fv.SETTINGS_TABLE+"\" SET "+fv.SETTINGS_TABLE_PATH+"='"+date+"'" + " WHERE " + fv.ROW_ID+ "='"+this.fv.SETTINGS_TABLE_LAST_DATABASE_BACKUP+"'";
 					this.DM.editRecord(query);
 				} else {
-					JOptionPane.showMessageDialog(frmHctMagazyn, "Nie wykonałem kopii bazy danych.");
+					JOptionPane.showMessageDialog(frame, "Nie wykonałem kopii bazy danych.");
 				}
 			} catch (IOException e) {
 				this.logger.logError("MAIN VIEW DATABASE BACKUP FAIL "+this.getClass().getName()+"\t"+e.getMessage());
@@ -111,51 +111,58 @@ public class MainView {
 	 */
 	private void initialize() {
 //		if(this.frmHctMagazyn == null)
+<<<<<<< HEAD
 		frmHctMagazyn = new JFrame();
 //		frmHctMagazyn.getContentPane().setBackground(new Color(255, 51, 0));
 		frmHctMagazyn.getContentPane().setBackground(Color.CYAN);
+=======
+		frame = new JFrame();
+//		frmHctMagazyn.getContentPane().setBackground(new Color(255, 51, 0));
+		frame.getContentPane().setBackground(Color.CYAN);
+>>>>>>> try_item_class
 		
-		frmHctMagazyn.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
-		frmHctMagazyn.setTitle("HCT MAGAZYN");
-		frmHctMagazyn.setBounds(100, 100, 650, 280);
-		frmHctMagazyn.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frmHctMagazyn.addWindowListener(new java.awt.event.WindowAdapter() {
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
+		frame.setTitle("HCT MAGAZYN");
+		frame.setBounds(100, 100, 650, 280);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-		        if (JOptionPane.showConfirmDialog(frmHctMagazyn, 
+		        if (JOptionPane.showConfirmDialog(frame, 
 			            fv.CLOSE_WINDOW, fv.CLOSE_WINDOW, 
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-		        	frmHctMagazyn.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		        	frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		            SqliteTestAppV.main(null);
 		        }
 		    }
 		});
-		frmHctMagazyn.getContentPane().setLayout(null);
+		frame.setLocation(10, 10);
+		frame.getContentPane().setLayout(null);
 		
 		JButton stockBtn = new JButton("Wyswietl magazyn");
 		stockBtn.setBackground(new Color(135, 206, 235));
 		stockBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		stockBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frmHctMagazyn.dispose();
+				frame.dispose();
 				WyswietlMagazyn.main(loggerFolderPath);
 			}
 		});
 		stockBtn.setBounds(60, 52, 200, 36);
-		frmHctMagazyn.getContentPane().add(stockBtn);
+		frame.getContentPane().add(stockBtn);
 		
 		JButton invoiceBtn = new JButton("Wyswietl rachunki");
 		invoiceBtn.setBackground(new Color(135, 206, 235));
 		invoiceBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		invoiceBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frmHctMagazyn.dispose();
+				frame.dispose();
 				WyswietlRachunki.main(loggerFolderPath);
 			}
 		});
 		invoiceBtn.setBounds(60, 171, 200, 36);
-		frmHctMagazyn.getContentPane().add(invoiceBtn);
+		frame.getContentPane().add(invoiceBtn);
 
 
 		JButton nowyRachunekBtn = new JButton("Wystaw rachunek");
@@ -163,48 +170,48 @@ public class MainView {
 		nowyRachunekBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		nowyRachunekBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				frmHctMagazyn.dispose();
+				frame.dispose();
 				WystawRachunek.main(defaultPaths);
 			}
 		});
 		nowyRachunekBtn.setBounds(358, 52, 200, 36);
-		frmHctMagazyn.getContentPane().add(nowyRachunekBtn);
+		frame.getContentPane().add(nowyRachunekBtn);
 		
 		JButton nowyTowarBtn = new JButton("Dodaj towar");
 		nowyTowarBtn.setBackground(new Color(135, 206, 235));
 		nowyTowarBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		nowyTowarBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frmHctMagazyn.dispose();
+				frame.dispose();
 				DodajTowar.main(loggerFolderPath);
 			}
 		});
 		nowyTowarBtn.setBounds(60, 112, 200, 36);
-		frmHctMagazyn.getContentPane().add(nowyTowarBtn);
+		frame.getContentPane().add(nowyTowarBtn);
 		
 		JButton nowaUslugaBtn = new JButton("Dodaj usluge");
 		nowaUslugaBtn.setBackground(new Color(135, 206, 235));
 		nowaUslugaBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		nowaUslugaBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				frmHctMagazyn.dispose();
+				frame.dispose();
 				DodajUsluge.main(loggerFolderPath);
 			}
 		});
 		nowaUslugaBtn.setBounds(358, 112, 200, 36);
-		frmHctMagazyn.getContentPane().add(nowaUslugaBtn);
+		frame.getContentPane().add(nowaUslugaBtn);
 		
 		Icon settingsImg = new ImageIcon("resources/img/cogs.png");
 		JButton btnSettings = new JButton("Settings", settingsImg);
 		btnSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				frmHctMagazyn.dispose();
+				frame.dispose();
 				SettingsFrame.main(defaultPaths);
 			}
 		});
 		btnSettings.setBounds(574, 180, 52, 52);
 		
-		frmHctMagazyn.getContentPane().add(btnSettings);
+		frame.getContentPane().add(btnSettings);
 		
 		JButton btnSalesReports = new JButton("Raporty sprzedaży");
 		btnSalesReports.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
@@ -212,11 +219,11 @@ public class MainView {
 		btnSalesReports.setBounds(358, 171, 200, 36);
 		btnSalesReports.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				frmHctMagazyn.dispose();
+				frame.dispose();
 				SalesReports.main(defaultPaths);
 			}
 		});
 		
-		frmHctMagazyn.getContentPane().add(btnSalesReports);
+		frame.getContentPane().add(btnSalesReports);
 	}
 }

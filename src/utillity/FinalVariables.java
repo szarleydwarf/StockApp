@@ -29,19 +29,31 @@ public class FinalVariables {
 	public final String MAX_SERVIS_QNT = "9999";
 	public final String[] SORT_BY = {"Nazwa", "Cena", "Qnt"};//, "Rozmiar"
 
+	public final String STOCK_SORT_BY="item_name";
+	public final String SERVICES_SORT_BY="service_name";
+
 	
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";
 	public final String INSERT_SUCCESS = "Zapisano pomyślnie";
 	public final String EDIT_SUCCESS = "Edycja zakończona pomyślnie";
 	public final String DELETE_SUCCESS = "Usuwanie zakończone pomyślnie";
-	//Database table names
+
+	//Other tables
 	public static final String[] MONTHS_2017 = {"01-2017", "02-2017", "03-2017", "04-2017", "05-2017", "06-2017", "07-2017", "08-2017", "09-2017", "10-2017", "11-2017", "12-2017"};
 	public static final String[] SALES_REPORT_TB_HEADINGS = {"Miesiąc", "Koszty", "Przychód", "Zysk"};
 	public static final String[] STOCK_TB_HEADINGS = {"Towar", "Koszt", "Cena", "Qnt"};
+	public static final String[] STOCK_TB_HEADINGS_NO_COST =  {"Towar", "Cena", "Qnt"};
 	public static final String[] INVOICE_TB_HEADINGS = {"Inv #", "Klient", "Serwis #", "Towar #", "Total", "Data wystawienia", "Nazwa pliku"};
 	public static final String[] CARS_TABLE_HEADER = {"Marka auta"};
+<<<<<<< HEAD
 
+=======
+	public final String CARS_TB_NAME = "CARS";
+	public final String STOCK_TB_NAME = "STOCK";
+
+	//Database table names
+>>>>>>> try_item_class
 	public static final String TOTAL = "total";
 	public static final String COST = "cost";
 	public final String INVOCE_TABLE = "invoice_list";
@@ -50,6 +62,7 @@ public class FinalVariables {
 	public final String STOCK_TABLE = "stock";
 	public final String USERS_TABLE = "users";
 	public final String SETTINGS_TABLE = "settings";
+	
 	//Database columns names 
 	public final String SERVICE_TABLE_NUMBER = "service_number";
 	public final String SERVICES_TABLE_SERVICE_NAME = "service_name";
@@ -71,5 +84,5 @@ public class FinalVariables {
 	
 	public final int DEFAULT_FOLDER_ARRAYLIST_INDEX = 0;
 	public final int PRINTER__ARRAYLIST_INDEX = 1;
-
+	
 }
