@@ -88,7 +88,7 @@ public class WystawRachunek {
 	private final String lblTotalSt = "TOTAL";
 	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
-	private boolean applyDiscount = true;
+	private boolean isDiscount = true;
 	private boolean printed = false;
 	private char ch = ' ';
 	private Item item;
@@ -132,7 +132,8 @@ public class WystawRachunek {
 	private JLabel lblCarBrand;
 	private ArrayList<Item> wholeStock;
 	private JTable tbChoosen;
-	private int sum;
+	private String cenaStr = "Cena";
+	protected double sum;
 	
 
 
@@ -301,7 +302,7 @@ public class WystawRachunek {
 		});
 		frame.getContentPane().add(btnBack);
 		
-		lblTotal = new JLabel("TOTAL");
+		lblTotal = new JLabel(lblTotalSt);
 		lblTotal.setForeground(new Color(51, 51, 51));
 		lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTotal.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
@@ -382,18 +383,46 @@ public class WystawRachunek {
 		tfDiscountAmount.setColumns(10);
 		tfDiscountAmount.setBounds(720, 430, 50, 24);
 		frame.getContentPane().add(tfDiscountAmount);
+		tfDiscountAmount.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				applyDiscount();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+			}
+		});
 		
+		rbMoney.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				isDiscount = true;
+				applyDiscount();
+			}
+		});
+		rbPercent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				isDiscount = false;
+				applyDiscount();
+			}
+		});
+
 		lblDiscount = new JLabel("Zniżka");
 		lblDiscount.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		lblDiscount.setBounds(620, 405, 60, 20);
 		frame.getContentPane().add(lblDiscount);
 		
-		lblPriceListed = new JLabel("Cena");
+		lblPriceListed = new JLabel(cenaStr);
 		lblPriceListed.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		lblPriceListed.setBounds(426, 270, 40, 20);
 		frame.getContentPane().add(lblPriceListed);
 		
-		lblPriceOther = new JLabel("Cena");
+		lblPriceOther = new JLabel(cenaStr);
 		lblPriceOther.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		lblPriceOther.setBounds(426, 494, 40, 20);
 		frame.getContentPane().add(lblPriceOther);
@@ -439,17 +468,6 @@ public class WystawRachunek {
 		TitledBorder border4 = BorderFactory.createTitledBorder(b4, "WYBRANE");
 		lblChoosenList.setBorder(border4);
 		frame.getContentPane().add(lblChoosenList);
-		
-		rbMoney.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				applyDiscount = true;
-			}
-		});
-		rbPercent.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				applyDiscount = false;
-			}
-		});
 
 		tfCarsSearchBox = new JTextField();
 		tfCarsSearchBox.setText("wpisz markę");
@@ -591,6 +609,22 @@ public class WystawRachunek {
 	}// END OF INSTANTIATE
 	
 
+	protected void applyDiscount() {
+		if(sum > 0 && !tfDiscountAmount.getText().isEmpty()){
+			discount = Double.parseDouble(tfDiscountAmount.getText());
+			if(!isDiscount){
+				//percentage
+				sum = sum - (sum * (discount/100));
+				System.out.println("Percentage "+isDiscount);
+			}else if(isDiscount){
+				//euro
+				sum = sum - discount;
+				System.out.println("euro "+isDiscount);
+			}
+		}
+		lblTotal.setText("€ "+df.format(sum));
+	}
+
 	private void createChoosenItemsTable() {
 		ArrayList<Item>emptyArray = new ArrayList<Item>();
 		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
@@ -603,15 +637,13 @@ public class WystawRachunek {
 		spInvoice.setBounds(620, 200, 400, 194);
 		frame.getContentPane().add(spInvoice);
 		
-//		sum = 0;
-
 		TableModel mod = tbChoosen.getModel();
 		mod.addTableModelListener(new TableModelListener(){
 //TODO
 			@Override
 			public void tableChanged(TableModelEvent arg0) {
 				int rowCount = mod.getRowCount();
-				int sum = 0;
+				sum = 0;
 				for(int i = 0; i < rowCount;i++) {
 					System.out.println(mod.getValueAt(i, 1));
 					double price = Double.parseDouble((String) mod.getValueAt(i, 1));
@@ -620,8 +652,6 @@ public class WystawRachunek {
 					
 					sum += price;
 				}
-//				sum = applyDiscount();
-				System.out.println("sum: "+df.format(sum));
 				lblTotal.setText("€ "+df.format(sum));
 			}			
 		});
