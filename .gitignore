@@ -16,4 +16,7 @@ TEST-*.xml
 junit*.properties
 /target/
 *.sqlite
+<<<<<<< HEAD
 *.sqlite
+=======
+>>>>>>> try_item_class
