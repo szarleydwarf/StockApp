@@ -126,6 +126,7 @@ public class WystawRachunek {
 	private JCheckBox chbCaps;
 	private JLabel lblCarBrand;
 	private ArrayList<Item> wholeStock;
+	private JTable tbChoosen;
 	
 
 
@@ -269,9 +270,7 @@ public class WystawRachunek {
 		});
 		frame.getContentPane().add(btnAddOther);
 		
-		JScrollPane spInvoice = new JScrollPane();
-		spInvoice.setBounds(620, 200, 400, 194);
-		frame.getContentPane().add(spInvoice);
+
 		
 		/*	
 	  	JButton btnCalculate = new JButton("Policz =");
@@ -591,9 +590,23 @@ public class WystawRachunek {
 		    }
 		});
 		
+		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
 	}// END OF INSTANTIATE
+	
+	private void createChoosenItemsTable() {
+		ArrayList<Item>emptyArray = new ArrayList<Item>();
+		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
+		data = populateDataArray(emptyArray, data, 0, 0);
+
+		tbChoosen = new JTable();
+		tbChoosen = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, fv.CHOSEN_TB_NAME, 240);
+	
+		JScrollPane spInvoice = new JScrollPane(tbChoosen);
+		spInvoice.setBounds(620, 200, 400, 194);
+		frame.getContentPane().add(spInvoice);
+	}
 
 	private void populateStockTable() {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+fv.STOCK_SORT_BY+" ASC";
@@ -610,11 +623,11 @@ public class WystawRachunek {
 
 		int rowNumber = wholeStock.size();
 
-		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
+		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 		data = populateDataArray(wholeStock, data, 0, wholeStock.size());
 
 		JTable table = new JTable();
-		table = createTable(data, this.fv.STOCK_TB_HEADINGS, fv.STOCK_TB_NAME, 240);
+		table = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, fv.STOCK_TB_NAME, 240);
 		rowSorterStock = new TableRowSorter<>(table.getModel());
 		
 		table.setRowSorter(rowSorterStock);
@@ -677,8 +690,6 @@ public class WystawRachunek {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 //				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
-				 System.out.println("cars e...."+table.getSelectedRow());
-				Item item = null;
 				int row = table.getSelectedRow();
 				if(row != -1) {
 					lblCarBrand.setText(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
@@ -693,8 +704,6 @@ public class WystawRachunek {
 		ListSelectionListener listener = new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-//				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
-				 System.out.println("stock e...."+table.getSelectedRow());
 				Item item = null;
 				int row = table.getSelectedRow();
 				if(row != -1) {
@@ -721,14 +730,12 @@ public class WystawRachunek {
 		int j = 0;
 		for(int i = startIndex; i < rowNumber; i++) {
 			data[i][0] = list.get(j).getName();
-			data[i][1] = ""+list.get(j).getCost();
-			data[i][2] = ""+list.get(j).getPrice();
+			data[i][1] = ""+list.get(j).getPrice();
 			if(list.get(j) instanceof StockItem)
-				data[i][3] = ""+((StockItem) list.get(j)).getQnt();
+				data[i][2] = ""+((StockItem) list.get(j)).getQnt();
 			else
-				data[i][3] = ""+0;
+				data[i][2] = ""+0;
 			j++;
-//System.out.println(" data "+data[i][0]);
 		}		
 		return data;
 	}

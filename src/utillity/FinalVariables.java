@@ -48,6 +48,7 @@ public class FinalVariables {
 	public static final String[] CARS_TABLE_HEADER = {"Marka auta"};
 	public final String CARS_TB_NAME = "CARS";
 	public final String STOCK_TB_NAME = "STOCK";
+	public final String CHOSEN_TB_NAME = "CHOOSEN";
 
 	//Database table names
 	public static final String TOTAL = "total";
