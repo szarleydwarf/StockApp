@@ -55,7 +55,6 @@ import utillity.StockPrinter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.JCheckBox;
-import java.awt.Component;
 
 public class WystawRachunek {
 
@@ -108,6 +107,7 @@ public class WystawRachunek {
 	private JLabel lblCarBrand;
 	protected Item item;
 	private ArrayList<Item> wholeStock;
+<<<<<<< HEAD
 //	private JTable tbChoosen;
 	private double sum;
 
@@ -120,6 +120,8 @@ public class WystawRachunek {
 	private JRadioButton rbPercent;
 
 	private JRadioButton rbMoney;
+=======
+>>>>>>> parent of 61d00d3... 21/11/17
 	
 
 
@@ -180,7 +182,7 @@ public class WystawRachunek {
 		frame.setBackground(new Color(255, 255, 0));
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
-		
+				
 		lblNewInvoice = new JLabel("Nowy Rachunek");
 		lblNewInvoice.setForeground(new Color(51, 51, 51));
 		lblNewInvoice.setBackground(new Color(102, 153, 255));
@@ -559,6 +561,7 @@ public class WystawRachunek {
 		chbCaps.setBounds(450, 412, 120, 23);
 		frame.getContentPane().add(chbCaps);
 
+	
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -572,6 +575,7 @@ public class WystawRachunek {
 		    }
 		});
 		
+<<<<<<< HEAD
 //		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
@@ -627,31 +631,42 @@ public class WystawRachunek {
 			sum = sum;
 		}
 		System.out.println("app: "+df.format(sum));
+=======
+		populateStockTable();
+		populateCarTable();
+>>>>>>> parent of 61d00d3... 21/11/17
 	}
-
-	protected void addToList(Item item) {		
+	protected void addToList(Item item) {
+		String element2model = item.getName();
+		
 		if(!tfPriceListed.getText().isEmpty())
 			productPrice = Double.parseDouble(tfPriceListed.getText());
 		else
 			productPrice = item.getPrice();
 		
-		int tfQnt = 0;
+		element2model = helper.paddStringRight(element2model, paddingLength, ch);
+		element2model += " €"+productPrice;
+		
+		int productQuantity = 0;
+		if(!this.tfQntListed.getText().isEmpty())
+			productQuantity = Integer.parseInt(tfQntListed.getText());
+		else
+			productQuantity = 1;
+
+		element2model+="x";
+		int qnt = 0, qntForDatabase = 0;
 		int itemQnt = 0;
 		if(item instanceof StockItem)
 			itemQnt = ((StockItem) item).getQnt();
 		else
 			itemQnt = 1;
 		
-		if(!this.tfQntListed.getText().isEmpty())
-			tfQnt = Integer.parseInt(this.tfQntListed.getText());
-		else
-			tfQnt = 1;
-		
-		while(tfQnt > itemQnt && (item instanceof StockItem)){
+		while(qnt > itemQnt){
 			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
-			if(tfQnt > itemQnt)
+			if(qnt > itemQnt)
 				return;
 		}
+<<<<<<< HEAD
 		
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 
@@ -661,7 +676,12 @@ public class WystawRachunek {
 		
 //		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
 //		model.addRow(rowData);
+=======
+		qntForDatabase = itemQnt - qnt;
+>>>>>>> parent of 61d00d3... 21/11/17
 	}
+
+	//END OF INIT METHOD
 
 	private void populateStockTable() {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+fv.STOCK_SORT_BY+" ASC";
@@ -749,8 +769,8 @@ public class WystawRachunek {
 				} else if(table.getName() == fv.STOCK_TB_NAME) {
 					//TODO
 					item = getItem(table.getModel().getValueAt(row, 0).toString());
-//					if(item != null)
-//						System.out.println("Name: "+item.getName());
+					if(item != null)
+						System.out.println("Name: "+item.getName());
 				}
 			}
 	    };
@@ -769,7 +789,6 @@ public class WystawRachunek {
 
 	private String[][] populateDataArray(ArrayList<Item> list, String[][] data, int startIndex, int rowNumber){
 		int j = 0;
-
 		for(int i = startIndex; i < rowNumber; i++) {
 			data[i][0] = list.get(j).getName();
 //			data[i][1] = ""+list.get(j).getCost();
@@ -779,8 +798,8 @@ public class WystawRachunek {
 			else
 				data[i][2] = ""+fv.MAX_SERVIS_QNT;
 			j++;
-//System.out.println(data[i][0]+"-"+data[i][1]+"-"+data[i][2]);
-		}	
+//System.out.println(" data "+data[i][0]);
+		}		
 		return data;
 	}
 
