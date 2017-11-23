@@ -108,6 +108,7 @@ public class WystawRachunek {
 	protected Item item;
 	private ArrayList<Item> wholeStock;
 <<<<<<< HEAD
+<<<<<<< HEAD
 //	private JTable tbChoosen;
 	private double sum;
 
@@ -120,6 +121,8 @@ public class WystawRachunek {
 	private JRadioButton rbPercent;
 
 	private JRadioButton rbMoney;
+=======
+>>>>>>> parent of 61d00d3... 21/11/17
 =======
 >>>>>>> parent of 61d00d3... 21/11/17
 	
@@ -576,6 +579,7 @@ public class WystawRachunek {
 		});
 		
 <<<<<<< HEAD
+<<<<<<< HEAD
 //		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
@@ -636,6 +640,11 @@ public class WystawRachunek {
 		populateCarTable();
 >>>>>>> parent of 61d00d3... 21/11/17
 	}
+=======
+		populateStockTable();
+		populateCarTable();
+	}
+>>>>>>> parent of 61d00d3... 21/11/17
 	protected void addToList(Item item) {
 		String element2model = item.getName();
 		
@@ -667,6 +676,7 @@ public class WystawRachunek {
 				return;
 		}
 <<<<<<< HEAD
+<<<<<<< HEAD
 		
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 
@@ -676,6 +686,9 @@ public class WystawRachunek {
 		
 //		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
 //		model.addRow(rowData);
+=======
+		qntForDatabase = itemQnt - qnt;
+>>>>>>> parent of 61d00d3... 21/11/17
 =======
 		qntForDatabase = itemQnt - qnt;
 >>>>>>> parent of 61d00d3... 21/11/17
