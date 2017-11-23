@@ -37,8 +37,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import dbase.DatabaseManager;
@@ -129,6 +132,7 @@ public class WystawRachunek {
 	private JLabel lblCarBrand;
 	private ArrayList<Item> wholeStock;
 	private JTable tbChoosen;
+	private int sum;
 	
 
 
@@ -297,7 +301,7 @@ public class WystawRachunek {
 		});
 		frame.getContentPane().add(btnBack);
 		
-		JLabel lblTotal = new JLabel("TOTAL");
+		lblTotal = new JLabel("TOTAL");
 		lblTotal.setForeground(new Color(51, 51, 51));
 		lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTotal.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
@@ -598,6 +602,29 @@ public class WystawRachunek {
 		JScrollPane spInvoice = new JScrollPane(tbChoosen);
 		spInvoice.setBounds(620, 200, 400, 194);
 		frame.getContentPane().add(spInvoice);
+		
+//		sum = 0;
+
+		TableModel mod = tbChoosen.getModel();
+		mod.addTableModelListener(new TableModelListener(){
+//TODO
+			@Override
+			public void tableChanged(TableModelEvent arg0) {
+				int rowCount = mod.getRowCount();
+				int sum = 0;
+				for(int i = 0; i < rowCount;i++) {
+					System.out.println(mod.getValueAt(i, 1));
+					double price = Double.parseDouble((String) mod.getValueAt(i, 1));
+					int qnt = Integer.parseInt((String)mod.getValueAt(i, 2));
+					price = price * qnt;
+					
+					sum += price;
+				}
+//				sum = applyDiscount();
+				System.out.println("sum: "+df.format(sum));
+				lblTotal.setText("€ "+df.format(sum));
+			}			
+		});
 	}
 
 	private void populateStockTable() {
