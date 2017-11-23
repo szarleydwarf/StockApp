@@ -80,13 +80,15 @@ public class WystawRachunek {
 	
 	private String lblCarManufacturerTxt = "CAR";
 	private String stockSearchText="";
-	private String carManufacturer, registration, servicePrice, productPrice ;
+	private String carManufacturer, registration, servicePrice ;
+	private double productPrice;
 	private final String lblTotalSt = "TOTAL";
 	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
 	private boolean applyDiscount = true;
 	private boolean printed = false;
 	private char ch = ' ';
+	private Item item;
 
 	private ArrayList<String> defaultPaths;
 	private Map<String, Integer> nameQnt;
@@ -255,7 +257,7 @@ public class WystawRachunek {
 		btnAddListed.setBounds(546, 296, 46, 24);
 		btnAddListed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				addToInvoice();
 			}
 		});
 		frame.getContentPane().add(btnAddListed);
@@ -269,22 +271,7 @@ public class WystawRachunek {
 			}
 		});
 		frame.getContentPane().add(btnAddOther);
-		
 
-		
-		/*	
-	  	JButton btnCalculate = new JButton("Policz =");
-		btnCalculate.setForeground(new Color(255, 255, 0));
-		btnCalculate.setBackground(new Color(204, 0, 0));
-		btnCalculate.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		btnCalculate.setBounds(620, 470, 100, 30);
-		btnCalculate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		frame.getContentPane().add(btnCalculate);
-		*/
 		JButton btnPrint = new JButton("DRUKUJ");
 		btnPrint.setForeground(Color.YELLOW);
 		btnPrint.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
@@ -595,6 +582,41 @@ public class WystawRachunek {
 		populateCarTable();
 	}// END OF INSTANTIATE
 	
+	protected void addToInvoice() {
+		if(!tfPriceListed.getText().isEmpty())
+			productPrice = Double.parseDouble(tfPriceListed.getText());
+		else
+			productPrice = item.getPrice();
+		
+		int tfQnt = 0;
+		int itemQnt = 0;
+		if(item instanceof StockItem)
+			itemQnt = ((StockItem) item).getQnt();
+		else
+			itemQnt = 1;
+		
+		if(!this.tfQntListed.getText().isEmpty())
+			tfQnt = Integer.parseInt(this.tfQntListed.getText());
+		else
+			tfQnt = 1;
+		
+		while(tfQnt > itemQnt && (item instanceof StockItem)){
+			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
+			if(tfQnt > itemQnt)
+				return;
+		}
+		
+		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
+
+		rowData[0] = item.getName();
+		rowData[1] = ""+productPrice;
+		rowData[2] = ""+tfQnt;
+		
+		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+		model.addRow(rowData);
+
+	}
+
 	private void createChoosenItemsTable() {
 		ArrayList<Item>emptyArray = new ArrayList<Item>();
 		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
@@ -704,7 +726,7 @@ public class WystawRachunek {
 		ListSelectionListener listener = new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				Item item = null;
+				item = null;
 				int row = table.getSelectedRow();
 				if(row != -1) {
 					item = getItem(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
