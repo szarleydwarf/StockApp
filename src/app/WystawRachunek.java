@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,8 +18,8 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
-import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,11 +37,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import dbase.DatabaseManager;
@@ -52,15 +48,24 @@ import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
 import utillity.StockPrinter;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.LineBorder;
-import javax.swing.JCheckBox;
 
 public class WystawRachunek {
 
 	private JFrame frame;
-
+	private JTextField tfProdQ;
+	private JTextField tfServQ;private JTextField textFieldDiscount;
+	private JList<String> listChosen, listItems, listServices;
+	private JRadioButton rbPercent, rbMoney;
+	private JTextField textFieldRegistration;
 	private JLabel lblTotal;
+	private JScrollPane scrollPaneItemList;
+	private JTextField tfOtherQnt1;
+	private JTextField tfOtherPrice1;
+	private JTextField tfSearchBox;
+	private JTextField tfOther1;
+	private JTextField tfServicePrice;
+	private JTextField tfItemPrice;
+	private DefaultListModel<String> model2Add;
 	
 	private StockPrinter sPrinter;
 	private ButtonGroup radioGroup;
@@ -73,12 +78,28 @@ public class WystawRachunek {
 	protected static String date;
 	protected static String loggerFolderPath;
 	
-	private double productPrice;
+	private String lblCarManufacturerTxt = "CAR";
+	private String stockSearchText="";
+	private String carManufacturer, registration, servicePrice, productPrice ;
+	private final String lblTotalSt = "TOTAL";
+	private int paddingLength = 22, invoiceNum = 0;
 	private double discount = 0;
 	private boolean applyDiscount = true;
+	private boolean printed = false;
+	private char ch = ' ';
 
-
-	private TableRowSorter<TableModel> rowSorterStock,rowSorterCars, rowSorterChosen;
+	private ArrayList<String> defaultPaths;
+	private Map<String, Integer> nameQnt;
+	private JTextField tfCompanyName;
+	private JTextField tfCompanyAddress;
+	private JTextField tfVATRegNum;
+	private String stringAddress = "Adres Firmy";
+	private String stringComName = "Nazwa firmy";
+	private String stringVATReg = "VAT / Tax No.";
+	private JTextField tfSearchItem;
+	private JTextField tfSearchCar;
+	private JTable tableCars;
+	private TableRowSorter rowSorterStock,rowSorterCars;
 	private JTextField tfCarsSearchBox;
 	private JTextField tfSearch;
 	private JTextField tfOtherService;
@@ -101,30 +122,10 @@ public class WystawRachunek {
 	private JLabel lblCompanyDetails;
 	private JLabel lblChoosenList;
 	private JLabel lblNewInvoice;
-	private JCheckBox chbTyrePaint;
+	private JCheckBox chbTyreShine;
 	private JCheckBox chbCaps;
-	private JCheckBox chbAirFreshener;
 	private JLabel lblCarBrand;
-	protected Item item;
 	private ArrayList<Item> wholeStock;
-<<<<<<< HEAD
-<<<<<<< HEAD
-//	private JTable tbChoosen;
-	private double sum;
-
-	private ArrayList<String> defaultPaths;
-
-	private HashMap<String, Integer> nameQnt;
-
-	private int invoiceNum;
-
-	private JRadioButton rbPercent;
-
-	private JRadioButton rbMoney;
-=======
->>>>>>> parent of 61d00d3... 21/11/17
-=======
->>>>>>> parent of 61d00d3... 21/11/17
 	
 
 
@@ -253,10 +254,7 @@ public class WystawRachunek {
 		btnAddListed.setBounds(546, 296, 46, 24);
 		btnAddListed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(item != null){
-					addToList(item);
-				}else
-					JOptionPane.showMessageDialog(frame, "Wybierz przedmiot z listy");
+				
 			}
 		});
 		frame.getContentPane().add(btnAddListed);
@@ -271,11 +269,28 @@ public class WystawRachunek {
 		});
 		frame.getContentPane().add(btnAddOther);
 		
+		JScrollPane spInvoice = new JScrollPane();
+		spInvoice.setBounds(620, 200, 400, 194);
+		frame.getContentPane().add(spInvoice);
+		
+		/*	
+	  	JButton btnCalculate = new JButton("Policz =");
+		btnCalculate.setForeground(new Color(255, 255, 0));
+		btnCalculate.setBackground(new Color(204, 0, 0));
+		btnCalculate.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		btnCalculate.setBounds(620, 470, 100, 30);
+		btnCalculate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
+		frame.getContentPane().add(btnCalculate);
+		*/
 		JButton btnPrint = new JButton("DRUKUJ");
 		btnPrint.setForeground(Color.YELLOW);
 		btnPrint.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		btnPrint.setBackground(new Color(204, 0, 0));
-		btnPrint.setBounds(770, 520, 160, 30);
+		btnPrint.setBounds(620, 520, 160, 30);
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -296,7 +311,7 @@ public class WystawRachunek {
 		});
 		frame.getContentPane().add(btnBack);
 		
-		lblTotal = new JLabel("TOTAL");
+		JLabel lblTotal = new JLabel("TOTAL");
 		lblTotal.setForeground(new Color(51, 51, 51));
 		lblTotal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTotal.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
@@ -337,10 +352,7 @@ public class WystawRachunek {
 		btnRemove.setBounds(1040, 200, 46, 24);
 		btnRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				if(item != null && tbChoosen.getSelectedRow() != -1){
-//					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
-//					model.removeRow(tbChoosen.getSelectedRow());
-//				}
+				
 			}
 		});
 		frame.getContentPane().add(btnRemove);
@@ -352,8 +364,7 @@ public class WystawRachunek {
 		btnClearAll.setBounds(930, 410, 100, 18);
 		btnClearAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
-//				model.setRowCount(0);
+				
 			}
 		});
 		frame.getContentPane().add(btnClearAll);
@@ -464,6 +475,7 @@ public class WystawRachunek {
 		
 		
 		tfCarsSearchBox.getDocument().addDocumentListener(new DocumentListener(){
+
             @Override
             public void insertUpdate(DocumentEvent e) {
                 String text = tfCarsSearchBox.getText();
@@ -538,31 +550,32 @@ public class WystawRachunek {
             }
         });
 
-
+		// CHECKBOX - FREEBES SECTION
 		JLabel lblFreebies = new JLabel("");
-		lblFreebies.setBounds(436, 339, 150, 130);
-		Border b7 = BorderFactory.createLineBorder(Color.cyan);
+		lblFreebies.setBounds(426, 331, 166, 140);
+		Border b7 = BorderFactory.createLineBorder(Color.orange);
 		TitledBorder border7 = BorderFactory.createTitledBorder(b7, "PREZENTY");
 		lblFreebies.setBorder(border7);
 		frame.getContentPane().add(lblFreebies);
 		
-		chbAirFreshener = new JCheckBox("Zapach");
-		chbAirFreshener.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		chbAirFreshener.setBackground(new Color(255, 0, 51));
-		chbAirFreshener.setBounds(450, 360, 120, 23);
-		frame.getContentPane().add(chbAirFreshener);
+		JCheckBox chbAirfreshener = new JCheckBox("Odświeżacz");
+		chbAirfreshener.setBackground(new Color(255, 51, 51));
+		chbAirfreshener.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		chbAirfreshener.setBounds(440, 350, 138, 23);
+		frame.getContentPane().add(chbAirfreshener);
 
-		chbTyrePaint = new JCheckBox("Farba do opon");
-		chbTyrePaint.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		chbTyrePaint.setBackground(new Color(255, 0, 51));
-		chbTyrePaint.setBounds(450, 386, 120, 23);
-		frame.getContentPane().add(chbTyrePaint);
+		chbTyreShine = new JCheckBox("Połysk do kół");
+		chbTyreShine.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		chbTyreShine.setBackground(new Color(255, 51, 51));
+		chbTyreShine.setBounds(440, 380, 138, 23);
+		frame.getContentPane().add(chbTyreShine);
 		
-		chbCaps = new JCheckBox("Nakrętki");
-		chbCaps.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		chbCaps.setBackground(new Color(255, 0, 51));
-		chbCaps.setBounds(450, 412, 120, 23);
+		chbCaps = new JCheckBox("Zestaw nakrętek");
+		chbCaps.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		chbCaps.setBackground(new Color(255, 51, 51));
+		chbCaps.setBounds(440, 409, 138, 23);
 		frame.getContentPane().add(chbCaps);
+		// CHECKBOX - FREEBES SECTION END
 
 	
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -578,123 +591,9 @@ public class WystawRachunek {
 		    }
 		});
 		
-<<<<<<< HEAD
-<<<<<<< HEAD
-//		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
-	}	//END OF INIT METHOD
-
-	
-	private void createChoosenItemsTable() {
-		ArrayList<Item>emptyArray = new ArrayList<Item>();
-		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
-		data = populateDataArray(emptyArray, data, 0, 0);
-
-//		tbChoosen = new JTable();
-//		tbChoosen = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, 240);
-//		TableModel mod = tbChoosen.getModel();
-//
-//		rowSorterChosen = new TableRowSorter<>(mod);
-//		
-//		JScrollPane spChoosen = new JScrollPane(tbChoosen);
-//		spChoosen.setBounds(620, 200, 400, 194);
-//		frame.getContentPane().add(spChoosen);
-//		sum = 0;
-//
-//		mod.addTableModelListener(new TableModelListener(){
-////TODO
-//			@Override
-//			public void tableChanged(TableModelEvent arg0) {
-//				int rowCount = mod.getRowCount();
-//				for(int i = 0; i < rowCount;i++) {
-//					System.out.println(mod.getValueAt(i, 1));
-//					double price = Double.parseDouble((String) mod.getValueAt(i, 1));
-//					int qnt = Integer.parseInt((String)mod.getValueAt(i, 2));
-//					price = price * qnt;
-//					
-//					sum += price;
-//				}
-////				sum = applyDiscount();
-//				System.out.println("sum: "+df.format(sum));
-//				lblTotal.setText("€ "+df.format(sum));
-//			}			
-//		});
-	}
-
-	private void applyDiscount() {
-		if(!tfDiscountAmount.getText().equals(""))
-			discount = Double.parseDouble(tfDiscountAmount.getText());
-		System.out.println("disc: "+df.format(discount));
-	
-		if(applyDiscount){
-			sum -= discount;
-		} else if(!applyDiscount){
-			sum -= (sum * (discount/100));
-		} else {
-			sum = sum;
-		}
-		System.out.println("app: "+df.format(sum));
-=======
-		populateStockTable();
-		populateCarTable();
->>>>>>> parent of 61d00d3... 21/11/17
-	}
-=======
-		populateStockTable();
-		populateCarTable();
-	}
->>>>>>> parent of 61d00d3... 21/11/17
-	protected void addToList(Item item) {
-		String element2model = item.getName();
-		
-		if(!tfPriceListed.getText().isEmpty())
-			productPrice = Double.parseDouble(tfPriceListed.getText());
-		else
-			productPrice = item.getPrice();
-		
-		element2model = helper.paddStringRight(element2model, paddingLength, ch);
-		element2model += " €"+productPrice;
-		
-		int productQuantity = 0;
-		if(!this.tfQntListed.getText().isEmpty())
-			productQuantity = Integer.parseInt(tfQntListed.getText());
-		else
-			productQuantity = 1;
-
-		element2model+="x";
-		int qnt = 0, qntForDatabase = 0;
-		int itemQnt = 0;
-		if(item instanceof StockItem)
-			itemQnt = ((StockItem) item).getQnt();
-		else
-			itemQnt = 1;
-		
-		while(qnt > itemQnt){
-			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
-			if(qnt > itemQnt)
-				return;
-		}
-<<<<<<< HEAD
-<<<<<<< HEAD
-		
-		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
-
-		rowData[0] = item.getName();
-		rowData[1] = ""+productPrice;
-		rowData[2] = ""+tfQnt;
-		
-//		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
-//		model.addRow(rowData);
-=======
-		qntForDatabase = itemQnt - qnt;
->>>>>>> parent of 61d00d3... 21/11/17
-=======
-		qntForDatabase = itemQnt - qnt;
->>>>>>> parent of 61d00d3... 21/11/17
-	}
-
-	//END OF INIT METHOD
+	}// END OF INSTANTIATE
 
 	private void populateStockTable() {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+fv.STOCK_SORT_BY+" ASC";
@@ -711,19 +610,19 @@ public class WystawRachunek {
 
 		int rowNumber = wholeStock.size();
 
-		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
+		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS.length];
 		data = populateDataArray(wholeStock, data, 0, wholeStock.size());
 
 		JTable table = new JTable();
-		table = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, 240);
+		table = createTable(data, this.fv.STOCK_TB_HEADINGS, fv.STOCK_TB_NAME, 240);
 		rowSorterStock = new TableRowSorter<>(table.getModel());
+		
 		table.setRowSorter(rowSorterStock);
-		table.setName(fv.STOCK_TB_NAME);
-		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
+	
 		JScrollPane spStockList = new JScrollPane(table);
 		spStockList.setBounds(16, 296, 400, 194);
-		frame.getContentPane().add(spStockList);	
+		frame.getContentPane().add(spStockList);
+		
 	}
 
 	private void populateCarTable() {
@@ -735,11 +634,9 @@ public class WystawRachunek {
 		data = populateDataArrayString(listOfCars, data, listOfCars.size());
 
 		JTable table = new JTable();
-		table = createTable(data, this.fv.CARS_TABLE_HEADER, 380);
+		table = createTable(data, this.fv.CARS_TABLE_HEADER, fv.CARS_TB_NAME, 380);
 		rowSorterCars = new TableRowSorter<>(table.getModel());
 		table.setRowSorter(rowSorterCars);
-		table.setName(fv.CARS_TB_NAME);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane spCars = new JScrollPane(table);
 		spCars.setSize(400, 140);
@@ -747,21 +644,26 @@ public class WystawRachunek {
 		frame.getContentPane().add(spCars);
 	}
 
-	private JTable createTable(String[][] data, String[] headings, int firstColumnWidth) {
+	private JTable createTable(String[][] data, String[] headings, String tbName, int firstColumnWidth) {
 		DefaultTableModel dm = new DefaultTableModel(data, headings);
 		JTable table = new JTable();
 		table.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-
-		ListSelectionListener listener = createTableListener(table);
-
-		table.getSelectionModel().addListSelectionListener(listener);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setModel(dm);
-		
+		table.setName(tbName);
+
 		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
 		table.setFillsViewportHeight(true);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		table.getColumnModel().getColumn(0).setPreferredWidth(firstColumnWidth);
+		ListSelectionListener listener = null;
+		if(tbName == fv.STOCK_TB_NAME)
+			listener = createStockTableListener(table);
+		else if(tbName == fv.CARS_TB_NAME)
+			listener = createCarTableListener(table);
+		
+		table.getSelectionModel().addListSelectionListener(listener);
 				
 		JTableHeader header = table.getTableHeader();
 		header.setBackground(Color.black);
@@ -770,17 +672,33 @@ public class WystawRachunek {
 		return table;
 	}
 
-	private ListSelectionListener createTableListener(JTable table) {
+	private ListSelectionListener createCarTableListener(JTable table) {
 		ListSelectionListener listener = new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 //				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
-				
+				Item item = null;
 				int row = table.getSelectedRow();
-				if(table.getName() == fv.CARS_TB_NAME) {
+				if(row != -1) {
 					lblCarBrand.setText(table.getModel().getValueAt(row, 0).toString());
 				} else if(table.getName() == fv.STOCK_TB_NAME) {
-					//TODO
+					item = getItem(table.getModel().getValueAt(row, 0).toString());
+					if(item != null)
+						System.out.println("Name: "+item.getName());
+				}
+			}
+	    };
+	    return listener;
+	
+	}
+	private ListSelectionListener createStockTableListener(JTable table) {
+		ListSelectionListener listener = new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+//				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
+				Item item = null;
+				int row = table.getSelectedRow();
+				if(row != -1) {
 					item = getItem(table.getModel().getValueAt(row, 0).toString());
 					if(item != null)
 						System.out.println("Name: "+item.getName());
@@ -804,12 +722,12 @@ public class WystawRachunek {
 		int j = 0;
 		for(int i = startIndex; i < rowNumber; i++) {
 			data[i][0] = list.get(j).getName();
-//			data[i][1] = ""+list.get(j).getCost();
-			data[i][1] = ""+list.get(j).getPrice();
+			data[i][1] = ""+list.get(j).getCost();
+			data[i][2] = ""+list.get(j).getPrice();
 			if(list.get(j) instanceof StockItem)
-				data[i][2] = ""+((StockItem) list.get(j)).getQnt();
+				data[i][3] = ""+((StockItem) list.get(j)).getQnt();
 			else
-				data[i][2] = ""+fv.MAX_SERVIS_QNT;
+				data[i][3] = ""+0;
 			j++;
 //System.out.println(" data "+data[i][0]);
 		}		
@@ -826,7 +744,6 @@ public class WystawRachunek {
 	}
 
 	private void addItemToList(JTextField tfOther, JTextField tfOtherPrice, JTextField tfOtherQnt) {
-		
 	}
 
 	private void sumCosts() {
