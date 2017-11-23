@@ -338,7 +338,10 @@ public class WystawRachunek {
 		btnRemove.setBounds(1040, 200, 46, 24);
 		btnRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				if(item != null && tbChoosen.getSelectedRow() != -1){
+					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+					model.removeRow(tbChoosen.getSelectedRow());
+				}
 			}
 		});
 		frame.getContentPane().add(btnRemove);
@@ -350,7 +353,8 @@ public class WystawRachunek {
 		btnClearAll.setBounds(930, 410, 100, 18);
 		btnClearAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+				model.setRowCount(0);
 			}
 		});
 		frame.getContentPane().add(btnClearAll);
@@ -582,40 +586,6 @@ public class WystawRachunek {
 		populateCarTable();
 	}// END OF INSTANTIATE
 	
-	protected void addToInvoice() {
-		if(!tfPriceListed.getText().isEmpty())
-			productPrice = Double.parseDouble(tfPriceListed.getText());
-		else
-			productPrice = item.getPrice();
-		
-		int tfQnt = 0;
-		int itemQnt = 0;
-		if(item instanceof StockItem)
-			itemQnt = ((StockItem) item).getQnt();
-		else
-			itemQnt = 1;
-		
-		if(!this.tfQntListed.getText().isEmpty())
-			tfQnt = Integer.parseInt(this.tfQntListed.getText());
-		else
-			tfQnt = 1;
-		
-		while(tfQnt > itemQnt && (item instanceof StockItem)){
-			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
-			if(tfQnt > itemQnt)
-				return;
-		}
-		
-		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
-
-		rowData[0] = item.getName();
-		rowData[1] = ""+productPrice;
-		rowData[2] = ""+tfQnt;
-		
-		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
-		model.addRow(rowData);
-
-	}
 
 	private void createChoosenItemsTable() {
 		ArrayList<Item>emptyArray = new ArrayList<Item>();
@@ -697,6 +667,8 @@ public class WystawRachunek {
 			listener = createStockTableListener(table);
 		else if(tbName == fv.CARS_TB_NAME)
 			listener = createCarTableListener(table);
+		else if(tbName == fv.CHOSEN_TB_NAME)
+			listener = createStockTableListener(table);
 		
 		table.getSelectionModel().addListSelectionListener(listener);
 				
@@ -769,6 +741,41 @@ public class WystawRachunek {
 			j++;
 		}		
 		return data;
+	}
+
+	protected void addToInvoice() {
+		if(!tfPriceListed.getText().isEmpty())
+			productPrice = Double.parseDouble(tfPriceListed.getText());
+		else
+			productPrice = item.getPrice();
+		
+		int tfQnt = 0;
+		int itemQnt = 0;
+		if(item instanceof StockItem)
+			itemQnt = ((StockItem) item).getQnt();
+		else
+			itemQnt = 1;
+		
+		if(!this.tfQntListed.getText().isEmpty())
+			tfQnt = Integer.parseInt(this.tfQntListed.getText());
+		else
+			tfQnt = 1;
+		
+		while(tfQnt > itemQnt && (item instanceof StockItem)){
+			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
+			if(tfQnt > itemQnt)
+				return;
+		}
+		
+		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
+
+		rowData[0] = item.getName();
+		rowData[1] = ""+productPrice;
+		rowData[2] = ""+tfQnt;
+		
+		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+		model.addRow(rowData);
+
 	}
 
 	private void addItemToList(JTextField tfOther, JTextField tfOtherPrice, JTextField tfOtherQnt) {
