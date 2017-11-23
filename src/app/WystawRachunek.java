@@ -218,7 +218,7 @@ public class WystawRachunek {
 		
 		lblCarBrand = new JLabel("MARKA");
 		lblCarBrand.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCarBrand.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		lblCarBrand.setFont(new Font("Segoe UI Black", Font.PLAIN, 16));
 		lblCarBrand.setBounds(426, 50, 160, 44);
 		Border b5 = BorderFactory.createLineBorder(Color.yellow);
 		TitledBorder border5 = BorderFactory.createTitledBorder(b5, "MARKA");
@@ -677,15 +677,13 @@ public class WystawRachunek {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 //				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
+				 System.out.println("cars e...."+table.getSelectedRow());
 				Item item = null;
 				int row = table.getSelectedRow();
 				if(row != -1) {
-					lblCarBrand.setText(table.getModel().getValueAt(row, 0).toString());
-				} else if(table.getName() == fv.STOCK_TB_NAME) {
-					item = getItem(table.getModel().getValueAt(row, 0).toString());
-					if(item != null)
-						System.out.println("Name: "+item.getName());
-				}
+					lblCarBrand.setText(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
+				} 
+
 			}
 	    };
 	    return listener;
@@ -696,10 +694,11 @@ public class WystawRachunek {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 //				helper.toggleJButton(btnAddToInvoice, Color.green, Color.darkGray, true);
+				 System.out.println("stock e...."+table.getSelectedRow());
 				Item item = null;
 				int row = table.getSelectedRow();
 				if(row != -1) {
-					item = getItem(table.getModel().getValueAt(row, 0).toString());
+					item = getItem(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
 					if(item != null)
 						System.out.println("Name: "+item.getName());
 				}
