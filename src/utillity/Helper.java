@@ -59,6 +59,17 @@ public class Helper {
 		return sum;
 	}
 		
+	public double getSum(double sum, double discount, boolean applyDiscount){
+	
+		if(applyDiscount){
+			return sum - discount;
+		} else if(!applyDiscount){
+			return sum - (sum * (discount/100));
+		} else {
+			return sum;
+		}
+	}
+		
 	public int checkInteger(String msg1, String msg2, String number){
 		String pattern = this.fv.INTEGER_PATTERN; 
 

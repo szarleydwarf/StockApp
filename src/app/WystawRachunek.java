@@ -134,6 +134,7 @@ public class WystawRachunek {
 	private JTable tbChoosen;
 	private String cenaStr = "Cena";
 	protected double sum;
+	private TableModel modTBchosen;
 	
 
 
@@ -208,26 +209,18 @@ public class WystawRachunek {
 		frame.setTitle("Nowy Rachunek - HCT");
 		frame.setBounds(10, 10, 1121, 606);
 		
-		
-		tfOtherService = new JTextField();
-		tfOtherService.setText("wpisz przedmiot");
-		tfOtherService.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		tfOtherService.setColumns(10);
-		tfOtherService.setBounds(16, 520, 400, 24);
-		frame.getContentPane().add(tfOtherService);
-		
 		tfRegistration = new JTextField();
 		tfRegistration.setHorizontalAlignment(SwingConstants.CENTER);
 		tfRegistration.setText("wpisz rejestracje");
 		tfRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfRegistration.setColumns(10);
-		tfRegistration.setBounds(426, 100, 160, 30);
+		tfRegistration.setBounds(438, 91, 160, 30);
 		frame.getContentPane().add(tfRegistration);
 		
 		lblCarBrand = new JLabel("MARKA");
 		lblCarBrand.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCarBrand.setFont(new Font("Segoe UI Black", Font.PLAIN, 16));
-		lblCarBrand.setBounds(426, 50, 160, 44);
+		lblCarBrand.setBounds(438, 41, 160, 44);
 		Border b5 = BorderFactory.createLineBorder(Color.yellow);
 		TitledBorder border5 = BorderFactory.createTitledBorder(b5, "MARKA");
 		lblCarBrand.setBorder(border5);
@@ -236,14 +229,40 @@ public class WystawRachunek {
 		tfPriceListed = new JTextField();
 		tfPriceListed.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfPriceListed.setColumns(10);
-		tfPriceListed.setBounds(426, 296, 50, 24);
+		tfPriceListed.setBounds(432, 296, 50, 24);
 		frame.getContentPane().add(tfPriceListed);
+		
+		JButton btnAddListed = new JButton("+");
+		btnAddListed.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		btnAddListed.setBounds(552, 296, 46, 24);
+		btnAddListed.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addToInvoice();
+			}
+		});
+		frame.getContentPane().add(btnAddListed);
 		
 		tfQntListed = new JTextField();
 		tfQntListed.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfQntListed.setColumns(10);
-		tfQntListed.setBounds(486, 296, 50, 24);
+		tfQntListed.setBounds(492, 296, 50, 24);
 		frame.getContentPane().add(tfQntListed);
+		
+		tfOtherService = new JTextField();
+		tfOtherService.setText("wpisz przedmiot");
+		tfOtherService.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		tfOtherService.setColumns(10);
+		tfOtherService.setBounds(16, 520, 400, 24);
+		tfOtherService.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfOtherService.setText(fv.OTHER_STRING_CHECKUP);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+			}
+		});
+		frame.getContentPane().add(tfOtherService);
 		
 		tfQntOther = new JTextField();
 		tfQntOther.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
@@ -256,23 +275,16 @@ public class WystawRachunek {
 		tfPriceOther.setColumns(10);
 		tfPriceOther.setBounds(426, 520, 50, 24);
 		frame.getContentPane().add(tfPriceOther);
-		
-		JButton btnAddListed = new JButton("+");
-		btnAddListed.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		btnAddListed.setBounds(546, 296, 46, 24);
-		btnAddListed.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				addToInvoice();
-			}
-		});
-		frame.getContentPane().add(btnAddListed);
-		
+	
 		JButton btnAddOther = new JButton("+");
 		btnAddOther.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		btnAddOther.setBounds(546, 520, 46, 24);
 		btnAddOther.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				if(!tfOtherService.getText().isEmpty() && !tfPriceOther.getText().isEmpty())
+					addItemToList(tfOtherService,tfPriceOther,tfQntOther);
+				else
+					JOptionPane.showMessageDialog(frame, "Opis usługi oraz cena nie mogą być puste.");
 			}
 		});
 		frame.getContentPane().add(btnAddOther);
@@ -292,7 +304,7 @@ public class WystawRachunek {
 		JButton btnBack = new JButton("Powrót");
 		btnBack.setForeground(new Color(0, 0, 0));
 		btnBack.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		btnBack.setBackground(new Color(153, 153, 153));
+		btnBack.setBackground(new Color(51, 204, 0));
 		btnBack.setBounds(1000, 520, 100, 30);
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -351,6 +363,18 @@ public class WystawRachunek {
 		});
 		frame.getContentPane().add(btnRemove);
 		
+		JButton btnZapisz = new JButton("ZAPISZ");
+		btnZapisz.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
+		btnZapisz.setForeground(new Color(0, 0, 102));
+		btnZapisz.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		btnZapisz.setBackground(new Color(102, 204, 0));
+		btnZapisz.setBounds(798, 520, 160, 30);
+		frame.getContentPane().add(btnZapisz);
+		
 		JButton btnClearAll = new JButton("Clear All");
 		btnClearAll.setForeground(new Color(204, 255, 0));
 		btnClearAll.setBackground(new Color(204, 0, 0));
@@ -363,7 +387,7 @@ public class WystawRachunek {
 			}
 		});
 		frame.getContentPane().add(btnClearAll);
-		
+			
 		rbPercent = new JRadioButton("%", false);
 		rbPercent.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		rbPercent.setBounds(620, 430, 40, 24);
@@ -383,32 +407,21 @@ public class WystawRachunek {
 		tfDiscountAmount.setColumns(10);
 		tfDiscountAmount.setBounds(720, 430, 50, 24);
 		frame.getContentPane().add(tfDiscountAmount);
-		tfDiscountAmount.getDocument().addDocumentListener(new DocumentListener() {
 
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-			}
-
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				applyDiscount();
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-			}
-		});
-		
 		rbMoney.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				isDiscount = true;
-				applyDiscount();
+				double sum = calculateSum();
+				sum = applyDiscount(sum);
+				lblTotal.setText("€ "+df.format(sum));
 			}
 		});
 		rbPercent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				isDiscount = false;
-				applyDiscount();
+				double sum = calculateSum();
+				sum = applyDiscount(sum);
+				lblTotal.setText("€ "+df.format(sum));
 			}
 		});
 
@@ -419,7 +432,7 @@ public class WystawRachunek {
 		
 		lblPriceListed = new JLabel(cenaStr);
 		lblPriceListed.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		lblPriceListed.setBounds(426, 270, 40, 20);
+		lblPriceListed.setBounds(432, 270, 40, 20);
 		frame.getContentPane().add(lblPriceListed);
 		
 		lblPriceOther = new JLabel(cenaStr);
@@ -429,7 +442,7 @@ public class WystawRachunek {
 		
 		lblQntListed = new JLabel("Sztuk");
 		lblQntListed.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		lblQntListed.setBounds(486, 270, 44, 20);
+		lblQntListed.setBounds(492, 270, 44, 20);
 		frame.getContentPane().add(lblQntListed);
 		
 		lblQntOther = new JLabel("Sztuk");
@@ -442,12 +455,12 @@ public class WystawRachunek {
 		TitledBorder border1 = BorderFactory.createTitledBorder(b1, "KLIENT");
 		lblCarList.setBorder(border1);
 		lblCarList.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		lblCarList.setBounds(10, 32, 412, 194);
+		lblCarList.setBounds(10, 32, 418, 194);
 		frame.getContentPane().add(lblCarList);
 		
 		lblStockList = new JLabel("");
 		lblStockList.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		lblStockList.setBounds(10, 246, 412, 253);
+		lblStockList.setBounds(10, 246, 418, 253);
 		Border b2 = BorderFactory.createLineBorder(Color.BLUE);
 		TitledBorder border2 = BorderFactory.createTitledBorder(b2, "WYBIERZ USŁUGĘ / PRODUKT");
 		lblStockList.setBorder(border2);
@@ -472,7 +485,7 @@ public class WystawRachunek {
 		tfCarsSearchBox = new JTextField();
 		tfCarsSearchBox.setText("wpisz markę");
 		tfCarsSearchBox.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		tfCarsSearchBox.setBounds(16, 51, 400, 24);
+		tfCarsSearchBox.setBounds(16, 51, 405, 24);
 		frame.getContentPane().add(tfCarsSearchBox);
 		tfCarsSearchBox.setColumns(10);
 		tfCarsSearchBox.addFocusListener(new FocusListener(){
@@ -520,7 +533,7 @@ public class WystawRachunek {
 		tfSearch.setText("wpisz przedmiot");
 		tfSearch.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfSearch.setColumns(10);
-		tfSearch.setBounds(16, 270, 400, 24);
+		tfSearch.setBounds(16, 270, 405, 24);
 		frame.getContentPane().add(tfSearch);
 		tfSearch.addFocusListener(new FocusListener(){
 	        @Override
@@ -564,7 +577,7 @@ public class WystawRachunek {
 
 		// CHECKBOX - FREEBES SECTION
 		JLabel lblFreebies = new JLabel("");
-		lblFreebies.setBounds(426, 331, 166, 140);
+		lblFreebies.setBounds(432, 331, 166, 140);
 		Border b7 = BorderFactory.createLineBorder(Color.orange);
 		TitledBorder border7 = BorderFactory.createTitledBorder(b7, "PREZENTY");
 		lblFreebies.setBorder(border7);
@@ -573,19 +586,19 @@ public class WystawRachunek {
 		JCheckBox chbAirfreshener = new JCheckBox("Odświeżacz");
 		chbAirfreshener.setBackground(new Color(255, 51, 51));
 		chbAirfreshener.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		chbAirfreshener.setBounds(440, 350, 138, 23);
+		chbAirfreshener.setBounds(446, 350, 138, 23);
 		frame.getContentPane().add(chbAirfreshener);
 
 		chbTyreShine = new JCheckBox("Połysk do kół");
 		chbTyreShine.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		chbTyreShine.setBackground(new Color(255, 51, 51));
-		chbTyreShine.setBounds(440, 380, 138, 23);
+		chbTyreShine.setBounds(446, 380, 138, 23);
 		frame.getContentPane().add(chbTyreShine);
 		
 		chbCaps = new JCheckBox("Zestaw nakrętek");
 		chbCaps.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		chbCaps.setBackground(new Color(255, 51, 51));
-		chbCaps.setBounds(440, 409, 138, 23);
+		chbCaps.setBounds(446, 409, 138, 23);
 		frame.getContentPane().add(chbCaps);
 		// CHECKBOX - FREEBES SECTION END
 
@@ -609,20 +622,16 @@ public class WystawRachunek {
 	}// END OF INSTANTIATE
 	
 
-	protected void applyDiscount() {
+	protected double applyDiscount(double sum) {
 		if(sum > 0 && !tfDiscountAmount.getText().isEmpty()){
 			discount = Double.parseDouble(tfDiscountAmount.getText());
 			if(!isDiscount){
-				//percentage
-				sum = sum - (sum * (discount/100));
-				System.out.println("Percentage "+isDiscount);
+				return sum - (sum * (discount/100));
 			}else if(isDiscount){
-				//euro
-				sum = sum - discount;
-				System.out.println("euro "+isDiscount);
+				return sum - discount;
 			}
 		}
-		lblTotal.setText("€ "+df.format(sum));
+		return sum;
 	}
 
 	private void createChoosenItemsTable() {
@@ -637,24 +646,28 @@ public class WystawRachunek {
 		spInvoice.setBounds(620, 200, 400, 194);
 		frame.getContentPane().add(spInvoice);
 		
-		TableModel mod = tbChoosen.getModel();
-		mod.addTableModelListener(new TableModelListener(){
+		modTBchosen = tbChoosen.getModel();
+		modTBchosen.addTableModelListener(new TableModelListener(){
 //TODO
 			@Override
 			public void tableChanged(TableModelEvent arg0) {
-				int rowCount = mod.getRowCount();
-				sum = 0;
-				for(int i = 0; i < rowCount;i++) {
-					System.out.println(mod.getValueAt(i, 1));
-					double price = Double.parseDouble((String) mod.getValueAt(i, 1));
-					int qnt = Integer.parseInt((String)mod.getValueAt(i, 2));
-					price = price * qnt;
-					
-					sum += price;
-				}
+				double sum = calculateSum();
 				lblTotal.setText("€ "+df.format(sum));
 			}			
 		});
+	}
+
+	protected double calculateSum() {
+		int rowCount = modTBchosen.getRowCount();
+		double sum = 0;
+		for(int i = 0; i < rowCount;i++) {
+			double price = Double.parseDouble((String) modTBchosen.getValueAt(i, 1));
+			int qnt = Integer.parseInt((String)modTBchosen.getValueAt(i, 2));
+			price = price * qnt;
+			
+			sum += price;
+		}
+		return sum;
 	}
 
 	private void populateStockTable() {
@@ -682,7 +695,7 @@ public class WystawRachunek {
 		table.setRowSorter(rowSorterStock);
 	
 		JScrollPane spStockList = new JScrollPane(table);
-		spStockList.setBounds(16, 296, 400, 194);
+		spStockList.setBounds(16, 296, 405, 194);
 		frame.getContentPane().add(spStockList);
 		
 	}
@@ -701,7 +714,7 @@ public class WystawRachunek {
 		table.setRowSorter(rowSorterCars);
 
 		JScrollPane spCars = new JScrollPane(table);
-		spCars.setSize(400, 140);
+		spCars.setSize(405, 140);
 		spCars.setLocation(16, 77);
 		frame.getContentPane().add(spCars);
 	}
@@ -832,10 +845,17 @@ public class WystawRachunek {
 		
 		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
 		model.addRow(rowData);
-
 	}
 
 	private void addItemToList(JTextField tfOther, JTextField tfOtherPrice, JTextField tfOtherQnt) {
+		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
+
+		rowData[0] = tfOther.getText();
+		rowData[1] = ""+tfOtherPrice.getText();
+		rowData[2] = ""+tfOtherQnt.getText();
+		
+		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+		model.addRow(rowData);
 	}
 
 	private void sumCosts() {
