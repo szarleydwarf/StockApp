@@ -59,6 +59,8 @@ public class StockPrinter  {
 	private JTable table;
 	private int rowCount;
 	private int colCount;
+	private boolean folderExist;
+	private boolean accFolderExist;
 	
 	protected static String loggerFolderPath;
 	private static Logger log;
@@ -103,6 +105,9 @@ public class StockPrinter  {
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
 		this.stockServicesNumber = new ArrayList<String>();
 		freebies = new boolean[fv.FREEBIES_ARRAY_SIZE];
+		
+		folderExist = false;
+		accFolderExist = false;
 	}
 	
 	public void printCleanPDF() throws Exception {
@@ -148,7 +153,7 @@ public class StockPrinter  {
 		this.carRegistration = this.carRegistration.toUpperCase();
 
 		this.invNo = invoiceNum;
-		System.out.println("print :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
+//		System.out.println("print :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
 		
 		generatePDF();
 
@@ -161,10 +166,13 @@ public class StockPrinter  {
 	}
 	public boolean saveDoc(JTable tbChoosen, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		savePath = savePath.concat(this.date);
-		helper.createFolderIfNotExist(savePath);
+		if(!folderExist)
+			folderExist = helper.createFolderIfNotExist(savePath);
+
+		accPath = savePath+slash + "_accountacy copy"+slash;		
 		
-		accPath = savePath+slash + "_accountacy copy"+slash;
-		helper.createFolderIfNotExist(accPath);
+		if(!accFolderExist)
+			accFolderExist = helper.createFolderIfNotExist(accPath);
 
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 		this.table = tbChoosen;
@@ -183,7 +191,7 @@ public class StockPrinter  {
 		this.carRegistration = this.carRegistration.toUpperCase();
 
 		this.invNo = invoiceNum;
-		System.out.println("save :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
+//		System.out.println("save :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
 		
 		generatePDF();
 
@@ -228,6 +236,7 @@ public class StockPrinter  {
 		PDPage page = new PDPage();
 		customerCopyDoc.addPage(page);
 		contentStream = new PDPageContentStream(customerCopyDoc, page);
+		
 		addLogo(customerCopyDoc);
 		fillCompanyDetails();
 		populateInvNumManufacturer();
@@ -235,11 +244,11 @@ public class StockPrinter  {
 
 		contentStream.close();
 		this.fileName =  date+" "+invNo+ext; 
-		this.invoiceFileName = date+"\\"+this.fileName;
+		this.invoiceFileName = date+slash+this.fileName;
 		docPath = savePath+slash+this.fileName;
 		//TODO
-//		log.logError("save path "+savePath +"docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
-		//TODO:
+//		log.logError("save path "+savePath +" docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
+
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
@@ -310,25 +319,36 @@ public class StockPrinter  {
 				for(int j = 0; j < this.colCount; j++){
 					contentStream.showText(" - "+this.md.getValueAt(i, j));
 					if(j == 1)
-						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
-					if(j == 2)
 						price = Double.parseDouble(this.md.getValueAt(i, j).toString());
+					if(j == 2)
+						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
+					
+					if(price > 0 && qnt > 0) {
+//						System.out.println("loop p&q :" + price + " " + qnt);
+						price = price * qnt;
+						sum += price;						
+					}
 				}
-				System.out.println("loop p&q :" + price + " " + qnt);
-				price = price * qnt;
-				sum += price;
-				System.out.println("loop sum :" + price);
-				
+//				System.out.println("loop sum :" + sum);
+				this.sum = sum;
 				contentStream.newLine();
 			}
 		}
 		contentStream.newLine();	
 		contentStream.newLine();	
-//		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
+		
+//		System.out.println("sum B :" + df.format(this.sum));
+		this.sum = this.helper.getSumDiscounted(sum, discount, applyDiscount);
+
 		contentStream.setFont(PDType1Font.COURIER, 18);
-		System.out.println("discount :" + df.format(this.discount));
-		System.out.println("sum :" + df.format(this.sum));
-		contentStream.showText("                         Discount          € "+df.format(this.discount));
+//		System.out.println("discount :" + df.format(this.discount));
+//		System.out.println("sum A :" + df.format(this.sum));
+		
+		char symbol = '€';
+		if(!this.applyDiscount)
+			symbol = '%';
+		
+		contentStream.showText("                         Discount          "+symbol+" "+df.format(this.discount));
 		contentStream.newLine();	
 		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
 		

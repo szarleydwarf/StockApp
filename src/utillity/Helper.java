@@ -59,7 +59,7 @@ public class Helper {
 		return sum;
 	}
 		
-	public double getSum(double sum, double discount, boolean applyDiscount){
+	public double getSumDiscounted(double sum, double discount, boolean applyDiscount){
 	
 		if(applyDiscount){
 			return sum - discount;

@@ -879,12 +879,11 @@ public class WystawRachunek {
 	protected void savePDFtoHDD() {
 		sPrinter = new StockPrinter(defaultPaths);
 		collectDataForInvoice();
-		for(int i = 0; i <freebies.length;i++)
+//		for(int i = 0; i <freebies.length;i++)
 //		System.out.println("save "+carManufacturer + " " + freebies[i] + discount + " " + isDiscount + " " + registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
-				boolean saved = sPrinter.saveDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
-				
+				boolean saved = sPrinter.saveDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
 			} else
 				JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {
@@ -898,8 +897,7 @@ public class WystawRachunek {
 //		System.out.println("print "+carManufacturer + " " + discount + " " + isDiscount + " " +  registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
-				boolean printed = sPrinter.printDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
-			
+				boolean printed = sPrinter.printDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
 		} else
 			JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {
