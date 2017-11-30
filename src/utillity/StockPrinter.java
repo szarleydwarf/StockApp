@@ -157,11 +157,11 @@ public class StockPrinter  {
 		
 		generatePDF();
 
-//		TODO printPDF(docPath);
+		printPDF(docPath);
 
 		createAccountancCopy();
 		
-//		TODO saveEntryToDatabase();
+		saveEntryToDatabase();
 		return jobDone ;
 	}
 	public boolean saveDoc(JTable tbChoosen, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
@@ -197,7 +197,7 @@ public class StockPrinter  {
 
 		createAccountancCopy();
 		
-//		TODO saveEntryToDatabase();
+		saveEntryToDatabase();
 		return jobDone ;
 	}
 
@@ -298,7 +298,6 @@ public class StockPrinter  {
 	}
 	
 	private void populateItemsTable() throws IOException {
-		boolean isService = false;
 		contentStream.beginText();
 		contentStream.setNonStrokingColor(Color.WHITE);
 		contentStream.setLeading(20.5f);
@@ -309,7 +308,6 @@ public class StockPrinter  {
 		contentStream.newLine();
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.setFont(PDType1Font.COURIER, 12);
-		//TODO
 		if(rowCount > 0) {
 			double sum = 0, price = 0;
 			int qnt = 0;
@@ -324,12 +322,10 @@ public class StockPrinter  {
 						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
 					
 					if(price > 0 && qnt > 0) {
-//						System.out.println("loop p&q :" + price + " " + qnt);
 						price = price * qnt;
 						sum += price;						
 					}
 				}
-//				System.out.println("loop sum :" + sum);
 				this.sum = sum;
 				contentStream.newLine();
 			}
@@ -337,12 +333,9 @@ public class StockPrinter  {
 		contentStream.newLine();	
 		contentStream.newLine();	
 		
-//		System.out.println("sum B :" + df.format(this.sum));
 		this.sum = this.helper.getSumDiscounted(sum, discount, applyDiscount);
 
 		contentStream.setFont(PDType1Font.COURIER, 18);
-//		System.out.println("discount :" + df.format(this.discount));
-//		System.out.println("sum A :" + df.format(this.sum));
 		
 		char symbol = '€';
 		if(!this.applyDiscount)
@@ -356,10 +349,19 @@ public class StockPrinter  {
 		
 		contentStream.newLine();	
 		contentStream.newLine();	
-		contentStream.showText("           Free ");
-		if(isService)
-			contentStream.showText(freebie);
-		contentStream.showText("air freshener");
+		contentStream.showText("        Free ");
+		contentStream.newLine();	
+		contentStream.showText("        ");
+		for(int i = 0; i < this.freebies.length; i++){
+			if(this.freebies[i])
+				contentStream.showText(this.fv.FREEBIES_ARRAY[i]);
+				
+			if(i < this.freebies.length - 1)
+				contentStream.showText(", ");
+	
+			contentStream.newLine();
+			contentStream.showText("        ");
+		}
 			
 		contentStream.endText();
 	}

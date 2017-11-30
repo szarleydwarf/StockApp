@@ -137,7 +137,7 @@ public class WystawRachunek {
 	private String defRegistrationString = "wpisz rejestracje", defaultRegistration = "00AA000";
 	private boolean[] freebies;
 	private JCheckBox chbAirfreshener;
-	private JCheckBox chckbxDarmoweMycie;
+	private JCheckBox chbFreeCarWash;
 
 
 	/**
@@ -353,6 +353,17 @@ public class WystawRachunek {
 		tfCompanyName.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfCompanyName.setColumns(10);
 		tfCompanyName.setBounds(620, 50, 400, 24);
+		tfCompanyName.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfCompanyName.setText(fv.COMPANY_STRING);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(tfCompanyName.getText().equals(fv.COMPANY_STRING))
+					tfCompanyName.setText(stringComName);
+			}
+		});
 		frame.getContentPane().add(tfCompanyName);
 		
 		tfCompanyAddress = new JTextField();
@@ -361,6 +372,17 @@ public class WystawRachunek {
 		tfCompanyAddress.setColumns(10);
 		tfCompanyAddress.setBackground(new Color(204, 204, 204));
 		tfCompanyAddress.setBounds(620, 80, 400, 24);
+		tfCompanyAddress.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfCompanyAddress.setText(fv.COMPANY_STRING);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(tfCompanyAddress.getText().equals(fv.COMPANY_STRING))
+					tfCompanyAddress.setText(stringAddress);
+			}
+		});
 		frame.getContentPane().add(tfCompanyAddress);
 		
 		tfVATRegNum = new JTextField();
@@ -369,6 +391,17 @@ public class WystawRachunek {
 		tfVATRegNum.setColumns(10);
 		tfVATRegNum.setBackground(new Color(204, 204, 204));
 		tfVATRegNum.setBounds(620, 110, 400, 24);
+		tfVATRegNum.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfVATRegNum.setText(fv.COMPANY_STRING);
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(tfVATRegNum.getText().equals(fv.COMPANY_STRING))
+					tfVATRegNum.setText(stringVATReg);
+			}
+		});
 		frame.getContentPane().add(tfVATRegNum);
 		
 		JButton btnRemove = new JButton("-");
@@ -612,11 +645,11 @@ public class WystawRachunek {
 		chbCaps.setBounds(446, 409, 138, 23);
 		frame.getContentPane().add(chbCaps);
 		
-		chckbxDarmoweMycie = new JCheckBox("Darmowe mycie");
-		chckbxDarmoweMycie.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		chckbxDarmoweMycie.setBackground(new Color(255, 51, 51));
-		chckbxDarmoweMycie.setBounds(446, 440, 138, 23);
-		frame.getContentPane().add(chckbxDarmoweMycie);
+		chbFreeCarWash = new JCheckBox("Darmowe mycie");
+		chbFreeCarWash.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		chbFreeCarWash.setBackground(new Color(255, 51, 51));
+		chbFreeCarWash.setBounds(446, 440, 138, 23);
+		frame.getContentPane().add(chbFreeCarWash);
 
 		// CHECKBOX - FREEBES SECTION END
 
@@ -938,7 +971,7 @@ public class WystawRachunek {
 			freebies[2] = true;
 		else freebies[2] = false;
 	
-		if(this.chbTyreShine.isSelected())
+		if(this.chbFreeCarWash.isSelected())
 			freebies[3] = true;
 		else freebies[3] = false;
 	}

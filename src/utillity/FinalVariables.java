@@ -82,5 +82,5 @@ public class FinalVariables {
 	public final int DEFAULT_FOLDER_ARRAYLIST_INDEX = 0;
 	public final int PRINTER__ARRAYLIST_INDEX = 1;
 	public int FREEBIES_ARRAY_SIZE = 4;
-	
+	public static final String[] FREEBIES_ARRAY = {"Air freshener", "Tyre paint", "Valve caps", "Free Car Wash"};
 }
