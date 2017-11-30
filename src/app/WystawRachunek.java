@@ -95,9 +95,6 @@ public class WystawRachunek {
 
 	private ArrayList<String> defaultPaths;
 	private Map<String, Integer> nameQnt;
-	private JTextField tfCompanyName;
-	private JTextField tfCompanyAddress;
-	private JTextField tfVATRegNum;
 	private String stringAddress = "Adres Firmy";
 	private String stringComName = "Nazwa firmy";
 	private String stringVATReg = "VAT / Tax No.";
@@ -113,9 +110,9 @@ public class WystawRachunek {
 	private JTextField tfQntListed;
 	private JTextField tfQntOther;
 	private JTextField tfPriceOther;
-	private JTextField txtCompanyName;
-	private JTextField tfComapnyAddress;
-	private JTextField tfVATTaxNo;
+	private JTextField tfCompanyName;
+	private JTextField tfCompanyAddress;
+	private JTextField tfVATRegNum;
 	private JTextField tfDiscountAmount;
 	private JLabel lblDiscount;
 	private JLabel lblPriceListed;
@@ -135,7 +132,12 @@ public class WystawRachunek {
 	private String cenaStr = "Cena";
 	protected double sum;
 	private TableModel modTBchosen;
-	
+	private String markaAuta = "MARKA";
+	private String otherString = "other";
+	private String defRegistrationString = "wpisz rejestracje", defaultRegistration = "00AA000";
+	private boolean[] freebies;
+	private JCheckBox chbAirfreshener;
+	private JCheckBox chckbxDarmoweMycie;
 
 
 	/**
@@ -174,7 +176,7 @@ public class WystawRachunek {
 		this.nameQnt = new HashMap<String, Integer>();
 		
 		invoiceNum = DM.getLastInvoiceNumber();
-		if(invoiceNum == 0)
+//		if(invoiceNum == 0)
 			invoiceNum++;
 
 		try {
@@ -211,13 +213,22 @@ public class WystawRachunek {
 		
 		tfRegistration = new JTextField();
 		tfRegistration.setHorizontalAlignment(SwingConstants.CENTER);
-		tfRegistration.setText("wpisz rejestracje");
+		tfRegistration.setText(defRegistrationString );
 		tfRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		tfRegistration.setColumns(10);
 		tfRegistration.setBounds(438, 91, 160, 30);
+		tfRegistration.addFocusListener(new FocusListener(){
+	        @Override
+	        public void focusGained(FocusEvent e){
+	        	tfRegistration.setText("");
+			}
+			@Override
+			public void focusLost(FocusEvent arg0) {
+			}
+		});
 		frame.getContentPane().add(tfRegistration);
 		
-		lblCarBrand = new JLabel("MARKA");
+		lblCarBrand = new JLabel(markaAuta);
 		lblCarBrand.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCarBrand.setFont(new Font("Segoe UI Black", Font.PLAIN, 16));
 		lblCarBrand.setBounds(438, 41, 160, 44);
@@ -296,11 +307,23 @@ public class WystawRachunek {
 		btnPrint.setBounds(620, 520, 160, 30);
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				printDocument();
 			}
 		});
 		frame.getContentPane().add(btnPrint);
-		
+//TODO	
+		JButton btnZapisz = new JButton("ZAPISZ");
+		btnZapisz.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				savePDFtoHDD();
+			}
+		});
+		btnZapisz.setForeground(new Color(0, 0, 102));
+		btnZapisz.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		btnZapisz.setBackground(new Color(102, 204, 0));
+		btnZapisz.setBounds(798, 520, 160, 30);
+		frame.getContentPane().add(btnZapisz);
+
 		JButton btnBack = new JButton("Powrót");
 		btnBack.setForeground(new Color(0, 0, 0));
 		btnBack.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
@@ -324,29 +347,29 @@ public class WystawRachunek {
 		lblTotal.setBorder(border6);
 		frame.getContentPane().add(lblTotal);
 		
-		txtCompanyName = new JTextField();
-		txtCompanyName.setBackground(new Color(204, 204, 204));
-		txtCompanyName.setText("Nazwa firmy");
-		txtCompanyName.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		txtCompanyName.setColumns(10);
-		txtCompanyName.setBounds(620, 50, 400, 24);
-		frame.getContentPane().add(txtCompanyName);
+		tfCompanyName = new JTextField();
+		tfCompanyName.setBackground(new Color(204, 204, 204));
+		tfCompanyName.setText(this.stringComName);
+		tfCompanyName.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		tfCompanyName.setColumns(10);
+		tfCompanyName.setBounds(620, 50, 400, 24);
+		frame.getContentPane().add(tfCompanyName);
 		
-		tfComapnyAddress = new JTextField();
-		tfComapnyAddress.setText("Adres");
-		tfComapnyAddress.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		tfComapnyAddress.setColumns(10);
-		tfComapnyAddress.setBackground(new Color(204, 204, 204));
-		tfComapnyAddress.setBounds(620, 80, 400, 24);
-		frame.getContentPane().add(tfComapnyAddress);
+		tfCompanyAddress = new JTextField();
+		tfCompanyAddress.setText(this.stringAddress);
+		tfCompanyAddress.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		tfCompanyAddress.setColumns(10);
+		tfCompanyAddress.setBackground(new Color(204, 204, 204));
+		tfCompanyAddress.setBounds(620, 80, 400, 24);
+		frame.getContentPane().add(tfCompanyAddress);
 		
-		tfVATTaxNo = new JTextField();
-		tfVATTaxNo.setText("VAT / Tax");
-		tfVATTaxNo.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		tfVATTaxNo.setColumns(10);
-		tfVATTaxNo.setBackground(new Color(204, 204, 204));
-		tfVATTaxNo.setBounds(620, 110, 400, 24);
-		frame.getContentPane().add(tfVATTaxNo);
+		tfVATRegNum = new JTextField();
+		tfVATRegNum.setText(this.stringVATReg);
+		tfVATRegNum.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		tfVATRegNum.setColumns(10);
+		tfVATRegNum.setBackground(new Color(204, 204, 204));
+		tfVATRegNum.setBounds(620, 110, 400, 24);
+		frame.getContentPane().add(tfVATRegNum);
 		
 		JButton btnRemove = new JButton("-");
 		btnRemove.setForeground(new Color(204, 255, 0));
@@ -362,19 +385,7 @@ public class WystawRachunek {
 			}
 		});
 		frame.getContentPane().add(btnRemove);
-		
-		JButton btnZapisz = new JButton("ZAPISZ");
-		btnZapisz.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
 				
-			}
-		});
-		btnZapisz.setForeground(new Color(0, 0, 102));
-		btnZapisz.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
-		btnZapisz.setBackground(new Color(102, 204, 0));
-		btnZapisz.setBounds(798, 520, 160, 30);
-		frame.getContentPane().add(btnZapisz);
-		
 		JButton btnClearAll = new JButton("Clear All");
 		btnClearAll.setForeground(new Color(204, 255, 0));
 		btnClearAll.setBackground(new Color(204, 0, 0));
@@ -583,7 +594,7 @@ public class WystawRachunek {
 		lblFreebies.setBorder(border7);
 		frame.getContentPane().add(lblFreebies);
 		
-		JCheckBox chbAirfreshener = new JCheckBox("Odświeżacz");
+		chbAirfreshener = new JCheckBox("Odświeżacz");
 		chbAirfreshener.setBackground(new Color(255, 51, 51));
 		chbAirfreshener.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		chbAirfreshener.setBounds(446, 350, 138, 23);
@@ -600,6 +611,13 @@ public class WystawRachunek {
 		chbCaps.setBackground(new Color(255, 51, 51));
 		chbCaps.setBounds(446, 409, 138, 23);
 		frame.getContentPane().add(chbCaps);
+		
+		chckbxDarmoweMycie = new JCheckBox("Darmowe mycie");
+		chckbxDarmoweMycie.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		chckbxDarmoweMycie.setBackground(new Color(255, 51, 51));
+		chckbxDarmoweMycie.setBounds(446, 440, 138, 23);
+		frame.getContentPane().add(chckbxDarmoweMycie);
+
 		// CHECKBOX - FREEBES SECTION END
 
 	
@@ -622,18 +640,6 @@ public class WystawRachunek {
 	}// END OF INSTANTIATE
 	
 
-	protected double applyDiscount(double sum) {
-		if(sum > 0 && !tfDiscountAmount.getText().isEmpty()){
-			discount = Double.parseDouble(tfDiscountAmount.getText());
-			if(!isDiscount){
-				return sum - (sum * (discount/100));
-			}else if(isDiscount){
-				return sum - discount;
-			}
-		}
-		return sum;
-	}
-
 	private void createChoosenItemsTable() {
 		ArrayList<Item>emptyArray = new ArrayList<Item>();
 		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
@@ -648,26 +654,12 @@ public class WystawRachunek {
 		
 		modTBchosen = tbChoosen.getModel();
 		modTBchosen.addTableModelListener(new TableModelListener(){
-//TODO
 			@Override
 			public void tableChanged(TableModelEvent arg0) {
 				double sum = calculateSum();
 				lblTotal.setText("€ "+df.format(sum));
 			}			
 		});
-	}
-
-	protected double calculateSum() {
-		int rowCount = modTBchosen.getRowCount();
-		double sum = 0;
-		for(int i = 0; i < rowCount;i++) {
-			double price = Double.parseDouble((String) modTBchosen.getValueAt(i, 1));
-			int qnt = Integer.parseInt((String)modTBchosen.getValueAt(i, 2));
-			price = price * qnt;
-			
-			sum += price;
-		}
-		return sum;
 	}
 
 	private void populateStockTable() {
@@ -772,8 +764,9 @@ public class WystawRachunek {
 				int row = table.getSelectedRow();
 				if(row != -1) {
 					item = getItem(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
-					if(item != null)
-						System.out.println("Name: "+item.getName());
+					if(item != null){
+//						System.out.println("Name: "+item.getName());
+					}
 				}
 			}
 	    };
@@ -858,10 +851,97 @@ public class WystawRachunek {
 		model.addRow(rowData);
 	}
 
-	private void sumCosts() {
+	protected double calculateSum() {
+		int rowCount = modTBchosen.getRowCount();
+		double sum = 0;
+		for(int i = 0; i < rowCount;i++) {
+			double price = Double.parseDouble((String) modTBchosen.getValueAt(i, 1));
+			int qnt = Integer.parseInt((String)modTBchosen.getValueAt(i, 2));
+			price = price * qnt;
+			
+			sum += price;
 		}
+		return sum;
+	}
+	
+	protected double applyDiscount(double sum) {
+		if(sum > 0 && !tfDiscountAmount.getText().isEmpty()){
+			discount = Double.parseDouble(tfDiscountAmount.getText());
+			if(!isDiscount){
+				return sum - (sum * (discount/100));
+			}else if(isDiscount){
+				return sum - discount;
+			}
+		}
+		return sum;
+	}
+//TODO
+	protected void savePDFtoHDD() {
+		sPrinter = new StockPrinter(defaultPaths);
+		collectDataForInvoice();
+		for(int i = 0; i <freebies.length;i++)
+//		System.out.println("save "+carManufacturer + " " + freebies[i] + discount + " " + isDiscount + " " + registration + " " + invoiceNum);
+		try {
+			if(!lblTotal.getText().equals(lblTotalSt)){
+				boolean saved = sPrinter.saveDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
+				
+			} else
+				JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
+		} catch (Exception e) {
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+		}
+	}
 
 	private void printDocument(){
-
+		sPrinter = new StockPrinter(defaultPaths);
+		collectDataForInvoice();
+//		System.out.println("print "+carManufacturer + " " + discount + " " + isDiscount + " " +  registration + " " + invoiceNum);
+		try {
+			if(!lblTotal.getText().equals(lblTotalSt)){
+				boolean printed = sPrinter.printDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
+			
+		} else
+			JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
+		} catch (Exception e) {
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+		}
+	}
+	private void collectDataForInvoice() {
+		registration = tfRegistration.getText();
+		if(!lblCarBrand.getText().equals(markaAuta))
+			carManufacturer = lblCarBrand.getText();
+		else
+			carManufacturer = otherString;
+		
+		if(!tfRegistration.getText().equals(defRegistrationString))
+			registration = tfRegistration.getText();
+		else registration = defaultRegistration;
+		
+		if((!tfCompanyName.getText().equals(stringComName) || !this.tfCompanyAddress.getText().equals(stringAddress) || !this.tfVATRegNum.getText().equals(stringVATReg))){
+			String str = "";
+			if(!tfCompanyName.getText().equals(fv.COMPANY_STRING))
+				str += " " + tfCompanyName.getText();
+			if(!tfCompanyAddress.getText().equals(fv.COMPANY_STRING))
+				str += " " + tfCompanyAddress.getText();
+			if(!tfVATRegNum.getText().equals(fv.COMPANY_STRING))
+				str += " " + tfVATRegNum.getText();
+			carManufacturer+=str;
+		}
+		freebies = new boolean[fv.FREEBIES_ARRAY_SIZE];
+		if(chbAirfreshener.isSelected())
+			freebies[0] = true;
+		else freebies[0] = false;
+		
+		if(this.chbTyreShine.isSelected())
+			freebies[1] = true;
+		else freebies[1] = false;
+		
+		if(this.chbCaps.isSelected())
+			freebies[2] = true;
+		else freebies[2] = false;
+	
+		if(this.chbTyreShine.isSelected())
+			freebies[3] = true;
+		else freebies[3] = false;
 	}
 }

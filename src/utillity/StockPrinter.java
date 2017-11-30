@@ -14,6 +14,8 @@ import javax.print.attribute.PrintServiceAttributeSet;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -33,7 +35,7 @@ public class StockPrinter  {
 	private PDPageContentStream contentStream ;
 	private DecimalFormat df;
 
-	private DefaultListModel md;
+	private TableModel md;
 	private double sum = 0, discount = 0;
 	private long timeout = 50000;
 	private boolean applyDiscount = false;
@@ -53,6 +55,10 @@ public class StockPrinter  {
 	private String printerName;
 	private ArrayList<String> m_defaultPaths;
 	private String slash = "\\";
+	private boolean[] freebies;
+	private JTable table;
+	private int rowCount;
+	private int colCount;
 	
 	protected static String loggerFolderPath;
 	private static Logger log;
@@ -96,6 +102,7 @@ public class StockPrinter  {
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
 		this.stockServicesNumber = new ArrayList<String>();
+		freebies = new boolean[fv.FREEBIES_ARRAY_SIZE];
 	}
 	
 	public void printCleanPDF() throws Exception {
@@ -115,7 +122,7 @@ public class StockPrinter  {
 //		this.printPDF(path);
 	}
 	
-	public boolean printDoc(JList<String> list, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
+	public boolean printDoc(JTable tbChoosen, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		
 		savePath = savePath.concat(this.date);
 		helper.createFolderIfNotExist(savePath);
@@ -124,7 +131,12 @@ public class StockPrinter  {
 		helper.createFolderIfNotExist(accPath);
 
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-		this.md = (DefaultListModel)list.getModel();
+		this.table = tbChoosen;
+		this.md = tbChoosen.getModel();
+		this.rowCount = this.md.getRowCount();
+		this.colCount = this.md.getColumnCount();
+
+		this.freebies = freebies;
 		this.discount = discount;
 		this.applyDiscount = applyDiscount;
 		this.carManufacturer = carManufacturer;
@@ -136,16 +148,50 @@ public class StockPrinter  {
 		this.carRegistration = this.carRegistration.toUpperCase();
 
 		this.invNo = invoiceNum;
+		System.out.println("print :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
 		
 		generatePDF();
 
-		printPDF(docPath);
+//		TODO printPDF(docPath);
 
 		createAccountancCopy();
-		saveEntryToDatabase();
+		
+//		TODO saveEntryToDatabase();
 		return jobDone ;
 	}
+	public boolean saveDoc(JTable tbChoosen, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
+		savePath = savePath.concat(this.date);
+		helper.createFolderIfNotExist(savePath);
+		
+		accPath = savePath+slash + "_accountacy copy"+slash;
+		helper.createFolderIfNotExist(accPath);
 
+		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
+		this.table = tbChoosen;
+		this.md = tbChoosen.getModel();
+		this.rowCount = this.md.getRowCount();
+		this.colCount = this.md.getColumnCount();
+		
+		this.freebies = freebies;
+		this.discount = discount;
+		this.applyDiscount = applyDiscount;
+		this.carManufacturer = carManufacturer;
+		if(!registration.isEmpty())
+			this.carRegistration = registration;
+
+		this.carRegistration.toUpperCase();
+		this.carRegistration = this.carRegistration.toUpperCase();
+
+		this.invNo = invoiceNum;
+		System.out.println("save :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
+		
+		generatePDF();
+
+		createAccountancCopy();
+		
+//		TODO saveEntryToDatabase();
+		return jobDone ;
+	}
 
 	private void saveEntryToDatabase() throws SQLException {
 		String servNo = "", itemNo = "";
@@ -207,6 +253,41 @@ public class StockPrinter  {
 		contentStream.fill();
 	}
 
+	private void fillCompanyDetails() throws IOException {
+		contentStream.setNonStrokingColor(Color.BLACK);
+		contentStream.beginText();
+		contentStream.setFont(PDType1Font.COURIER, 18);
+		contentStream.newLineAtOffset(25f,  740);
+		contentStream.setLeading(20.5f);
+		
+		String text = "HCT",
+				text2 = "Killaneen, Ballinamore",
+				text3 = "co.Leitrim",
+				text4 = "N41YK50",
+				text5 = "089 24 22 993",
+				text6 = "hctballinamore@gmail.com",
+				text7 = "hct-ireland.business.site",
+				text8 = "FB @hct.irl";
+		contentStream.showText(text + "                                       " + date);
+		contentStream.newLine();
+		contentStream.setFont(PDType1Font.COURIER, 12);
+		contentStream.showText(text2);
+		contentStream.newLine();
+		contentStream.showText(text3);
+		contentStream.newLine();
+		contentStream.showText(text4);
+		contentStream.newLine();
+		contentStream.showText(text5);
+		contentStream.newLine();
+		contentStream.showText(text6);
+		contentStream.newLine();
+		contentStream.showText(text7);
+		contentStream.newLine();
+		contentStream.showText(text8);
+		
+		contentStream.endText();
+	}
+	
 	private void populateItemsTable() throws IOException {
 		boolean isService = false;
 		contentStream.beginText();
@@ -219,36 +300,34 @@ public class StockPrinter  {
 		contentStream.newLine();
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.setFont(PDType1Font.COURIER, 12);
-		
-		if(md.size() > 0){
-			for(int i = 0; i < md.size(); i++){
-				String tempSt = md.getElementAt(i).toString();
-				String description = tempSt.substring(0, tempSt.lastIndexOf("€"));
-				
-				if(description.contains("Wash") || description.contains("wash"))
-					isService=true;
-				
-				createItemList(description);
-				
-				String priceSt = tempSt.substring(tempSt.lastIndexOf("€")+1);
-				priceSt = priceSt.substring(0, priceSt.lastIndexOf("x"));
-				String quant = tempSt.substring(tempSt.lastIndexOf("x")+1);
-				
-				if(quant.isEmpty()) {
-					quant = "1";
+		//TODO
+		if(rowCount > 0) {
+			double sum = 0, price = 0;
+			int qnt = 0;
+			for(int i = 0; i < this.rowCount; i++){
+				contentStream.showText(""+i+1);
+				qnt = 0;
+				for(int j = 0; j < this.colCount; j++){
+					contentStream.showText(" - "+this.md.getValueAt(i, j));
+					if(j == 1)
+						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
+					if(j == 2)
+						price = Double.parseDouble(this.md.getValueAt(i, j).toString());
 				}
-
-				priceSt = helper.paddStringLeft(priceSt, stringLengthF, paddingChar);
-				priceSt = helper.paddStringRight(priceSt, stringLengthB, paddingChar);
-				contentStream.showText((i+1)+" - "+description+ "  " +priceSt+"  "+quant);
-				contentStream.newLine();			
+				System.out.println("loop p&q :" + price + " " + qnt);
+				price = price * qnt;
+				sum += price;
+				System.out.println("loop sum :" + price);
+				
+				contentStream.newLine();
 			}
-		}		
-
+		}
 		contentStream.newLine();	
 		contentStream.newLine();	
-		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
+//		sum = helper.getSum(this.md, this.discount, this.applyDiscount);
 		contentStream.setFont(PDType1Font.COURIER, 18);
+		System.out.println("discount :" + df.format(this.discount));
+		System.out.println("sum :" + df.format(this.sum));
 		contentStream.showText("                         Discount          € "+df.format(this.discount));
 		contentStream.newLine();	
 		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
@@ -344,41 +423,6 @@ public class StockPrinter  {
 		contentStream.endText();
 	}
 
-	private void fillCompanyDetails() throws IOException {
-		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.beginText();
-		contentStream.setFont(PDType1Font.COURIER, 18);
-		contentStream.newLineAtOffset(25f,  740);
-		contentStream.setLeading(20.5f);
-		
-		String text = "HCT",
-				text2 = "Killaneen, Ballinamore",
-				text3 = "co.Leitrim",
-				text4 = "N41YK50",
-				text5 = "089 24 22 993",
-				text6 = "hctballinamore@gmail.com",
-				text7 = "hct-ireland.business.site",
-				text8 = "FB @hct.irl";
-		contentStream.showText(text + "                                       " + date);
-		contentStream.newLine();
-		contentStream.setFont(PDType1Font.COURIER, 12);
-		contentStream.showText(text2);
-		contentStream.newLine();
-		contentStream.showText(text3);
-		contentStream.newLine();
-		contentStream.showText(text4);
-		contentStream.newLine();
-		contentStream.showText(text5);
-		contentStream.newLine();
-		contentStream.showText(text6);
-		contentStream.newLine();
-		contentStream.showText(text7);
-		contentStream.newLine();
-		contentStream.showText(text8);
-		
-		contentStream.endText();
-	}
-	
 	private void createAccountancCopy() throws IOException {
 		PDDocument customerCopyDoc = new PDDocument();
 		PDPage page = new PDPage();
