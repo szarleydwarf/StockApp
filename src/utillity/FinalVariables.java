@@ -31,7 +31,9 @@ public class FinalVariables {
 
 	public final String STOCK_SORT_BY="item_name";
 	public final String SERVICES_SORT_BY="service_name";
-
+	public final String AAA = "AAA";
+	public final String AAS = "AAS";
+	
 	
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";

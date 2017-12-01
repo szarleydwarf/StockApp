@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -61,6 +62,8 @@ public class StockPrinter  {
 	private int colCount;
 	private boolean folderExist;
 	private boolean accFolderExist;
+	private String eightSpaceStr = "        ";
+	private Map<String, String> itemCodeName;
 	
 	protected static String loggerFolderPath;
 	private static Logger log;
@@ -127,14 +130,18 @@ public class StockPrinter  {
 //		this.printPDF(path);
 	}
 	
-	public boolean printDoc(JTable tbChoosen, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
-		
+	public boolean printDoc(JTable tbChoosen, Map<String, String> itemCodeName, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		savePath = savePath.concat(this.date);
-		helper.createFolderIfNotExist(savePath);
-		
-		accPath = savePath+slash + "_accountacy copy"+slash;
-		helper.createFolderIfNotExist(accPath);
+		if(!folderExist)
+			folderExist = helper.createFolderIfNotExist(savePath);
 
+		accPath = savePath+slash + "_accountacy copy"+slash;		
+		
+		if(!accFolderExist)
+			accFolderExist = helper.createFolderIfNotExist(accPath);
+		
+		this.itemCodeName = itemCodeName;
+		
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 		this.table = tbChoosen;
 		this.md = tbChoosen.getModel();
@@ -164,7 +171,8 @@ public class StockPrinter  {
 		saveEntryToDatabase();
 		return jobDone ;
 	}
-	public boolean saveDoc(JTable tbChoosen, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
+
+	public boolean saveDoc(JTable tbChoosen, Map<String, String> itemCodeName, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
 		savePath = savePath.concat(this.date);
 		if(!folderExist)
 			folderExist = helper.createFolderIfNotExist(savePath);
@@ -173,6 +181,8 @@ public class StockPrinter  {
 		
 		if(!accFolderExist)
 			accFolderExist = helper.createFolderIfNotExist(accPath);
+		
+		this.itemCodeName = itemCodeName;
 
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 		this.table = tbChoosen;
@@ -203,13 +213,55 @@ public class StockPrinter  {
 
 	private void saveEntryToDatabase() throws SQLException {
 		String servNo = "", itemNo = "";
-		for(String s : stockServicesNumber){
-			if(s.contains("AAA")){
-				itemNo += s+",";
-			}else if(s.contains("AAS")){
-				servNo += s+",";
+		if(rowCount > 0) {
+			int qnt = 0, count = 0;
+			boolean isStockItem = false, addToString = false;
+			ArrayList<String> oldValues = new ArrayList<String>();
+			String newValue = "";
+			
+			for(int i = 0; i < this.rowCount; i++){
+				qnt = 0;
+
+				for(int j = 0; j < this.colCount; j++){
+					if(j == 0){
+						String key = this.md.getValueAt(i, j).toString();
+						newValue = this.itemCodeName.get(key);
+					}
+					
+					if(j == 2)
+						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
+					
+					System.out.println("nV: "+newValue);
+					if(oldValues.contains(newValue) && qnt <= 1 && count == 0){
+						count++;
+						qnt++;
+						System.out.println("qnt I: "+qnt + "/" + count);
+					} else {
+						oldValues.add(newValue);
+					}
+					
+//					if(!Character.isDigit(value.charAt(0))) 
+
+					System.out.println("qnt: "+qnt);
+				}
+				
+				newValue = qnt + newValue+",";
+				System.out.println("nVqn: "+qnt+" "+newValue);
+				System.out.println("isi: "+isStockItem + "\n\n");
+				
+				if(newValue.contains(fv.AAA))
+					itemNo += newValue;
+				else if(newValue.contains(fv.AAS))
+					servNo += newValue;
 			}
+//			System.out.println("nVqn2: "+qnt+" "+newValue);
+			count = 0;
+			System.out.println("it: "+itemNo);
+			System.out.println("se: "+servNo);
+
 		}
+
+/*	
 		if(!itemNo.isEmpty())
 			itemNo = itemNo.substring(0, itemNo.lastIndexOf(","));
 		if(!servNo.isEmpty())
@@ -229,6 +281,7 @@ public class StockPrinter  {
 			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
 			this.jobDone = false;
 		}
+		*/
 	}
 
 	private void generatePDF()  throws IOException{
@@ -344,14 +397,12 @@ public class StockPrinter  {
 		contentStream.showText("                         Discount          "+symbol+" "+df.format(this.discount));
 		contentStream.newLine();	
 		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
-		
-		String freebie = "tire paint, ";
-		
+				
 		contentStream.newLine();	
 		contentStream.newLine();	
-		contentStream.showText("        Free ");
+		contentStream.showText(eightSpaceStr + "Free ");
 		contentStream.newLine();	
-		contentStream.showText("        ");
+		contentStream.showText(eightSpaceStr );
 		for(int i = 0; i < this.freebies.length; i++){
 			if(this.freebies[i])
 				contentStream.showText(this.fv.FREEBIES_ARRAY[i]);
@@ -360,27 +411,10 @@ public class StockPrinter  {
 				contentStream.showText(", ");
 	
 			contentStream.newLine();
-			contentStream.showText("        ");
+			contentStream.showText(eightSpaceStr);
 		}
 			
 		contentStream.endText();
-	}
-
-	private void createItemList(String description) {
-		String des = description.trim();
-		if(!des.contains(this.fv.OTHER_STRING_CHECKUP)){
-			String query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+" FROM "+this.fv.SERVICES_TABLE+" WHERE "+this.fv.SERVICES_TABLE_SERVICE_NAME+"=\""+des+"\" union all SELECT "+this.fv.STOCK_TABLE_NUMBER+" FROM "+this.fv.STOCK_TABLE+" WHERE "+this.fv.STOCK_TABLE_ITEM_NAME+"=\""+des+"\"";
-			try {
-				ArrayList<String> t = DM.selectRecordArrayList(query);
-				for(String ts : t){
-					if(!stockServicesNumber.contains(ts)){
-						this.stockServicesNumber.add(ts);
-					} 
-				}
-			} catch (Exception e) {
-				log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
-			}
-		}
 	}
 
 	private void populateInvNumManufacturer() throws IOException {
@@ -457,9 +491,7 @@ public class StockPrinter  {
 		populateItemsTable();
 
 		contentStream.close();
-	
-		//TODO:
-		//add test for folder existance - create folder.
+
 		accPath = accPath+"\\"+date+"_"+docNameCopy+" "+invNo+ext;
 //		log.logError("acc path "+accPath);
 		//TODO:

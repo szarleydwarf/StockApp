@@ -94,7 +94,7 @@ public class WystawRachunek {
 	private Item item;
 
 	private ArrayList<String> defaultPaths;
-	private Map<String, Integer> nameQnt;
+	private Map<String, String> itemCodeName;
 	private String stringAddress = "Adres Firmy";
 	private String stringComName = "Nazwa firmy";
 	private String stringVATReg = "VAT / Tax No.";
@@ -173,7 +173,7 @@ public class WystawRachunek {
 		//TODO: add check for arraylist null?
 		this.defaultPaths = new ArrayList<String>();
 		this.defaultPaths = defaultPaths;
-		this.nameQnt = new HashMap<String, Integer>();
+		this.itemCodeName = new HashMap<String, String>();
 		
 		invoiceNum = DM.getLastInvoiceNumber();
 //		if(invoiceNum == 0)
@@ -709,7 +709,10 @@ public class WystawRachunek {
 		wholeStock.addAll(listOfItems);
 
 		int rowNumber = wholeStock.size();
-
+		int t = 0;
+		for(Item i : wholeStock){
+			this.itemCodeName.put(i.getName(), i.getStockNumber());
+		}
 		String[][] data = new String [rowNumber][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 		data = populateDataArray(wholeStock, data, 0, wholeStock.size());
 
@@ -916,7 +919,7 @@ public class WystawRachunek {
 //		System.out.println("save "+carManufacturer + " " + freebies[i] + discount + " " + isDiscount + " " + registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
-				boolean saved = sPrinter.saveDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
+				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
 			} else
 				JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {
@@ -930,13 +933,14 @@ public class WystawRachunek {
 //		System.out.println("print "+carManufacturer + " " + discount + " " + isDiscount + " " +  registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
-				boolean printed = sPrinter.printDoc(tbChoosen, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
+				boolean printed = sPrinter.printDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
 		} else
 			JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {
 			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 		}
 	}
+	
 	private void collectDataForInvoice() {
 		registration = tfRegistration.getText();
 		if(!lblCarBrand.getText().equals(markaAuta))
