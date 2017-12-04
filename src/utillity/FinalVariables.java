@@ -31,7 +31,9 @@ public class FinalVariables {
 
 	public final String STOCK_SORT_BY="item_name";
 	public final String SERVICES_SORT_BY="service_name";
-
+	public final String AAA = "AAA";
+	public final String AAS = "AAS";
+	
 	
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";
@@ -51,6 +53,7 @@ public class FinalVariables {
 =======
 	public final String CARS_TB_NAME = "CARS";
 	public final String STOCK_TB_NAME = "STOCK";
+	public final String CHOSEN_TB_NAME = "CHOOSEN";
 
 	//Database table names
 >>>>>>> try_item_class
@@ -84,5 +87,6 @@ public class FinalVariables {
 	
 	public final int DEFAULT_FOLDER_ARRAYLIST_INDEX = 0;
 	public final int PRINTER__ARRAYLIST_INDEX = 1;
-	
+	public int FREEBIES_ARRAY_SIZE = 4;
+	public static final String[] FREEBIES_ARRAY = {"Air freshener", "Tyre paint", "Valve caps", "Free Car Wash"};
 }

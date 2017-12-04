@@ -21,3 +21,5 @@ junit*.properties
 =======
 >>>>>>> try_item_class
 *.txt
+*.sqlite
+src/app/WystawRachunek.java
