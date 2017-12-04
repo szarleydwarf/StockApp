@@ -216,7 +216,8 @@ public class StockPrinter  {
 		if(rowCount > 0) {
 			int qnt = 0, count = 0;
 			boolean isStockItem = false, addToString = false;
-			ArrayList<String> oldValues = new ArrayList<String>();
+			String[] pair = new String[2]; 
+			ArrayList<String[]> oldValues = new ArrayList<String[]>();
 			String newValue = "";
 			
 			for(int i = 0; i < this.rowCount; i++){
@@ -231,33 +232,43 @@ public class StockPrinter  {
 					if(j == 2)
 						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
 					
-					System.out.println("nV: "+newValue);
-					if(oldValues.contains(newValue) && qnt <= 1 && count == 0){
-						count++;
-						qnt++;
-						System.out.println("qnt I: "+qnt + "/" + count);
-					} else {
-						oldValues.add(newValue);
-					}
+					System.out.println(i+"/"+j+" nV: "+newValue);
 					
+					if(oldValues.size()==0 && j == 2){
+						pair[0] = newValue;
+						pair[1] = ""+qnt;
+						oldValues.add(pair);
+						System.out.println("first: "+qnt );
+					} else if(j == 2) {
+						for(int index = 0; index < oldValues.size(); index++){
+							String[] pairT = oldValues.get(index);
+							System.out.println("pair: "+pairT[0]+" / "+newValue+" "+pairT[1] );
+							if(pairT[0].equals(newValue)){
+									qnt = Integer.parseInt(pairT[1]);
+									if(count == 0){
+										count++;
+										qnt++;
+									}
+									pairT[1] = "" + qnt;
+									oldValues.remove(index);
+									System.out.println("loop if: "+qnt+" "+pairT[0]+" "+pairT[1] );
+							} else if(!pair[0].equals(newValue)){
+								pairT[0] = newValue;
+								pairT[1] = ""+qnt;
+								System.out.println("loop else: "+qnt+" "+pairT[0]+" "+pairT[1] );
+							}
+							oldValues.add(pairT);
+						}	
+					}
 //					if(!Character.isDigit(value.charAt(0))) 
-
-					System.out.println("qnt: "+qnt);
+					System.out.println("qnt: "+qnt+"\n");
 				}
-				
-				newValue = qnt + newValue+",";
-				System.out.println("nVqn: "+qnt+" "+newValue);
-				System.out.println("isi: "+isStockItem + "\n\n");
-				
-				if(newValue.contains(fv.AAA))
-					itemNo += newValue;
-				else if(newValue.contains(fv.AAS))
-					servNo += newValue;
 			}
-//			System.out.println("nVqn2: "+qnt+" "+newValue);
 			count = 0;
-			System.out.println("it: "+itemNo);
-			System.out.println("se: "+servNo);
+
+			int k = 0;
+			for(String[] s : oldValues)
+				System.out.println(k++ +" : "+s[0]+" - "+s[1]);
 
 		}
 
