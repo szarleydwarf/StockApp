@@ -20,3 +20,4 @@ junit*.properties
 *.sqlite
 =======
 >>>>>>> try_item_class
+*.txt
