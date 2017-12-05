@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.print.PrintService;
@@ -213,66 +214,41 @@ public class StockPrinter  {
 
 	private void saveEntryToDatabase() throws SQLException {
 		String servNo = "", itemNo = "";
-		if(rowCount > 0) {
-			int qnt = 0, count = 0;
-			boolean isStockItem = false, addToString = false;
-			String[] pair = new String[2]; 
-			ArrayList<String[]> oldValues = new ArrayList<String[]>();
-			String newValue = "";
-			
+		int qnt = 0;
+		String[] pt = new String[2]; 
+		ArrayList<String[]> oldValues = new ArrayList<String[]>();
+
+		if(rowCount > 0) {			
 			for(int i = 0; i < this.rowCount; i++){
-				qnt = 0;
-
-				for(int j = 0; j < this.colCount; j++){
-					if(j == 0){
-						String key = this.md.getValueAt(i, j).toString();
-						newValue = this.itemCodeName.get(key);
+				pt = new String[2];
+				pt[0] = this.itemCodeName.get(this.md.getValueAt(i, 0).toString());
+				pt[1] = this.md.getValueAt(i, 2).toString();
+				
+				if(!oldValues.isEmpty()){
+					Iterator<String[]> it = oldValues.iterator();
+					while(it.hasNext()){
+						String[] s = it.next();
+						if(s[0].equals(pt[0])){						
+							qnt = Integer.parseInt(pt[1]) + Integer.parseInt(s[1]);
+							pt[1] = ""+qnt;	
+							it.remove();
+						}
 					}
-					
-					if(j == 2)
-						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
-					
-					System.out.println(i+"/"+j+" nV: "+newValue);
-					
-					if(oldValues.size()==0 && j == 2){
-						pair[0] = newValue;
-						pair[1] = ""+qnt;
-						oldValues.add(pair);
-						System.out.println("first: "+qnt );
-					} else if(j == 2) {
-						for(int index = 0; index < oldValues.size(); index++){
-							String[] pairT = oldValues.get(index);
-							System.out.println("pair: "+pairT[0]+" / "+newValue+" "+pairT[1] );
-							if(pairT[0].equals(newValue)){
-									qnt = Integer.parseInt(pairT[1]);
-									if(count == 0){
-										count++;
-										qnt++;
-									}
-									pairT[1] = "" + qnt;
-									oldValues.remove(index);
-									System.out.println("loop if: "+qnt+" "+pairT[0]+" "+pairT[1] );
-							} else if(!pair[0].equals(newValue)){
-								pairT[0] = newValue;
-								pairT[1] = ""+qnt;
-								System.out.println("loop else: "+qnt+" "+pairT[0]+" "+pairT[1] );
-							}
-							oldValues.add(pairT);
-						}	
-					}
-//					if(!Character.isDigit(value.charAt(0))) 
-					System.out.println("qnt: "+qnt+"\n");
 				}
-			}
-			count = 0;
-
-			int k = 0;
-			for(String[] s : oldValues)
-				System.out.println(k++ +" : "+s[0]+" - "+s[1]);
-
+				oldValues.add(pt);
+			}//end for loop rowcount
 		}
 
-/*	
+		int k = 0;
+		if(!oldValues.isEmpty()){
+			for(String[] s : oldValues){
+				if(s[0].contains(fv.AAA))
+					itemNo += s[1]+s[0]+",";
+				else if(s[0].contains(fv.AAS))
+					servNo += s[1]+s[0]+",";
+			}
+		}
+	
 		if(!itemNo.isEmpty())
 			itemNo = itemNo.substring(0, itemNo.lastIndexOf(","));
 		if(!servNo.isEmpty())
@@ -292,7 +268,6 @@ public class StockPrinter  {
 			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
 			this.jobDone = false;
 		}
-		*/
 	}
 
 	private void generatePDF()  throws IOException{

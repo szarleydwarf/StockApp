@@ -18,3 +18,4 @@ junit*.properties
 *.sqlite
 *.txt
 *.sqlite
+*.sqlite
