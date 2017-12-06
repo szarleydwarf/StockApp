@@ -92,15 +92,20 @@ public class MainView {
 			} catch (IOException e) {
 				this.logger.logError("MAIN VIEW DATABASE BACKUP FAIL "+this.getClass().getName()+"\t"+e.getMessage());
 			}
-			StockPrinter stPrinter = new StockPrinter(defaultPaths);
-			try {
-				stPrinter.printCleanPDF();
-			} catch (Exception e) {
-				this.logger.logError("MAIN VIEW EMPTY PDF PRINT FAIL "+this.getClass().getName()+"\t"+e.getMessage());
-			}
+			printTestPage(false);
 		}
 		
 		initialize();
+	}
+
+	private void printTestPage(boolean doPrint){
+		StockPrinter stPrinter = new StockPrinter(defaultPaths);
+		try {
+			stPrinter.printCleanPDF(doPrint);
+		} catch (Exception e) {
+			this.logger.logError("MAIN VIEW EMPTY PDF PRINT FAIL "+this.getClass().getName()+"\t"+e.getMessage());
+		}
+
 	}
 
 	public int getInvoiceNum(){
@@ -117,7 +122,7 @@ public class MainView {
 		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setTitle("HCT MAGAZYN");
-		frame.setBounds(100, 100, 650, 280);
+		frame.setBounds(100, 100, 704, 270);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
@@ -203,7 +208,7 @@ public class MainView {
 				SettingsFrame.main(defaultPaths);
 			}
 		});
-		btnSettings.setBounds(574, 180, 52, 52);
+		btnSettings.setBounds(606, 52, 52, 52);
 		
 		frame.getContentPane().add(btnSettings);
 		
@@ -219,5 +224,16 @@ public class MainView {
 		});
 		
 		frame.getContentPane().add(btnSalesReports);
+		
+		Icon testPageImg = new ImageIcon("resources/img/testpageico.png");
+		JButton btnTestPage = new JButton("Strona testowa", testPageImg);
+		btnTestPage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				printTestPage(true);
+			}
+		});
+		btnTestPage.setBackground(new Color(255, 255, 153));
+		btnTestPage.setBounds(606, 121, 52, 52);
+		frame.getContentPane().add(btnTestPage);
 	}
 }

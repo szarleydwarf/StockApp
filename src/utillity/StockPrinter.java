@@ -114,7 +114,7 @@ public class StockPrinter  {
 		accFolderExist = false;
 	}
 	
-	public void printCleanPDF() throws Exception {
+	public void printCleanPDF(boolean doPrint) throws Exception {
 		PDDocument empty = new PDDocument();
 		PDPage page = new PDPage();
 		empty.addPage(page);
@@ -123,12 +123,17 @@ public class StockPrinter  {
 		fillCompanyDetails();
 
 		contentStream.close();
+		if((savePath.lastIndexOf(slash) == savePath.length()-1) && (loggerFolderPath.indexOf(slash) == 0)){
+			loggerFolderPath = loggerFolderPath.substring(1);
+		}
 		String path = savePath+loggerFolderPath+"empty.pdf";
 //		log.logError("print empty pdf "+path);
 		empty.save(path);
 		empty.close();
 // TODO
-//		this.printPDF(path);
+		if(doPrint){
+			this.printPDF(path);
+		}
 	}
 	
 	public boolean printDoc(JTable tbChoosen, Map<String, String> itemCodeName, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
@@ -496,9 +501,8 @@ public class StockPrinter  {
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
 
-        //TODO
-        //Uncomment bellow
-//        job.print();
+        //TODO /Uncomment bellow
+        job.print();
         
         document.close();
    }

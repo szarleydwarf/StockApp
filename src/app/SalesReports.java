@@ -97,7 +97,7 @@ public class SalesReports {
 		frame = new JFrame();
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
-		frame.setBounds(100, 100, 748, 426);
+		frame.setBounds(100, 100, 748, 526);
 		frame.setLocation(10, 10);
 
 		JLabel lblTitle = new JLabel("Raporty sprzeda\u017Cy");
@@ -190,6 +190,18 @@ public class SalesReports {
 		scrollPane.setSize(560, 287);
 		
 		frame.getContentPane().add(scrollPane);
+		
+		JButton button = new JButton("Drukuj dzienny raport");
+		button.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		button.setBackground(new Color(135, 206, 235));
+		button.setBounds(402, 387, 200, 36);
+		frame.getContentPane().add(button);
+		
+		JButton btnDrukujMiesiecznyRaport = new JButton("Drukuj miesi\u0119czny raport");
+		btnDrukujMiesiecznyRaport.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnDrukujMiesiecznyRaport.setBackground(new Color(135, 206, 235));
+		btnDrukujMiesiecznyRaport.setBounds(402, 340, 200, 36);
+		frame.getContentPane().add(btnDrukujMiesiecznyRaport);
 		
 	}
 
