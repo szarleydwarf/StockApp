@@ -304,7 +304,7 @@ public class StockPrinter  {
 	private void fillCompanyDetails() throws IOException {
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.beginText();
-		contentStream.setFont(PDType1Font.COURIER, 18);
+		contentStream.setFont(PDType1Font.COURIER, 16);
 		contentStream.newLineAtOffset(25f,  740);
 		contentStream.setLeading(20.5f);
 		
@@ -340,13 +340,13 @@ public class StockPrinter  {
 		contentStream.beginText();
 		contentStream.setNonStrokingColor(Color.WHITE);
 		contentStream.setLeading(20.5f);
-		contentStream.setFont(PDType1Font.COURIER_BOLD, 20);
+		contentStream.setFont(PDType1Font.COURIER_BOLD, 18);
 		contentStream.newLineAtOffset(25, 440);
 		contentStream.showText(noSt+"    Description         Price        Qnt");
 		contentStream.newLine();
 		contentStream.newLine();
 		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.setFont(PDType1Font.COURIER, 12);
+		contentStream.setFont(PDType1Font.COURIER, 10);
 		if(rowCount > 0) {
 			double sum = 0, price = 0;
 			int qnt = 0;
@@ -391,10 +391,7 @@ public class StockPrinter  {
 		contentStream.showText(eightSpaceStr );
 		for(int i = 0; i < this.freebies.length; i++){
 			if(this.freebies[i])
-				contentStream.showText(this.fv.FREEBIES_ARRAY[i]);
-				
-			if(i < this.freebies.length - 1)
-				contentStream.showText(", ");
+				contentStream.showText(this.fv.FREEBIES_ARRAY[i]+", ");
 	
 			contentStream.newLine();
 			contentStream.showText(eightSpaceStr);

@@ -843,9 +843,13 @@ public class WystawRachunek {
 	}
 
 	protected void addToInvoice() {
-		if(!tfPriceListed.getText().isEmpty())
-			productPrice = Double.parseDouble(tfPriceListed.getText());
-		else
+		if(!tfPriceListed.getText().isEmpty()){
+			String tPrice = tfPriceListed.getText();
+			if(tPrice.contains(",")){
+				tPrice = tPrice.replace(',', '.');
+			}
+			productPrice = Double.parseDouble(tPrice);
+		} else
 			productPrice = item.getPrice();
 		
 		int tfQnt = 0;
@@ -880,7 +884,13 @@ public class WystawRachunek {
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 
 		rowData[0] = tfOther.getText();
-		rowData[1] = ""+tfOtherPrice.getText();
+		
+		String tPrice = tfOtherPrice.getText();
+		if(tPrice.contains(",")){
+			tPrice = tPrice.replace(',', '.');
+		}
+		
+		rowData[1] = tPrice;
 		rowData[2] = ""+tfOtherQnt.getText();
 		
 		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
@@ -915,11 +925,15 @@ public class WystawRachunek {
 	protected void savePDFtoHDD() {
 		sPrinter = new StockPrinter(defaultPaths);
 		collectDataForInvoice();
-//		for(int i = 0; i <freebies.length;i++)
-//		System.out.println("save "+carManufacturer + " " + freebies[i] + discount + " " + isDiscount + " " + registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
-				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
+				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
+				if(saved){
+					this.frame.dispose();
+				} else {
+					JOptionPane.showMessageDialog(frame, this.fv.SAVE_ERROR);
+				}
+					
 			} else
 				JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {
@@ -930,10 +944,14 @@ public class WystawRachunek {
 	private void printDocument(){
 		sPrinter = new StockPrinter(defaultPaths);
 		collectDataForInvoice();
-//		System.out.println("print "+carManufacturer + " " + discount + " " + isDiscount + " " +  registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
 				boolean printed = sPrinter.printDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
+				if(printed){
+					this.frame.dispose();
+				} else {
+					JOptionPane.showMessageDialog(frame, this.fv.PRINT_ERROR);
+				}
 		} else
 			JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {

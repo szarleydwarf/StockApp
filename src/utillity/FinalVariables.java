@@ -38,6 +38,8 @@ public class FinalVariables {
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";
 	public final String INSERT_SUCCESS = "Zapisano pomyślnie";
+	public final String SAVE_ERROR = "Zapis dokumentu nie powiódł się. Sprawdż LOG";
+	public final String PRINT_ERROR = "Wydruk  dokumentu nie powiódł się. Sprawdż LOG";
 	public final String EDIT_SUCCESS = "Edycja zakończona pomyślnie";
 	public final String DELETE_SUCCESS = "Usuwanie zakończone pomyślnie";
 
