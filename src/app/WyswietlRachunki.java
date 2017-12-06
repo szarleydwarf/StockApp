@@ -10,6 +10,8 @@ import utillity.Helper;
 import utillity.Logger;
 
 import java.awt.Color;
+import java.awt.Dimension;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -19,6 +21,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.JTableHeader;
 
 import dbase.DatabaseManager;
 import hct_speciale.Invoice;
@@ -34,6 +37,7 @@ import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTextField;
@@ -41,15 +45,12 @@ import javax.swing.JTextField;
 public class WyswietlRachunki {
 
 	private JFrame frame;
-	private JTextField tfSearch;
-	private JScrollPane scrollPane;
-	private JList<String> list;
-	
+	private JTextField tfSearch;	
 	
 	private FinalVariables fv;
 	private DatabaseManager DM;
 	private ArrayList<Invoice> listOfInvoices;
-	private Invoice selectedInvoice;
+	private JTable table;
 
 	protected static String date;
 	protected static String loggerFolderPath;
@@ -83,10 +84,7 @@ public class WyswietlRachunki {
 		this.fv = new FinalVariables();
 		this.DM = new DatabaseManager(loggerFolderPath);
 		
-		this.selectedInvoice = new Invoice();
-
 		this.listOfInvoices = new ArrayList<Invoice>();
-		list = new JList<String>();
 		
 		initialize();
 		this.populateList();
@@ -127,9 +125,6 @@ public class WyswietlRachunki {
 		label.setBounds(10, 62, 626, 461);
 		frame.getContentPane().add(label);
 		
-		scrollPane = new JScrollPane();
-		scrollPane.setBounds(23, 114, 601, 400);
-		frame.getContentPane().add(scrollPane);
 			
 		JButton btnRefresh = new JButton("Odśwież");
 		btnRefresh.setForeground(new Color(0, 153, 255));
@@ -179,7 +174,7 @@ public class WyswietlRachunki {
 		btnDelete.setBounds(663, 80, 71, 20);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				deleteRocordFromDatabase();
+				
 			}
 		});
 		frame.getContentPane().add(btnDelete);
@@ -191,7 +186,7 @@ public class WyswietlRachunki {
 		btnPrintOne.setBounds(663, 114, 71, 23);
 		btnPrintOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				selectedInvoice.print();
+				
 			}
 		});
 		frame.getContentPane().add(btnPrintOne);
@@ -201,7 +196,7 @@ public class WyswietlRachunki {
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setBounds(100, 100, 760, 606);
 		
-		this.list.addListSelectionListener(new ListSelectionListener() {
+/*		this.list.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent listSelectionEvent) {
 				if(!list.isSelectionEmpty()){
@@ -216,7 +211,7 @@ public class WyswietlRachunki {
 			
 		});
 		
-		
+	*/	
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -234,37 +229,41 @@ public class WyswietlRachunki {
 
 	protected void populateList() {
 		String query = "SELECT * from "+this.fv.INVOCE_TABLE+" ORDER BY "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" ASC";//item_name, cost, price,quantity
-		DefaultListModel<String> modelItems = new DefaultListModel<>();
-		
+//		ArrayList<String> list = new ArrayList<String>();
+//		list = this.DM.selectRecordArrayList(query);
 		listOfInvoices = DM.getInvoiceList(query);
+
+		String[][] data = new String [listOfInvoices.size()][this.fv.INVOICE_REPORT_TB_HEADINGS.length];
 		
-		for(int i = 0; i < listOfInvoices.size(); i++) {
-			Invoice invoice = (Invoice) listOfInvoices.get(i);
-			modelItems.addElement(invoice.toString());
+		for(int i = 0; i < listOfInvoices.size(); i++){
+			data[i][0] = ""+listOfInvoices.get(i).getInvoiceNumber();
+			data[i][1] = ""+listOfInvoices.get(i).getCustomerName();
+			data[i][2] = ""+listOfInvoices.get(i).getItemNumber();
+			data[i][3] = ""+listOfInvoices.get(i).getServiceNumber();
+			data[i][4] = ""+listOfInvoices.get(i).getTotal();
+			data[i][5] = ""+listOfInvoices.get(i).getInvoiceDateString();
+			data[i][6] = ""+listOfInvoices.get(i).getFilePathName();
+			
 		}
 
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		scrollPane.setViewportView(list);
-		list.setModel(modelItems);
+		table = new JTable(data, this.fv.INVOICE_REPORT_TB_HEADINGS);
+		table.setBounds(42, 87, 560, 288);
+		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+		table.setFillsViewportHeight(true);
+		
+		JTableHeader header = table.getTableHeader();
+		header.setBackground(Color.black);
+		header.setForeground(Color.yellow);
+	      
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(23, 114, 601, 400);
+		frame.getContentPane().add(scrollPane);	
 	}
 
 	protected void searchInDatabase() {
 		String query = "SELECT * FROM "+this.fv.INVOCE_TABLE+"";
 		if(!tfSearch.getText().equals(this.fv.SEARCH_TEXT_FIELD_FRAZE))
 			query += " WHERE "+this.fv.INVOCE_TABLE_CUSTOMER_NAME+" LIKE '%"+tfSearch.getText()+"%' ORDER BY "+this.fv.INVOCE_TABLE_DATE+" ASC";
-		DefaultListModel<String> modelItems = new DefaultListModel<>();
-		
-		ArrayList<Invoice> listOfIvoices = DM.getInvoiceList(query);
-		
-		for(int i = 0; i < listOfIvoices.size(); i++) {
-			Invoice item = listOfIvoices.get(i);
-			modelItems.addElement(item.toString());
-		}
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		scrollPane.setViewportView(list);
-		list.setModel(modelItems);
 	}
 
 	protected void deleteRocordFromDatabase() {

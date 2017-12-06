@@ -119,6 +119,18 @@ public class SalesReports {
 		lblBorder.setBounds(42, 50, 560, 20);
 		frame.getContentPane().add(lblBorder);
 
+		JButton button = new JButton("Drukuj dzienny raport");
+		button.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		button.setBackground(new Color(135, 206, 235));
+		button.setBounds(402, 387, 200, 36);
+		frame.getContentPane().add(button);
+		
+		JButton btnDrukujMiesiecznyRaport = new JButton("Drukuj miesi\u0119czny raport");
+		btnDrukujMiesiecznyRaport.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnDrukujMiesiecznyRaport.setBackground(new Color(135, 206, 235));
+		btnDrukujMiesiecznyRaport.setBounds(402, 340, 200, 36);
+		frame.getContentPane().add(btnDrukujMiesiecznyRaport);
+
 		populateTable();
 		
 		btnBack.addActionListener(new ActionListener() {
@@ -144,8 +156,7 @@ public class SalesReports {
 	}
 
 	private void populateTable() {
-		DecimalFormat df;
-		df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
+		DecimalFormat df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 		String query = "";
 		String[][] data = new String [this.fv.MONTHS_2017.length][this.fv.SALES_REPORT_TB_HEADINGS.length];
 
@@ -189,20 +200,7 @@ public class SalesReports {
 		scrollPane.setLocation(42, 48);
 		scrollPane.setSize(560, 287);
 		
-		frame.getContentPane().add(scrollPane);
-		
-		JButton button = new JButton("Drukuj dzienny raport");
-		button.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		button.setBackground(new Color(135, 206, 235));
-		button.setBounds(402, 387, 200, 36);
-		frame.getContentPane().add(button);
-		
-		JButton btnDrukujMiesiecznyRaport = new JButton("Drukuj miesi\u0119czny raport");
-		btnDrukujMiesiecznyRaport.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnDrukujMiesiecznyRaport.setBackground(new Color(135, 206, 235));
-		btnDrukujMiesiecznyRaport.setBounds(402, 340, 200, 36);
-		frame.getContentPane().add(btnDrukujMiesiecznyRaport);
-		
+		frame.getContentPane().add(scrollPane);		
 	}
 
 	private double sumCosts(String[] tokens) {
