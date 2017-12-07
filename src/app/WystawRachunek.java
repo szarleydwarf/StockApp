@@ -930,6 +930,7 @@ public class WystawRachunek {
 				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
 				if(saved){
 					this.frame.dispose();
+					MainView.main(null);
 				} else {
 					JOptionPane.showMessageDialog(frame, this.fv.SAVE_ERROR);
 				}
@@ -949,6 +950,7 @@ public class WystawRachunek {
 				boolean printed = sPrinter.printDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
 				if(printed){
 					this.frame.dispose();
+					MainView.main(null);
 				} else {
 					JOptionPane.showMessageDialog(frame, this.fv.PRINT_ERROR);
 				}

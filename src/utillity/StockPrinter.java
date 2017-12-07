@@ -359,9 +359,9 @@ public class StockPrinter  {
 				contentStream.showText(""+i+1);
 				qnt = 0;
 				for(int j = 0; j < this.colCount; j++){
-					contentStream.showText(" - "+this.md.getValueAt(i, j));
+					contentStream.showText(" - "+this.md.getValueAt(i, j)+this.eightSpaceStr);
 					if(j == 1)
-						price = Double.parseDouble(this.md.getValueAt(i, j).toString());
+						price = Double.parseDouble(this.md.getValueAt(i, j).toString()+this.eightSpaceStr);
 					if(j == 2)
 						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
 					
