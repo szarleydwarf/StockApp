@@ -26,6 +26,8 @@ import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.util.Matrix;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
+import hct_speciale.StockItem;
 
 
 public class StockPrinter  { 
@@ -486,6 +488,37 @@ public class StockPrinter  {
 
 		customerCopyDoc.save(accPath);
 		customerCopyDoc.close();
+	}
+//TODO in progress
+	public void printStockList(ArrayList<Item> listToPrint) throws Exception {
+		PDDocument stockDoc = new PDDocument();
+		PDPage page = new PDPage();
+		stockDoc.addPage(page);
+		contentStream = new PDPageContentStream(stockDoc, page);
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.BLACK);
+		contentStream.setLeading(20.5f);
+		contentStream.setFont(PDType1Font.COURIER_BOLD, 18);
+		contentStream.newLineAtOffset(25, 760);
+		contentStream.showText(noSt+" - ID - Nazwa -  Koszt - Cena - Qnt");
+		contentStream.newLine();
+	
+		contentStream.setFont(PDType1Font.COURIER, 12);	
+		if(listToPrint.size()>0){
+			for(int i = 0; i < listToPrint.size(); i++){
+				contentStream.showText(i+" - "+listToPrint.get(i).getStockNumber()+" - "+listToPrint.get(i).getName()+" - "+listToPrint.get(i).getCost()+" - "+listToPrint.get(i).getPrice()+" - "+((StockItem) listToPrint.get(i)).getQnt());
+				contentStream.newLine();
+			}
+		}
+		contentStream.endText();
+		contentStream.close();
+
+		String path = savePath+loggerFolderPath+date+"_magazyn.pdf";
+		log.logError("print stock pdf "+path);
+		stockDoc.save(path);
+		stockDoc.close();
+		
+		this.printPDF(path);
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{

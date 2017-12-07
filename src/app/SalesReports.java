@@ -1,40 +1,31 @@
 package app;
 
-import java.awt.EventQueue;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.Dimension;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
-import dbase.DatabaseManager;
-import hct_speciale.Item;
-import utillity.FinalVariables;
-import utillity.Helper;
-import utillity.Logger;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.table.JTableHeader;
+
+import dbase.DatabaseManager;
+import utillity.FinalVariables;
+import utillity.Helper;
+import utillity.Logger;
 
 public class SalesReports {
 

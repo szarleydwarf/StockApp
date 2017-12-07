@@ -117,12 +117,12 @@ public class MainView {
 	private void initialize() {
 //		if(this.frmHctMagazyn == null)
 		frame = new JFrame();
-		frame.getContentPane().setBackground(new Color(255, 51, 0));
-//		frame.getContentPane().setBackground(Color.CYAN);
+//		frame.getContentPane().setBackground(new Color(255, 51, 0));
+		frame.getContentPane().setBackground(Color.CYAN);
 		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setTitle("HCT MAGAZYN");
-		frame.setBounds(100, 100, 704, 270);
+		frame.setBounds(10, 10, 704, 270);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
