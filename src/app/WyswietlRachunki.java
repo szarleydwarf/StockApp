@@ -249,6 +249,10 @@ public class WyswietlRachunki {
 			
 		}
 
+		/*
+		 * Auto column width taken from link below
+		 * https://stackoverflow.com/questions/17858132/automatically-adjust-jtable-column-to-fit-content
+		 * */
 		table = new JTable(data, this.fv.INVOICE_REPORT_TB_HEADINGS){
 		    @Override
 		       public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {

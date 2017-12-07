@@ -13,8 +13,6 @@ import java.util.Map;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.attribute.PrintServiceAttributeSet;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
@@ -25,6 +23,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.printing.PDFPageable;
+import org.apache.pdfbox.util.Matrix;
 
 import dbase.DatabaseManager;
 
@@ -41,16 +40,15 @@ public class StockPrinter  {
 	private double sum = 0, discount = 0;
 	private long timeout = 50000;
 	private boolean applyDiscount = false;
-	private int itemCount = 0, servCount = 0;
-	private int invNo = 1, stringLengthF = 3, stringLengthB = 12;
-	private char paddingChar = ' ';
+
+	private int invNo = 1;
 	private String carManufacturer = "OTHER", carRegistration = "00AA0000", invSt = "Invoice", noSt = "No.", date;
 	
 	private Helper helper;
 	private DatabaseManager DM;
 	private FinalVariables fv;
 	
-	private ArrayList<String> stockServicesNumber;
+//	private ArrayList<String> stockServicesNumber;
 	private boolean jobDone = false;
 	private String invoiceFileName;
 	private String fileName;
@@ -107,7 +105,7 @@ public class StockPrinter  {
 
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
-		this.stockServicesNumber = new ArrayList<String>();
+//		this.stockServicesNumber = new ArrayList<String>();
 		freebies = new boolean[fv.FREEBIES_ARRAY_SIZE];
 		
 		folderExist = false;
@@ -130,7 +128,7 @@ public class StockPrinter  {
 //		log.logError("print empty pdf "+path);
 		empty.save(path);
 		empty.close();
-// TODO
+		
 		if(doPrint){
 			this.printPDF(path);
 		}
@@ -290,13 +288,12 @@ public class StockPrinter  {
 		this.fileName =  date+" "+invNo+ext; 
 		this.invoiceFileName = date+slash+this.fileName;
 		docPath = savePath+slash+this.fileName;
-		//TODO
-//		log.logError("save path "+savePath +" docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
-
+		
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
 
+	
 	private void addLogo(PDDocument customerCopyDoc) throws IOException {
 		PDImageXObject pdImage = PDImageXObject.createFromFile(this.fv.INVOICE_LOGO_PATH, customerCopyDoc);
 		
@@ -357,13 +354,16 @@ public class StockPrinter  {
 			int qnt = 0;
 			//TODO  find out if you can position next part of the string
 			// try to do something similiar like in save to database to have each product displayed just once
+	
 			for(int i = 0; i < this.rowCount; i++){
 				contentStream.showText(""+i+1);
 				qnt = 0;
 				for(int j = 0; j < this.colCount; j++){
+
 					contentStream.showText(" - "+this.md.getValueAt(i, j)+this.eightSpaceStr);
-					if(j == 1)
-						price = Double.parseDouble(this.md.getValueAt(i, j).toString()+this.eightSpaceStr);
+					if(j == 1){
+						price = Double.parseDouble(this.md.getValueAt(i, j).toString());
+					}
 					if(j == 2)
 						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
 					
@@ -483,8 +483,7 @@ public class StockPrinter  {
 		contentStream.close();
 
 		accPath = accPath+"\\"+date+"_"+docNameCopy+" "+invNo+ext;
-//		log.logError("acc path "+accPath);
-		//TODO:
+
 		customerCopyDoc.save(accPath);
 		customerCopyDoc.close();
 	}
@@ -503,7 +502,7 @@ public class StockPrinter  {
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
 
-        //TODO /Uncomment bellow
+        //TODO /Uncomment bellow before export to app
 //        job.print();
         
         document.close();
