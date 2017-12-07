@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -311,7 +312,7 @@ public class WystawRachunek {
 			}
 		});
 		frame.getContentPane().add(btnPrint);
-//TODO	
+	
 		JButton btnZapisz = new JButton("ZAPISZ");
 		btnZapisz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -628,6 +629,7 @@ public class WystawRachunek {
 		frame.getContentPane().add(lblFreebies);
 		
 		chbAirfreshener = new JCheckBox("Odświeżacz");
+		chbAirfreshener.setSelected(true);
 		chbAirfreshener.setBackground(new Color(255, 51, 51));
 		chbAirfreshener.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		chbAirfreshener.setBounds(446, 350, 138, 23);
@@ -699,6 +701,13 @@ public class WystawRachunek {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+fv.STOCK_SORT_BY+" ASC";
 		ArrayList<Item> listOfItems = new ArrayList<Item>();
 		listOfItems = DM.getItemsList(query);
+		
+		Iterator<Item> it = listOfItems.iterator();
+		while(it.hasNext()){
+			if (((StockItem) it.next()).getQnt() == 0){
+				it.remove();
+			}
+		}
 
 		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+fv.SERVICES_SORT_BY+" ASC";//item_name, cost, price,quantity
 		ArrayList<Item> listOfServices = new ArrayList<Item>();
@@ -921,7 +930,7 @@ public class WystawRachunek {
 		}
 		return sum;
 	}
-//TODO
+
 	protected void savePDFtoHDD() {
 		sPrinter = new StockPrinter(defaultPaths);
 		collectDataForInvoice();

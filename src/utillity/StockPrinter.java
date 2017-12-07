@@ -355,6 +355,8 @@ public class StockPrinter  {
 		if(rowCount > 0) {
 			double sum = 0, price = 0;
 			int qnt = 0;
+			//TODO  find out if you can position next part of the string
+			// try to do something similiar like in save to database to have each product displayed just once
 			for(int i = 0; i < this.rowCount; i++){
 				contentStream.showText(""+i+1);
 				qnt = 0;
@@ -502,7 +504,7 @@ public class StockPrinter  {
         job.setPrintService(myPrintService);
 
         //TODO /Uncomment bellow
-        job.print();
+//        job.print();
         
         document.close();
    }

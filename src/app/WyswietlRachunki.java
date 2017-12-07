@@ -10,6 +10,7 @@ import utillity.Helper;
 import utillity.Logger;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
@@ -22,6 +23,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import dbase.DatabaseManager;
 import hct_speciale.Invoice;
@@ -96,7 +99,11 @@ public class WyswietlRachunki {
 	private void initialize() {
 		frame = new JFrame();
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
-		frame.setLocation(10, 10);
+		
+		frame.setBackground(new Color(255, 255, 0));
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
+		frame.setBounds(10, 10, 1220, 700);
+//		frame.setLocation(10, 10);
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Lista wystawionych rachunkow");
@@ -112,7 +119,7 @@ public class WyswietlRachunki {
 				MainView.main(null);
 			}
 		});
-		btnBack.setBounds(645, 533, 89, 23);
+		btnBack.setBounds(1105, 627, 89, 23);
 		frame.getContentPane().add(btnBack);
 
 		Border b = BorderFactory.createLineBorder(Color.BLUE);
@@ -122,7 +129,7 @@ public class WyswietlRachunki {
 		label.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		label.setBorder(border);
 		label.setVerticalAlignment(SwingConstants.TOP);
-		label.setBounds(10, 62, 626, 461);
+		label.setBounds(10, 62, 1106, 554);
 		frame.getContentPane().add(label);
 		
 			
@@ -168,22 +175,22 @@ public class WyswietlRachunki {
 			}
 		});
 		frame.getContentPane().add(btnSearch);
-		
+		/*
 		JButton btnDelete = new JButton("Usuń");
 		btnDelete.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		btnDelete.setBounds(663, 80, 71, 20);
+		btnDelete.setBounds(972, 80, 71, 20);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
 			}
 		});
 		frame.getContentPane().add(btnDelete);
-		
+		*/
 		JButton btnPrintOne = new JButton("Drukuj");
 		btnPrintOne.setBackground(Color.LIGHT_GRAY);
 		btnPrintOne.setForeground(Color.GRAY);
 		btnPrintOne.setFont(new Font("Segoe UI Black", Font.PLAIN, 11));
-		btnPrintOne.setBounds(663, 114, 71, 23);
+		btnPrintOne.setBounds(1123, 64, 71, 23);
 		btnPrintOne.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -191,10 +198,6 @@ public class WyswietlRachunki {
 		});
 		frame.getContentPane().add(btnPrintOne);
 		
-		
-		frame.setBackground(new Color(255, 255, 0));
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
-		frame.setBounds(100, 100, 760, 606);
 		
 /*		this.list.addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -246,7 +249,17 @@ public class WyswietlRachunki {
 			
 		}
 
-		table = new JTable(data, this.fv.INVOICE_REPORT_TB_HEADINGS);
+		table = new JTable(data, this.fv.INVOICE_REPORT_TB_HEADINGS){
+		    @Override
+		       public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+		           Component component = super.prepareRenderer(renderer, row, column);
+		           int rendererWidth = component.getPreferredSize().width;
+		           TableColumn tableColumn = getColumnModel().getColumn(column);
+		           tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
+		           return component;
+		        }
+		    };
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setBounds(42, 87, 560, 288);
 		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
 		table.setFillsViewportHeight(true);
@@ -255,8 +268,8 @@ public class WyswietlRachunki {
 		header.setBackground(Color.black);
 		header.setForeground(Color.yellow);
 	      
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(23, 114, 601, 400);
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setBounds(23, 114, 1080, 491);
 		frame.getContentPane().add(scrollPane);	
 	}
 
