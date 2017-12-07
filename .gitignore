@@ -22,4 +22,9 @@ junit*.properties
 >>>>>>> try_item_class
 *.txt
 *.sqlite
+<<<<<<< HEAD
 src/app/WystawRachunek.java
+=======
+*.sqlite
+*.sqlite
+>>>>>>> try_item_class

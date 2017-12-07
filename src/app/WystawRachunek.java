@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -430,7 +431,7 @@ public class WystawRachunek {
 			}
 		});
 		frame.getContentPane().add(btnPrint);
-//TODO	
+	
 		JButton btnZapisz = new JButton("ZAPISZ");
 		btnZapisz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1109,6 +1110,7 @@ public class WystawRachunek {
 		frame.getContentPane().add(lblFreebies);
 		
 		chbAirfreshener = new JCheckBox("Odświeżacz");
+		chbAirfreshener.setSelected(true);
 		chbAirfreshener.setBackground(new Color(255, 51, 51));
 		chbAirfreshener.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		chbAirfreshener.setBounds(446, 350, 138, 23);
@@ -1275,6 +1277,13 @@ public class WystawRachunek {
 		String query = "SELECT * from "+this.fv.STOCK_TABLE+" ORDER BY "+fv.STOCK_SORT_BY+" ASC";
 		ArrayList<Item> listOfItems = new ArrayList<Item>();
 		listOfItems = DM.getItemsList(query);
+		
+		Iterator<Item> it = listOfItems.iterator();
+		while(it.hasNext()){
+			if (((StockItem) it.next()).getQnt() == 0){
+				it.remove();
+			}
+		}
 
 		String queryServices = "SELECT * from "+this.fv.SERVICES_TABLE+" ORDER BY "+fv.SERVICES_SORT_BY+" ASC";//item_name, cost, price,quantity
 		ArrayList<Item> listOfServices = new ArrayList<Item>();
@@ -1502,9 +1511,13 @@ public class WystawRachunek {
 	}
 
 	protected void addToInvoice() {
-		if(!tfPriceListed.getText().isEmpty())
-			productPrice = Double.parseDouble(tfPriceListed.getText());
-		else
+		if(!tfPriceListed.getText().isEmpty()){
+			String tPrice = tfPriceListed.getText();
+			if(tPrice.contains(",")){
+				tPrice = tPrice.replace(',', '.');
+			}
+			productPrice = Double.parseDouble(tPrice);
+		} else
 			productPrice = item.getPrice();
 		
 		int tfQnt = 0;
@@ -1539,7 +1552,13 @@ public class WystawRachunek {
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
 
 		rowData[0] = tfOther.getText();
-		rowData[1] = ""+tfOtherPrice.getText();
+		
+		String tPrice = tfOtherPrice.getText();
+		if(tPrice.contains(",")){
+			tPrice = tPrice.replace(',', '.');
+		}
+		
+		rowData[1] = tPrice;
 		rowData[2] = ""+tfOtherQnt.getText();
 		
 		DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
@@ -1640,15 +1659,20 @@ public class WystawRachunek {
 		}
 		return sum;
 	}
-//TODO
+
 	protected void savePDFtoHDD() {
 		sPrinter = new StockPrinter(defaultPaths);
 		collectDataForInvoice();
-//		for(int i = 0; i <freebies.length;i++)
-//		System.out.println("save "+carManufacturer + " " + freebies[i] + discount + " " + isDiscount + " " + registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
-				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
+				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
+				if(saved){
+					this.frame.dispose();
+					MainView.main(null);
+				} else {
+					JOptionPane.showMessageDialog(frame, this.fv.SAVE_ERROR);
+				}
+					
 			} else
 				JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {
@@ -1659,10 +1683,15 @@ public class WystawRachunek {
 	private void printDocument(){
 		sPrinter = new StockPrinter(defaultPaths);
 		collectDataForInvoice();
-//		System.out.println("print "+carManufacturer + " " + discount + " " + isDiscount + " " +  registration + " " + invoiceNum);
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
 				boolean printed = sPrinter.printDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
+				if(printed){
+					this.frame.dispose();
+					MainView.main(null);
+				} else {
+					JOptionPane.showMessageDialog(frame, this.fv.PRINT_ERROR);
+				}
 		} else
 			JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {

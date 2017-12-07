@@ -97,7 +97,7 @@ public class SalesReports {
 		frame = new JFrame();
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
-		frame.setBounds(100, 100, 748, 426);
+		frame.setBounds(100, 100, 748, 526);
 		frame.setLocation(10, 10);
 
 		JLabel lblTitle = new JLabel("Raporty sprzeda\u017Cy");
@@ -124,6 +124,18 @@ public class SalesReports {
 		lblBorder.setBounds(42, 50, 560, 20);
 		frame.getContentPane().add(lblBorder);
 
+		JButton button = new JButton("Drukuj dzienny raport");
+		button.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		button.setBackground(new Color(135, 206, 235));
+		button.setBounds(402, 387, 200, 36);
+		frame.getContentPane().add(button);
+		
+		JButton btnDrukujMiesiecznyRaport = new JButton("Drukuj miesi\u0119czny raport");
+		btnDrukujMiesiecznyRaport.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnDrukujMiesiecznyRaport.setBackground(new Color(135, 206, 235));
+		btnDrukujMiesiecznyRaport.setBounds(402, 340, 200, 36);
+		frame.getContentPane().add(btnDrukujMiesiecznyRaport);
+
 		populateTable();
 		
 		btnBack.addActionListener(new ActionListener() {
@@ -149,8 +161,7 @@ public class SalesReports {
 	}
 
 	private void populateTable() {
-		DecimalFormat df;
-		df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
+		DecimalFormat df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
 		String query = "";
 		String[][] data = new String [this.fv.MONTHS_2017.length][this.fv.SALES_REPORT_TB_HEADINGS.length];
 
@@ -199,8 +210,7 @@ public class SalesReports {
 		header.setForeground(Color.yellow);
 
 		
-		frame.getContentPane().add(scrollPane);
-		
+		frame.getContentPane().add(scrollPane);		
 	}
 
 	private double sumCosts(String[] tokens) {

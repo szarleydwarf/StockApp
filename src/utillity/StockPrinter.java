@@ -7,13 +7,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.attribute.PrintServiceAttributeSet;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
@@ -24,6 +23,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.printing.PDFPageable;
+import org.apache.pdfbox.util.Matrix;
 
 import dbase.DatabaseManager;
 
@@ -40,16 +40,15 @@ public class StockPrinter  {
 	private double sum = 0, discount = 0;
 	private long timeout = 50000;
 	private boolean applyDiscount = false;
-	private int itemCount = 0, servCount = 0;
-	private int invNo = 1, stringLengthF = 3, stringLengthB = 12;
-	private char paddingChar = ' ';
+
+	private int invNo = 1;
 	private String carManufacturer = "OTHER", carRegistration = "00AA0000", invSt = "Invoice", noSt = "No.", date;
 	
 	private Helper helper;
 	private DatabaseManager DM;
 	private FinalVariables fv;
 	
-	private ArrayList<String> stockServicesNumber;
+//	private ArrayList<String> stockServicesNumber;
 	private boolean jobDone = false;
 	private String invoiceFileName;
 	private String fileName;
@@ -106,14 +105,14 @@ public class StockPrinter  {
 
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
-		this.stockServicesNumber = new ArrayList<String>();
+//		this.stockServicesNumber = new ArrayList<String>();
 		freebies = new boolean[fv.FREEBIES_ARRAY_SIZE];
 		
 		folderExist = false;
 		accFolderExist = false;
 	}
 	
-	public void printCleanPDF() throws Exception {
+	public void printCleanPDF(boolean doPrint) throws Exception {
 		PDDocument empty = new PDDocument();
 		PDPage page = new PDPage();
 		empty.addPage(page);
@@ -122,12 +121,17 @@ public class StockPrinter  {
 		fillCompanyDetails();
 
 		contentStream.close();
+		if((savePath.lastIndexOf(slash) == savePath.length()-1) && (loggerFolderPath.indexOf(slash) == 0)){
+			loggerFolderPath = loggerFolderPath.substring(1);
+		}
 		String path = savePath+loggerFolderPath+"empty.pdf";
 //		log.logError("print empty pdf "+path);
 		empty.save(path);
 		empty.close();
-// TODO
-//		this.printPDF(path);
+		
+		if(doPrint){
+			this.printPDF(path);
+		}
 	}
 	
 	public boolean printDoc(JTable tbChoosen, Map<String, String> itemCodeName, boolean[] freebies, double discount, boolean applyDiscount, String carManufacturer, String registration, int invoiceNum) throws Exception{
@@ -213,66 +217,41 @@ public class StockPrinter  {
 
 	private void saveEntryToDatabase() throws SQLException {
 		String servNo = "", itemNo = "";
-		if(rowCount > 0) {
-			int qnt = 0, count = 0;
-			boolean isStockItem = false, addToString = false;
-			String[] pair = new String[2]; 
-			ArrayList<String[]> oldValues = new ArrayList<String[]>();
-			String newValue = "";
-			
+		int qnt = 0;
+		String[] pt = new String[2]; 
+		ArrayList<String[]> oldValues = new ArrayList<String[]>();
+
+		if(rowCount > 0) {			
 			for(int i = 0; i < this.rowCount; i++){
-				qnt = 0;
-
-				for(int j = 0; j < this.colCount; j++){
-					if(j == 0){
-						String key = this.md.getValueAt(i, j).toString();
-						newValue = this.itemCodeName.get(key);
+				pt = new String[2];
+				pt[0] = this.itemCodeName.get(this.md.getValueAt(i, 0).toString());
+				pt[1] = this.md.getValueAt(i, 2).toString();
+				
+				if(!oldValues.isEmpty()){
+					Iterator<String[]> it = oldValues.iterator();
+					while(it.hasNext()){
+						String[] s = it.next();
+						if(s[0].equals(pt[0])){						
+							qnt = Integer.parseInt(pt[1]) + Integer.parseInt(s[1]);
+							pt[1] = ""+qnt;	
+							it.remove();
+						}
 					}
-					
-					if(j == 2)
-						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
-					
-					System.out.println(i+"/"+j+" nV: "+newValue);
-					
-					if(oldValues.size()==0 && j == 2){
-						pair[0] = newValue;
-						pair[1] = ""+qnt;
-						oldValues.add(pair);
-						System.out.println("first: "+qnt );
-					} else if(j == 2) {
-						for(int index = 0; index < oldValues.size(); index++){
-							String[] pairT = oldValues.get(index);
-							System.out.println("pair: "+pairT[0]+" / "+newValue+" "+pairT[1] );
-							if(pairT[0].equals(newValue)){
-									qnt = Integer.parseInt(pairT[1]);
-									if(count == 0){
-										count++;
-										qnt++;
-									}
-									pairT[1] = "" + qnt;
-									oldValues.remove(index);
-									System.out.println("loop if: "+qnt+" "+pairT[0]+" "+pairT[1] );
-							} else if(!pair[0].equals(newValue)){
-								pairT[0] = newValue;
-								pairT[1] = ""+qnt;
-								System.out.println("loop else: "+qnt+" "+pairT[0]+" "+pairT[1] );
-							}
-							oldValues.add(pairT);
-						}	
-					}
-//					if(!Character.isDigit(value.charAt(0))) 
-					System.out.println("qnt: "+qnt+"\n");
 				}
-			}
-			count = 0;
-
-			int k = 0;
-			for(String[] s : oldValues)
-				System.out.println(k++ +" : "+s[0]+" - "+s[1]);
-
+				oldValues.add(pt);
+			}//end for loop rowcount
 		}
 
-/*	
+		int k = 0;
+		if(!oldValues.isEmpty()){
+			for(String[] s : oldValues){
+				if(s[0].contains(fv.AAA))
+					itemNo += s[1]+s[0]+",";
+				else if(s[0].contains(fv.AAS))
+					servNo += s[1]+s[0]+",";
+			}
+		}
+	
 		if(!itemNo.isEmpty())
 			itemNo = itemNo.substring(0, itemNo.lastIndexOf(","));
 		if(!servNo.isEmpty())
@@ -292,7 +271,6 @@ public class StockPrinter  {
 			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
 			this.jobDone = false;
 		}
-		*/
 	}
 
 	private void generatePDF()  throws IOException{
@@ -310,13 +288,12 @@ public class StockPrinter  {
 		this.fileName =  date+" "+invNo+ext; 
 		this.invoiceFileName = date+slash+this.fileName;
 		docPath = savePath+slash+this.fileName;
-		//TODO
-//		log.logError("save path "+savePath +" docpath "+this.docPath+" "+this.docNameCopy+"\t invName "+this.invoiceFileName);
-
+		
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
 
+	
 	private void addLogo(PDDocument customerCopyDoc) throws IOException {
 		PDImageXObject pdImage = PDImageXObject.createFromFile(this.fv.INVOICE_LOGO_PATH, customerCopyDoc);
 		
@@ -329,7 +306,7 @@ public class StockPrinter  {
 	private void fillCompanyDetails() throws IOException {
 		contentStream.setNonStrokingColor(Color.BLACK);
 		contentStream.beginText();
-		contentStream.setFont(PDType1Font.COURIER, 18);
+		contentStream.setFont(PDType1Font.COURIER, 16);
 		contentStream.newLineAtOffset(25f,  740);
 		contentStream.setLeading(20.5f);
 		
@@ -365,23 +342,28 @@ public class StockPrinter  {
 		contentStream.beginText();
 		contentStream.setNonStrokingColor(Color.WHITE);
 		contentStream.setLeading(20.5f);
-		contentStream.setFont(PDType1Font.COURIER_BOLD, 20);
+		contentStream.setFont(PDType1Font.COURIER_BOLD, 18);
 		contentStream.newLineAtOffset(25, 440);
 		contentStream.showText(noSt+"    Description         Price        Qnt");
 		contentStream.newLine();
 		contentStream.newLine();
 		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.setFont(PDType1Font.COURIER, 12);
+		contentStream.setFont(PDType1Font.COURIER, 10);
 		if(rowCount > 0) {
 			double sum = 0, price = 0;
 			int qnt = 0;
+			//TODO  find out if you can position next part of the string
+			// try to do something similiar like in save to database to have each product displayed just once
+	
 			for(int i = 0; i < this.rowCount; i++){
 				contentStream.showText(""+i+1);
 				qnt = 0;
 				for(int j = 0; j < this.colCount; j++){
-					contentStream.showText(" - "+this.md.getValueAt(i, j));
-					if(j == 1)
+
+					contentStream.showText(" - "+this.md.getValueAt(i, j)+this.eightSpaceStr);
+					if(j == 1){
 						price = Double.parseDouble(this.md.getValueAt(i, j).toString());
+					}
 					if(j == 2)
 						qnt = Integer.parseInt(this.md.getValueAt(i, j).toString());
 					
@@ -416,10 +398,7 @@ public class StockPrinter  {
 		contentStream.showText(eightSpaceStr );
 		for(int i = 0; i < this.freebies.length; i++){
 			if(this.freebies[i])
-				contentStream.showText(this.fv.FREEBIES_ARRAY[i]);
-				
-			if(i < this.freebies.length - 1)
-				contentStream.showText(", ");
+				contentStream.showText(this.fv.FREEBIES_ARRAY[i]+", ");
 	
 			contentStream.newLine();
 			contentStream.showText(eightSpaceStr);
@@ -504,8 +483,7 @@ public class StockPrinter  {
 		contentStream.close();
 
 		accPath = accPath+"\\"+date+"_"+docNameCopy+" "+invNo+ext;
-//		log.logError("acc path "+accPath);
-		//TODO:
+
 		customerCopyDoc.save(accPath);
 		customerCopyDoc.close();
 	}
@@ -524,8 +502,7 @@ public class StockPrinter  {
         job.setPageable(new PDFPageable(document));
         job.setPrintService(myPrintService);
 
-        //TODO
-        //Uncomment bellow
+        //TODO /Uncomment bellow before export to app
 //        job.print();
         
         document.close();

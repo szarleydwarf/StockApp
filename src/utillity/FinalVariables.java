@@ -38,6 +38,8 @@ public class FinalVariables {
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";
 	public final String INSERT_SUCCESS = "Zapisano pomyślnie";
+	public final String SAVE_ERROR = "Zapis dokumentu nie powiódł się. Sprawdż LOG";
+	public final String PRINT_ERROR = "Wydruk  dokumentu nie powiódł się. Sprawdż LOG";
 	public final String EDIT_SUCCESS = "Edycja zakończona pomyślnie";
 	public final String DELETE_SUCCESS = "Usuwanie zakończone pomyślnie";
 
@@ -49,8 +51,12 @@ public class FinalVariables {
 	public static final String[] INVOICE_TB_HEADINGS = {"Inv #", "Klient", "Serwis #", "Towar #", "Total", "Data wystawienia", "Nazwa pliku"};
 	public static final String[] CARS_TABLE_HEADER = {"Marka auta"};
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
+=======
+	public static final String[] INVOICE_REPORT_TB_HEADINGS = {"Inv #", "Klient", "Usługi", "Produkty", "Total", "Data faktury", "Ścieżka dostępu"};
+>>>>>>> try_item_class
 	public final String CARS_TB_NAME = "CARS";
 	public final String STOCK_TB_NAME = "STOCK";
 	public final String CHOSEN_TB_NAME = "CHOOSEN";
