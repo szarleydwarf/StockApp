@@ -26,6 +26,9 @@ import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
+import utillity.StockPrinter;
+
+import javax.swing.JComboBox;
 
 public class SalesReports {
 
@@ -40,6 +43,9 @@ public class SalesReports {
 	private static Logger log;
 	private static Helper helper;
 	private JTable table;
+	protected int dayOfReport = 0;
+	private ArrayList<String> defaultPaths;
+	private StockPrinter stPrinter;
 
 	/**
 	 * Launch the application.
@@ -52,6 +58,7 @@ public class SalesReports {
 				log = new Logger(loggerFolderPath);
 				helper = new Helper();
 				date = helper.getFormatedDate();
+				
 				try {
 					SalesReports window = new SalesReports();
 					window.frame.setVisible(true);
@@ -76,7 +83,11 @@ public class SalesReports {
 		String q2 = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.COST+" FROM "+ this.fv.STOCK_TABLE;
 		this.stocksCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q2);
 
-		
+		if(this.defaultPaths == null || this.defaultPaths.isEmpty())
+			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+
+		stPrinter = new StockPrinter(defaultPaths);
+
 		initialize();
 	}
 
@@ -88,7 +99,7 @@ public class SalesReports {
 		frame = new JFrame();
 		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setLayout(null);
-		frame.setBounds(100, 100, 748, 526);
+		frame.setBounds(100, 100, 748, 490);
 		frame.setLocation(10, 10);
 
 		JLabel lblTitle = new JLabel("Raporty sprzeda\u017Cy");
@@ -110,18 +121,50 @@ public class SalesReports {
 		lblBorder.setBounds(42, 50, 560, 20);
 		frame.getContentPane().add(lblBorder);
 
-		JButton button = new JButton("Drukuj dzienny raport");
-		button.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		button.setBackground(new Color(135, 206, 235));
-		button.setBounds(402, 387, 200, 36);
-		frame.getContentPane().add(button);
+		JButton btnPntDailyRep = new JButton("Drukuj dzienny raport");
+		btnPntDailyRep.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnPntDailyRep.setBackground(new Color(135, 206, 235));
+		btnPntDailyRep.setBounds(402, 357, 200, 36);
+		btnPntDailyRep.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(dayOfReport != 0) {
+					stPrinter.printDailyReport(dayOfReport);
+				} else{
+					int day = helper.getDayOfMonthNum();
+					stPrinter.printDailyReport(day);
+				}
+			}			
+		});
+		frame.getContentPane().add(btnPntDailyRep);
 		
-		JButton btnDrukujMiesiecznyRaport = new JButton("Drukuj miesi\u0119czny raport");
-		btnDrukujMiesiecznyRaport.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
-		btnDrukujMiesiecznyRaport.setBackground(new Color(135, 206, 235));
-		btnDrukujMiesiecznyRaport.setBounds(402, 340, 200, 36);
-		frame.getContentPane().add(btnDrukujMiesiecznyRaport);
-
+		String[]days = getDaysArray();
+		
+		JComboBox cbDays = new JComboBox(days);
+		cbDays.setBounds(148, 357, 227, 36);
+		frame.getContentPane().add(cbDays);
+		
+		cbDays.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				if(a.getSource() == cbDays ){
+					JComboBox cb = (JComboBox) a.getSource();
+					dayOfReport = Integer.parseInt(cb.getSelectedItem().toString());
+				}
+				
+			}
+		});
+		
+		JButton btnPntMnthRep = new JButton("Drukuj miesi\u0119czny raport");
+		btnPntMnthRep.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnPntMnthRep.setBackground(new Color(135, 206, 235));
+		btnPntMnthRep.setBounds(402, 404, 200, 36);
+		frame.getContentPane().add(btnPntMnthRep);
+	
+		JComboBox cbMonths = new JComboBox(fv.MONTHS_NAMES);
+		cbMonths.setBounds(148, 404, 227, 36);
+		frame.getContentPane().add(cbMonths);
+	      
 		populateTable();
 		
 		btnBack.addActionListener(new ActionListener() {
@@ -144,6 +187,38 @@ public class SalesReports {
 		        }
 		    }
 		});
+	}
+
+	private String[] getDaysArray() {
+		int month = helper.getMonthNum();
+		month++;
+
+		switch(month){
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+			case 8:
+			case 10:
+			case 12:
+				return fv.DAYS_NUM_31;
+	
+			case 4:
+			case 6:
+			case 9:
+			case 11:
+				return fv.DAYS_NUM_30;
+	
+			case 2:
+				boolean isLeap = helper.isLeapYear();
+				if(isLeap)
+					return fv.DAYS_NUM_29;
+				else
+					return fv.DAYS_NUM_28;
+	
+			default:
+				return fv.DAYS_NUM_31;
+		}
 	}
 
 	private void populateTable() {
@@ -186,7 +261,7 @@ public class SalesReports {
 		JTableHeader header = table.getTableHeader();
 		header.setBackground(Color.black);
 		header.setForeground(Color.yellow);
-	      
+
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setLocation(42, 48);
 		scrollPane.setSize(560, 287);

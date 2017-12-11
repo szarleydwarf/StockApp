@@ -320,7 +320,7 @@ public class StockPrinter  {
 				text6 = "hctballinamore@gmail.com",
 				text7 = "hct-ireland.business.site",
 				text8 = "FB @hct.irl";
-		contentStream.showText(text + "                                       " + date);
+		contentStream.showText(text + "                                           " + date);
 		contentStream.newLine();
 		contentStream.setFont(PDType1Font.COURIER, 12);
 		contentStream.showText(text2);
@@ -490,7 +490,6 @@ public class StockPrinter  {
 		customerCopyDoc.close();
 	}
 
-	//TODO in progress
 	public void printStockList(ArrayList<Item> listToPrint) throws Exception {
 		PDDocument stockDoc = new PDDocument();
 		PDPage page = new PDPage();
@@ -548,6 +547,13 @@ public class StockPrinter  {
 		contentStream.newLineAtOffset(25, 760);
 		contentStream.showText(noSt+" - ID - Nazwa -  Koszt - Cena - Qnt");
 		contentStream.endText();
+	}
+
+
+	public void printDailyReport(int day) {
+		// TODO Auto-generated method stub
+		System.out.println("DB: "+day);
+
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{

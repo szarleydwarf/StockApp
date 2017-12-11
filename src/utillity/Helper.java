@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -148,9 +149,60 @@ public class Helper {
 		SimpleDateFormat df= new SimpleDateFormat(this.fv.DATE_FORMAT);
 		
 		return df.format(today.getTime());
+	}
 
+	public int getDayOfMonthNum(){
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.DAY_OF_MONTH);
+	}
+
+	public int getMonthNum(){
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.MONTH);
+	}
+
+	public int getYearNum(){
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.YEAR);
 	}
 	
+	public boolean isLeapYear(int year){
+        if(year % 4 == 0)
+        {
+            if( year % 100 == 0)
+            {
+                if ( year % 400 == 0)
+                    return true;
+                else
+                	return false;
+            }
+            else
+            	return true;
+        }
+        else {
+        	return false;
+        }
+	}
+	
+	public boolean isLeapYear(){
+		int year = this.getYearNum();
+        if(year % 4 == 0)
+        {
+            if( year % 100 == 0)
+            {
+                if ( year % 400 == 0)
+                    return true;
+                else
+                	return false;
+            }
+            else
+            	return true;
+        }
+        else {
+        	return false;
+        }
+	}
+
 	public boolean createFolderIfNotExist (String path) {
 //		System.out.println("helper Folder path: "+path);
 		
