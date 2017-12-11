@@ -34,6 +34,8 @@ public class FinalVariables {
 	public final String AAA = "AAA";
 	public final String AAS = "AAS";
 	
+	public static final float PAGE_MARGIN = 20;
+
 	
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";

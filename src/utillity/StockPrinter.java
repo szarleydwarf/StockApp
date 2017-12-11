@@ -65,6 +65,7 @@ public class StockPrinter  {
 	private boolean accFolderExist;
 	private String eightSpaceStr = "        ";
 	private Map<String, String> itemCodeName;
+	private float headerFontSize = 18, stockDocFontSize = 12,lineSpacing = 16.0f;//18/20.5f;
 	
 	protected static String loggerFolderPath;
 	private static Logger log;
@@ -294,7 +295,6 @@ public class StockPrinter  {
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
-
 	
 	private void addLogo(PDDocument customerCopyDoc) throws IOException {
 		PDImageXObject pdImage = PDImageXObject.createFromFile(this.fv.INVOICE_LOGO_PATH, customerCopyDoc);
@@ -489,29 +489,44 @@ public class StockPrinter  {
 		customerCopyDoc.save(accPath);
 		customerCopyDoc.close();
 	}
-//TODO in progress
+
+	//TODO in progress
 	public void printStockList(ArrayList<Item> listToPrint) throws Exception {
 		PDDocument stockDoc = new PDDocument();
 		PDPage page = new PDPage();
 		stockDoc.addPage(page);
-		contentStream = new PDPageContentStream(stockDoc, page);
-		contentStream.beginText();
-		contentStream.setNonStrokingColor(Color.BLACK);
-		contentStream.setLeading(20.5f);
-		contentStream.setFont(PDType1Font.COURIER_BOLD, 18);
-		contentStream.newLineAtOffset(25, 760);
-		contentStream.showText(noSt+" - ID - Nazwa -  Koszt - Cena - Qnt");
-		contentStream.newLine();
-	
-		contentStream.setFont(PDType1Font.COURIER, 12);	
+		
+		int k = 1;
+		
+		float pageH = page.getMediaBox().getHeight();
+		float th = pageH - (fv.PAGE_MARGIN*3);		
+		
 		if(listToPrint.size()>0){
+			contentStream = new PDPageContentStream(stockDoc, page);
+			addHeader(contentStream);
+			
 			for(int i = 0; i < listToPrint.size(); i++){
-				contentStream.showText(i+" - "+listToPrint.get(i).getStockNumber()+" - "+listToPrint.get(i).getName()+" - "+listToPrint.get(i).getCost()+" - "+listToPrint.get(i).getPrice()+" - "+((StockItem) listToPrint.get(i)).getQnt());
-				contentStream.newLine();
+				if(th <= (fv.PAGE_MARGIN*4)) {
+					contentStream.close();
+					page = new PDPage();
+					stockDoc.addPage(page);
+					contentStream = new PDPageContentStream(stockDoc, page);
+					addHeader(contentStream);			
+					th = pageH -(fv.PAGE_MARGIN*3);
+				}
+
+				th = th - stockDocFontSize;
+				contentStream.beginText();
+				contentStream.setNonStrokingColor(Color.black);
+				contentStream.setFont(PDType1Font.COURIER, stockDocFontSize);
+				contentStream.newLineAtOffset(25, th);
+
+				contentStream.showText(k +" - "+listToPrint.get(i).getStockNumber()+" - "+listToPrint.get(i).getName()+" - "+listToPrint.get(i).getCost()+" - "+listToPrint.get(i).getPrice()+" - "+((StockItem) listToPrint.get(i)).getQnt());
+				contentStream.endText();
+				k++;
 			}
+			contentStream.close();
 		}
-		contentStream.endText();
-		contentStream.close();
 
 		String path = savePath+loggerFolderPath+date+"_magazyn.pdf";
 		log.logError("print stock pdf "+path);
@@ -519,6 +534,20 @@ public class StockPrinter  {
 		stockDoc.close();
 		
 		this.printPDF(path);
+	}
+		
+	private void addHeader(PDPageContentStream contentStream) throws IOException {
+		contentStream.setNonStrokingColor(Color.darkGray);
+		contentStream.addRect(15, 750, 580, 30);
+		contentStream.fill();
+		
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.white);
+		contentStream.setLeading(lineSpacing );
+		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
+		contentStream.newLineAtOffset(25, 760);
+		contentStream.showText(noSt+" - ID - Nazwa -  Koszt - Cena - Qnt");
+		contentStream.endText();
 	}
 
 	public void printPDF(String docPath) throws IOException, Exception{

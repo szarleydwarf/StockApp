@@ -258,4 +258,18 @@ public class Helper {
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
 	}
+	
+	
+	public float pt2mmForWeb72dpi(float pt) {
+	   return pt2mm(pt,72);
+	}
+	public float pt2mmForPrint300dpi(float pt) {
+	   return pt2mm(pt,300);
+	}
+	public float pt2mmForPrint600dpi(float pt) {
+	   return pt2mm(pt,600);
+	}
+	public float pt2mm(float pt, float dpi) {
+	   return pt * 25.4f / dpi;
+	}
 }

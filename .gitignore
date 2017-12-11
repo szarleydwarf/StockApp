@@ -20,3 +20,5 @@ junit*.properties
 *.sqlite
 *.sqlite
 *.sqlite
+*.pdf
+*.sqlite
