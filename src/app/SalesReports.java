@@ -23,6 +23,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.JTableHeader;
 
 import dbase.DatabaseManager;
+import hct_speciale.Invoice;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
@@ -43,9 +44,11 @@ public class SalesReports {
 	private static Logger log;
 	private static Helper helper;
 	private JTable table;
-	protected int dayOfReport = 0;
+	protected String dayOfReport = "";
 	private ArrayList<String> defaultPaths;
 	private StockPrinter stPrinter;
+	protected String yearOfReport = "";
+	protected String monthOfReport = "";
 
 	/**
 	 * Launch the application.
@@ -128,20 +131,45 @@ public class SalesReports {
 		btnPntDailyRep.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(dayOfReport != 0) {
-					stPrinter.printDailyReport(dayOfReport);
-				} else{
-					int day = helper.getDayOfMonthNum();
-					stPrinter.printDailyReport(day);
+				String day = "01", month = "01", year = "2017", dateOfReport = "";
+				if(dayOfReport != "") {
+					day = dayOfReport;
+				} else {
+					day = ""+helper.getDayOfMonthNum();
 				}
+				
+				if(monthOfReport != ""){
+					month = monthOfReport;
+				}else{
+					int mn = helper.getMonthNum()+1;
+					month = ""+mn;
+				}
+				
+				if(yearOfReport != ""){
+					year = yearOfReport;
+				}else{
+					int y = helper.getYearNum();
+					year = ""+y;
+				}
+				if(day.length() == 1)
+					day = "0"+day;
+				
+				if(month.length() == 1)
+					month = "0" + month;
+				
+				dateOfReport = day+"-"+month+"-"+year;
+				
+				getVarsForPrint(dateOfReport);
 			}			
 		});
 		frame.getContentPane().add(btnPntDailyRep);
 		
 		String[]days = getDaysArray();
-		
+		int today = helper.getDayOfMonthNum();
+
 		JComboBox cbDays = new JComboBox(days);
-		cbDays.setBounds(148, 357, 227, 36);
+		cbDays.setSelectedIndex(today-1);
+		cbDays.setBounds(40, 357, 110, 36);
 		frame.getContentPane().add(cbDays);
 		
 		cbDays.addActionListener(new ActionListener() {
@@ -149,9 +177,8 @@ public class SalesReports {
 			public void actionPerformed(ActionEvent a) {
 				if(a.getSource() == cbDays ){
 					JComboBox cb = (JComboBox) a.getSource();
-					dayOfReport = Integer.parseInt(cb.getSelectedItem().toString());
-				}
-				
+					dayOfReport = (cb.getSelectedItem().toString());
+				}		
 			}
 		});
 		
@@ -160,11 +187,74 @@ public class SalesReports {
 		btnPntMnthRep.setBackground(new Color(135, 206, 235));
 		btnPntMnthRep.setBounds(402, 404, 200, 36);
 		frame.getContentPane().add(btnPntMnthRep);
+		
+		int monthNo = helper.getMonthNum();
 	
 		JComboBox cbMonths = new JComboBox(fv.MONTHS_NAMES);
-		cbMonths.setBounds(148, 404, 227, 36);
+		cbMonths.setBounds(160, 404, 110, 36);
+		cbMonths.setSelectedIndex(monthNo);
+		cbMonths.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				if(a.getSource() == cbMonths ){
+					JComboBox cb = (JComboBox) a.getSource();
+					monthOfReport = (cb.getSelectedItem().toString());
+				}		
+			}
+		});
+
 		frame.getContentPane().add(cbMonths);
 	      
+		JComboBox cbMonthDaily = new JComboBox(fv.MONTHS_NAMES);
+		cbMonthDaily.setSelectedIndex(-1);
+		cbMonthDaily.setBounds(160, 357, 110, 36);
+		cbMonthDaily.setSelectedIndex(monthNo);
+		cbMonthDaily.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				if(a.getSource() == cbMonthDaily ){
+					JComboBox cb = (JComboBox) a.getSource();
+					monthOfReport = (cb.getSelectedItem().toString());
+				}		
+			}
+		});
+
+		frame.getContentPane().add(cbMonthDaily);
+		
+		int yearIndex = helper.getYearIndex();
+		
+		JComboBox cbYearDaily = new JComboBox(fv.YEARS_NO_STRING);
+		cbYearDaily.setSelectedIndex(-1);
+		cbYearDaily.setBounds(280, 357, 110, 36);
+		cbYearDaily.setSelectedIndex(yearIndex);
+		cbYearDaily.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				if(a.getSource() == cbYearDaily ){
+					JComboBox cb = (JComboBox) a.getSource();
+					yearOfReport = (cb.getSelectedItem().toString());
+				}		
+			}
+		});
+
+		frame.getContentPane().add(cbYearDaily);
+		
+		JComboBox cbYearMonthly = new JComboBox(fv.YEARS_NO_STRING);
+		cbYearMonthly.setSelectedIndex(-1);
+		cbYearMonthly.setBounds(280, 404, 110, 36);
+		cbYearMonthly.setSelectedIndex(yearIndex);
+		cbYearMonthly.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				if(a.getSource() == cbYearMonthly ){
+					JComboBox cb = (JComboBox) a.getSource();
+					yearOfReport = (cb.getSelectedItem().toString());
+				}		
+			}
+		});
+
+		frame.getContentPane().add(cbYearMonthly);
+
 		populateTable();
 		
 		btnBack.addActionListener(new ActionListener() {
@@ -173,8 +263,7 @@ public class SalesReports {
 				MainView.main(null);
 			}
 		});
-		
-		
+			
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -187,6 +276,32 @@ public class SalesReports {
 		        }
 		    }
 		});
+	}//TODO END OF INITIALIZE
+
+	protected void getVarsForPrint(String date) {
+		ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
+		String invDate = date;
+
+		String query = "SELECT * FROM \"" + fv.INVOCE_TABLE + "\" WHERE \"" + fv.INVOCE_TABLE_DATE + "\"=\"" + invDate + "\"";
+
+		invoiceList = DM.getInvoiceList(query);
+		if(invoiceList != null && !invoiceList.isEmpty()){
+			System.out.println("not null");
+			for(Invoice i : invoiceList){
+				//TODO
+				// myjnia - suma obrotow
+				//naprawy - suma obrotow *
+				//sprzedaz - suma obrotow
+			}
+		}else{
+			JOptionPane.showMessageDialog(frame, "Brak wpisów z dnia "+date);
+		}
+		System.out.println("end");
+		
+		
+		
+		
+//		stPrinter.printDailyReport(day);
 	}
 
 	private String[] getDaysArray() {
@@ -263,7 +378,7 @@ public class SalesReports {
 		header.setForeground(Color.yellow);
 
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setLocation(42, 48);
+		scrollPane.setLocation(40, 48);
 		scrollPane.setSize(560, 287);
 		
 		frame.getContentPane().add(scrollPane);		

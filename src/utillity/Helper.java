@@ -165,6 +165,17 @@ public class Helper {
 		Calendar cal = Calendar.getInstance();
 		return cal.get(Calendar.YEAR);
 	}
+
+	public int getYearIndex() {
+		String year = ""+getYearNum();
+		int index = 0;
+		for(int i = 0; i < fv.YEARS_NO_STRING.length; i++){
+			if(fv.YEARS_NO_STRING[i].equals(year)){
+				return i;
+			}
+		}
+		return index;
+	}
 	
 	public boolean isLeapYear(int year){
         if(year % 4 == 0)

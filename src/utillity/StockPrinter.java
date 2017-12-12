@@ -50,7 +50,6 @@ public class StockPrinter  {
 	private DatabaseManager DM;
 	private FinalVariables fv;
 	
-//	private ArrayList<String> stockServicesNumber;
 	private boolean jobDone = false;
 	private String invoiceFileName;
 	private String fileName;
@@ -65,11 +64,10 @@ public class StockPrinter  {
 	private boolean accFolderExist;
 	private String eightSpaceStr = "        ";
 	private Map<String, String> itemCodeName;
-	private float headerFontSize = 18, stockDocFontSize = 12,lineSpacing = 16.0f;//18/20.5f;
+	private float headerFontSize = 18.0f, stockDocFontSize = 12.0f, lineSpacing = 18.0f;//18/20.5f;
 	
 	protected static String loggerFolderPath;
-	private static Logger log;
-	
+	private static Logger log;	
 	
 	public StockPrinter(ArrayList<String> defaultPaths){
 		this.fv = new FinalVariables();

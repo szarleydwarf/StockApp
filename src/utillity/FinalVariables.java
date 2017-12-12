@@ -1,5 +1,7 @@
 package utillity;
 
+import javax.swing.ComboBoxModel;
+
 public class FinalVariables {
 	//JOptionPane messages
 	public final String CLOSE_WINDOW = "Czy napewno chcesz zamknąć te okienko?";
@@ -38,6 +40,7 @@ public class FinalVariables {
 	public final String[] DAYS_NUM_30 = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30"};
 	public final String[] DAYS_NUM_29 = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"};
 	public final String[] DAYS_NUM_28 = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"};
+	public final String[] YEARS_NO_STRING = {"2017", "2018", "2019", "2020"};
 	public static final float PAGE_MARGIN = 20;
 
 	
