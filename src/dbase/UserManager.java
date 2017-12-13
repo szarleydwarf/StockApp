@@ -80,7 +80,7 @@ public class UserManager {
 	}
 	
 	public void createNewUser(){
-		String query = "INSERT INTO \"users\" VALUES('admin','tezrn6H#s7|89jd-M@voxEBI|@£*cW$I','EDORzQox5Kot57a7BlT3jkTiBDXhuFclXYnsBEUtZzmiSrabadAdtx8g8W67U9LO','Rad','Cho','HCT','0892422993','Killaneen','Ballinamore','Leitrim','Ireland','N41YK50');";
+		String query = "INSERT INTO \"users\" VALUES('admin','tezrn6H#s7|89jd-M@voxEBI|@ï¿½*cW$I','EDORzQox5Kot57a7BlT3jkTiBDXhuFclXYnsBEUtZzmiSrabadAdtx8g8W67U9LO','Rad','Cho','HCT','0892422993','Killaneen','Ballinamore','Leitrim','Ireland','N41YK50');";
 		System.out.println(query);
 		String pass = "Pa55word1!";
 		String pass2 = "Alex123!";
