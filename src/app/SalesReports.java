@@ -49,6 +49,8 @@ public class SalesReports {
 	private StockPrinter stPrinter;
 	protected String yearOfReport = "";
 	protected String monthOfReport = "";
+	private HashMap<String, Double> stockPrices;
+	private HashMap<String, Double> servicePrices;
 
 	/**
 	 * Launch the application.
@@ -80,11 +82,19 @@ public class SalesReports {
 		stocksCosts = new HashMap<String, Double>();
 		servicesCosts = new HashMap<String, Double>();
 		
-		String q1 = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.COST+" FROM "+ this.fv.SERVICES_TABLE;
-		this.servicesCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q1);
-//		this.helper.printMap(servicesCosts);
-		String q2 = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.COST+" FROM "+ this.fv.STOCK_TABLE;
-		this.stocksCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q2);
+		String q = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.COST_COL_NAME+" FROM "+ this.fv.SERVICES_TABLE;
+		this.servicesCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
+
+		q = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.PRICE_COL_NAME+" FROM "+ this.fv.SERVICES_TABLE;
+		this.servicePrices = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
+		
+		q = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.COST_COL_NAME+" FROM "+ this.fv.STOCK_TABLE;
+		this.stocksCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
+	
+		q = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.PRICE_COL_NAME+" FROM "+ this.fv.STOCK_TABLE;
+		this.stockPrices = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
+//		System.out.println("item price");
+//		this.helper.printMap(stockPrices);
 
 		if(this.defaultPaths == null || this.defaultPaths.isEmpty())
 			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
@@ -164,7 +174,7 @@ public class SalesReports {
 		});
 		frame.getContentPane().add(btnPntDailyRep);
 		
-		String[]days = getDaysArray();
+		String[]days = helper.getDaysArray();
 		int today = helper.getDayOfMonthNum();
 
 		JComboBox cbDays = new JComboBox(days);
@@ -280,19 +290,35 @@ public class SalesReports {
 
 	protected void getVarsForPrint(String date) {
 		ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
-		String invDate = date;
+		ArrayList<String> servicesList = new ArrayList<String>();
+		ArrayList<String> itemsList = new ArrayList<String>();
+		String invDate = "07-12-2017";//date;
+		double tyreSaleSum = 0, carWashSum = 0, tyreServSum = 0;
 
 		String query = "SELECT * FROM \"" + fv.INVOCE_TABLE + "\" WHERE \"" + fv.INVOCE_TABLE_DATE + "\"=\"" + invDate + "\"";
-
 		invoiceList = DM.getInvoiceList(query);
+
 		if(invoiceList != null && !invoiceList.isEmpty()){
-			System.out.println("not null");
-			for(Invoice i : invoiceList){
-				//TODO
-				// myjnia - suma obrotow
-				//naprawy - suma obrotow *
-				//sprzedaz - suma obrotow
+			servicesList = getServiceList(servicesList, invoiceList);
+			System.out.println("SR sum: " + helper.getSumDouble(servicePrices, (String[]) servicesList.toArray()));
+			itemsList = getItemList(itemsList, invoiceList);
+			
+			for(String s : itemsList){
+				System.out.println("for i :"+s);
 			}
+			for(String s : servicesList){
+				System.out.println("for s :"+s);
+			}
+
+			//TODO
+			// myjnia - suma obrotow
+			
+			//naprawy - suma obrotow *
+
+			//sprzedaz - suma obrotow
+			
+			
+			//JOptionPane.showMessageDialog(frame, "Raport z dnia "+date + " wygenerowany pomyslnie.");
 		}else{
 			JOptionPane.showMessageDialog(frame, "Brak wpisów z dnia "+date);
 		}
@@ -304,36 +330,32 @@ public class SalesReports {
 //		stPrinter.printDailyReport(day);
 	}
 
-	private String[] getDaysArray() {
-		int month = helper.getMonthNum();
-		month++;
-
-		switch(month){
-			case 1:
-			case 3:
-			case 5:
-			case 7:
-			case 8:
-			case 10:
-			case 12:
-				return fv.DAYS_NUM_31;
-	
-			case 4:
-			case 6:
-			case 9:
-			case 11:
-				return fv.DAYS_NUM_30;
-	
-			case 2:
-				boolean isLeap = helper.isLeapYear();
-				if(isLeap)
-					return fv.DAYS_NUM_29;
-				else
-					return fv.DAYS_NUM_28;
-	
-			default:
-				return fv.DAYS_NUM_31;
+	private ArrayList<String> getItemList(ArrayList<String> itemsList, ArrayList<Invoice> invoiceList) {
+		for(int i = 0; i < invoiceList.size(); i++){
+			if(!invoiceList.get(i).getItemNumber().equals("") && !invoiceList.get(i).getItemNumber().isEmpty()) {
+				String[] tokens = invoiceList.get(i).getItemNumber().split(",", -1);
+				if(tokens.length > 0){
+					for(String s : tokens){
+						itemsList.add(s);
+					}
+				}
+			}
 		}
+		return itemsList;
+	}
+
+	private ArrayList<String> getServiceList(ArrayList<String> servicesList, ArrayList<Invoice> invoiceList) {
+		for(int i = 0; i < invoiceList.size(); i++){
+			if(!invoiceList.get(i).getServiceNumber().equals("") && !invoiceList.get(i).getServiceNumber().isEmpty()) {
+				String[] tokens = invoiceList.get(i).getServiceNumber().split(",", -1);
+				if(tokens.length > 0){
+					for(String s : tokens){
+						servicesList.add(s);
+					}
+				}
+			}
+		}
+		return servicesList;
 	}
 
 	private void populateTable() {
@@ -384,20 +406,19 @@ public class SalesReports {
 		frame.getContentPane().add(scrollPane);		
 	}
 
+	//TODO - move this function to helper??? - add checkup for first char in the token if its a number then multiply by it.
 	private double sumCosts(String[] tokens) {
 		double sum = 0;
 		for (String token : tokens) {
 			double d = 0;
 			if(this.servicesCosts.containsKey(token)) {
 				d = this.servicesCosts.get(token);
-//				System.out.println("found service :"+d);
 			} else if(this.stocksCosts.containsKey(token)) {
 				d = this.stocksCosts.get(token);
-//				System.out.println("found stock :"+d);
 			}
 			sum += d;
 		}
-//		System.out.println("sum :"+sum);
 		return (sum);
 	}
+
 }

@@ -41,6 +41,7 @@ public class FinalVariables {
 	public final String[] DAYS_NUM_29 = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"};
 	public final String[] DAYS_NUM_28 = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"};
 	public final String[] YEARS_NO_STRING = {"2017", "2018", "2019", "2020"};
+	public final String[] SALES_REPORT_HEADINGS = {"Tyre Sale", "Car Wash", "Tyre services", "GRAND TOTAL"};
 	public static final float PAGE_MARGIN = 20;
 
 	
@@ -67,7 +68,8 @@ public class FinalVariables {
 
 	//Database table names
 	public static final String TOTAL = "total";
-	public static final String COST = "cost";
+	public static final String COST_COL_NAME = "cost";
+	public final String PRICE_COL_NAME = "price";
 	public final String INVOCE_TABLE = "invoice_list";
 	public final String MANUFACTURER_LIST_TABLE = "manufacturers";
 	public final String SERVICES_TABLE = "services";
@@ -82,7 +84,6 @@ public class FinalVariables {
 	public final String STOCK_TABLE_ITEM_NAME = "item_name";
 	public final String STOCK_TABLE_QNT = "quantity";
 	public final String MANUFACTURER_TABLE_NAME = "manufacturer";
-	public final String STOCK_TABLE_PRICE = "price";
 	public final String INVOCE_TABLE_INVOICE_NUMBER = "invoice_number";
 	public final String INVOCE_TABLE_CUSTOMER_NAME = "customer_name";
 	public final String INVOCE_TABLE_DATE = "invoice_date";

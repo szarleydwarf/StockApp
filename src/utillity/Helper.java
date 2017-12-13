@@ -12,6 +12,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -309,8 +310,69 @@ public class Helper {
 		}		
 		return false;
 	}
+
+	public String[] getDaysArray() {
+		int month = getMonthNum();
+		month++;
+
+		switch(month){
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+			case 8:
+			case 10:
+			case 12:
+				return fv.DAYS_NUM_31;
 	
-	/* Function copied from
+			case 4:
+			case 6:
+			case 9:
+			case 11:
+				return fv.DAYS_NUM_30;
+	
+			case 2:
+				boolean isLeap = isLeapYear();
+				if(isLeap)
+					return fv.DAYS_NUM_29;
+				else
+					return fv.DAYS_NUM_28;
+	
+			default:
+				return fv.DAYS_NUM_31;
+		}
+	}
+
+	
+	public double getSumDouble(HashMap<String, Double> map, String[] tokens) {
+		double sum = 0;
+		for (String token : tokens) {
+			int q = Integer.parseInt(token.substring(0, token.indexOf("A")-1));
+			token = token.substring(token.indexOf("A"));
+			System.out.println("helper q: "+q+" / "+token);
+			double d = 0;
+			if(map.containsKey(token)) {
+				d = map.get(token);
+			} 
+			sum += d;
+		}
+		return sum;
+	}
+
+	
+	public String getSumString(HashMap<String, Double> map, String[] tokens) {
+		DecimalFormat df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
+		double sum = 0;
+		for (String token : tokens) {
+			double d = 0;
+			if(map.containsKey(token)) {
+				d = map.get(token);
+			} 
+			sum += d;
+		}
+		return df.format(sum);
+	}
+/* Function copied from
 	 * https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
 	*/
 	public static void printMap(Map mp) {
