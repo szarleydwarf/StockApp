@@ -347,12 +347,13 @@ public class Helper {
 	public double getSumDouble(HashMap<String, Double> map, String[] tokens) {
 		double sum = 0;
 		for (String token : tokens) {
-			int q = Integer.parseInt(token.substring(0, token.indexOf("A")-1));
+			String t = token;
+			int q = Integer.parseInt(token.substring(0, token.indexOf("A")));
 			token = token.substring(token.indexOf("A"));
-			System.out.println("helper q: "+q+" / "+token);
 			double d = 0;
 			if(map.containsKey(token)) {
-				d = map.get(token);
+				d = map.get(token) * q;
+//				System.out.println("helper q: "+(q) + " * " + map.get(token)+" = "+d);
 			} 
 			sum += d;
 		}

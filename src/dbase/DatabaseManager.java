@@ -442,6 +442,42 @@ public class DatabaseManager {
 		return 0;
 	}
 	
+
+	public Map<String, String> getServiceCodesMap(String q) {
+		Map<String, String> toReturn = new HashMap<String, String>();
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		if(conn == null)
+			conn = this.connect();
+		try {
+			pst = conn.prepareStatement(q);
+			rs = pst.executeQuery();		
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();   
+			
+			while(rs.next()) {			
+				for(int i = 0 ; i <= columnsNumber; i++){
+					if(i % 2 != 0){
+						toReturn.put(rs.getString(i), rs.getString(i+1));
+					}
+				}        
+			}
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
+		} finally {
+			try{
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+			} catch (Exception e){
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
+			}
+		}
+		return toReturn;
+	}
+
+	
 	public Map<String, Double> getAllCostsPrices(String query){
 		Map<String, Double> toReturn = new HashMap<String, Double>();
 		
@@ -836,5 +872,4 @@ public class DatabaseManager {
 			}
 		}
 	}
-
 }

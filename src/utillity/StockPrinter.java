@@ -548,12 +548,14 @@ public class StockPrinter  {
 	}
 
 
-	public void printDailyReport(int day) {
+
+	public boolean printDailyReport(double sumItemPrices, double sumItemCost, double itemProfit, double carWashPrices,
+			double carWashSumC, double carWashProfit, double otherServPrices, double otherServSumC,
+			double otherProfit) {
 		// TODO Auto-generated method stub
-		System.out.println("DB: "+day);
-
+		return false;
+		
 	}
-
 	public void printPDF(String docPath) throws IOException, Exception{
 //		System.out.println("printpdf "+docPath);
 		PDDocument document = PDDocument.load(new File(docPath));
@@ -583,4 +585,5 @@ public class StockPrinter  {
         }
         return null;
     }
+
 }

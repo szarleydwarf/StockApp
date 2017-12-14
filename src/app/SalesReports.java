@@ -51,6 +51,7 @@ public class SalesReports {
 	protected String monthOfReport = "";
 	private HashMap<String, Double> stockPrices;
 	private HashMap<String, Double> servicePrices;
+	private HashMap<String, String> serviceCodesNames;
 
 	/**
 	 * Launch the application.
@@ -88,13 +89,16 @@ public class SalesReports {
 		q = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.PRICE_COL_NAME+" FROM "+ this.fv.SERVICES_TABLE;
 		this.servicePrices = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
 		
+		q = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.SERVICES_TABLE_SERVICE_NAME+" FROM "+ this.fv.SERVICES_TABLE;
+		this.serviceCodesNames = (HashMap<String, String>) this.DM.getServiceCodesMap(q);
+		
 		q = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.COST_COL_NAME+" FROM "+ this.fv.STOCK_TABLE;
 		this.stocksCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
 	
 		q = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.PRICE_COL_NAME+" FROM "+ this.fv.STOCK_TABLE;
 		this.stockPrices = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
-//		System.out.println("item price");
-//		this.helper.printMap(stockPrices);
+//		System.out.println("codeNames");
+//		this.helper.printMap(serviceCodesNames);
 
 		if(this.defaultPaths == null || this.defaultPaths.isEmpty())
 			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
@@ -290,8 +294,6 @@ public class SalesReports {
 
 	protected void getVarsForPrint(String date) {
 		ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
-		ArrayList<String> servicesList = new ArrayList<String>();
-		ArrayList<String> itemsList = new ArrayList<String>();
 		String invDate = "07-12-2017";//date;
 		double tyreSaleSum = 0, carWashSum = 0, tyreServSum = 0;
 
@@ -299,35 +301,108 @@ public class SalesReports {
 		invoiceList = DM.getInvoiceList(query);
 
 		if(invoiceList != null && !invoiceList.isEmpty()){
-			servicesList = getServiceList(servicesList, invoiceList);
-			System.out.println("SR sum: " + helper.getSumDouble(servicePrices, (String[]) servicesList.toArray()));
-			itemsList = getItemList(itemsList, invoiceList);
+			String[] itemArray = getItemsArray(invoiceList);
+			double sumItemCost = helper.getSumDouble(stocksCosts, itemArray);
+			double sumItemPrices = helper.getSumDouble(stockPrices, itemArray);
+			double itemProfit = sumItemPrices -  sumItemCost;
 			
-			for(String s : itemsList){
-				System.out.println("for i :"+s);
-			}
-			for(String s : servicesList){
-				System.out.println("for s :"+s);
-			}
-
-			//TODO
-			// myjnia - suma obrotow
+			String[] carWashArray = getCarWashArray(invoiceList);
+			double carWashSumC = helper.getSumDouble(servicesCosts, carWashArray);
+			double carWashPrices = helper.getSumDouble(servicePrices, carWashArray);
+			double carWashProfit = carWashPrices - carWashSumC;
 			
-			//naprawy - suma obrotow *
-
-			//sprzedaz - suma obrotow
+			String[] otherServArray = getOtherServiceArray(invoiceList);
+			double otherServSumC = helper.getSumDouble(servicesCosts, otherServArray);
+			double otherServPrices = helper.getSumDouble(servicePrices, otherServArray);
+			double otherProfit = otherServPrices - otherServSumC;
+//			System.out.println("item "+ sumItemPrices  + " - "+ sumItemCost + " = "+ itemProfit);
+//			System.out.println("cw "+ carWashPrices  + " - "+ carWashSumC + " = "+ carWashProfit);
+//			System.out.println("ot "+ otherServPrices  + " - "+ otherServSumC + " = "+ otherProfit);
+//			//TODO
+			boolean jobDone = stPrinter.printDailyReport(sumItemPrices, sumItemCost, itemProfit,carWashPrices, carWashSumC, carWashProfit,otherServPrices, otherServSumC, otherProfit);
 			
-			
-			//JOptionPane.showMessageDialog(frame, "Raport z dnia "+date + " wygenerowany pomyslnie.");
+			if(jobDone)
+				JOptionPane.showMessageDialog(frame, "Raport z dnia "+date + " wygenerowany pomyslnie.");
+			else
+				JOptionPane.showMessageDialog(frame, "Raport z dnia "+date + " nie zostal wygenerowany.");
 		}else{
 			JOptionPane.showMessageDialog(frame, "Brak wpisów z dnia "+date);
 		}
-		System.out.println("end");
-		
-		
-		
-		
-//		stPrinter.printDailyReport(day);
+	}
+
+	private String[] getOtherServiceArray(ArrayList<Invoice> invoiceList) {
+		ArrayList<String> temp = new ArrayList<String>();
+		temp = getOtherServiceList(temp, invoiceList);
+		String[] tArray = new String[temp.size()];
+		tArray = temp.toArray(tArray);
+		return tArray;
+	}
+
+	private String[] getCarWashArray(ArrayList<Invoice> invoiceList) {
+		ArrayList<String> temp = new ArrayList<String>();
+		temp = getCarWashServiceList(temp, invoiceList);
+		String[] tArray = new String[temp.size()];
+		tArray = temp.toArray(tArray);
+		return tArray;
+	}
+
+	private ArrayList<String> getCarWashServiceList(ArrayList<String> temp, ArrayList<Invoice> invoiceList) {
+		for(int i = 0; i < invoiceList.size(); i++){
+			if(!invoiceList.get(i).getServiceNumber().equals("") && !invoiceList.get(i).getServiceNumber().isEmpty()) {
+				String[] tokens = invoiceList.get(i).getServiceNumber().split(",", -1);
+				if(tokens.length > 0){
+					for(String s : tokens){
+						String t = s.substring(s.indexOf("A"));
+						if(this.serviceCodesNames.containsKey(t)){
+							if(this.serviceCodesNames.get(t).contains("*")){
+								temp.add(s);
+							}
+						}
+						
+					}
+				}
+			}
+		}
+		return temp;
+	}
+
+	private ArrayList<String> getOtherServiceList(ArrayList<String> temp, ArrayList<Invoice> invoiceList) {
+		for(int i = 0; i < invoiceList.size(); i++){
+			if(!invoiceList.get(i).getServiceNumber().equals("") && !invoiceList.get(i).getServiceNumber().isEmpty()) {
+				String[] tokens = invoiceList.get(i).getServiceNumber().split(",", -1);
+				if(tokens.length > 0){
+					for(String s : tokens){
+						String t = s.substring(s.indexOf("A"));
+						if(this.serviceCodesNames.containsKey(t)){
+							if(!this.serviceCodesNames.get(t).contains("*")){
+								temp.add(s);
+							}
+						}
+					}
+				}
+			}
+		}
+		return temp;
+	}
+
+	private String[] getItemsArray(ArrayList<Invoice> invoiceList) {
+		ArrayList<String> itemsList = new ArrayList<String>();
+		itemsList = getItemList(itemsList, invoiceList);
+		String[] itemArray = new String[itemsList.size()];
+		return itemsList.toArray(itemArray);	}
+
+	/*
+	 * 			String[] servArray = getServArray(invoiceList);
+			double sumServicePrices = helper.getSumDouble(servicePrices, servArray);
+System.out.println("\n");
+			double sumServiceCost = helper.getSumDouble(servicesCosts, servArray);
+			System.out.println("\nSR sum: " + sumServiceCost + " - " + sumServicePrices);
+*/
+	private String[] getServArray(ArrayList<Invoice> invoiceList) {
+		ArrayList<String> servicesList = new ArrayList<String>();
+		servicesList = getServiceList(servicesList, invoiceList);
+		String[] servArray = new String[servicesList.size()];
+		return servicesList.toArray(servArray);
 	}
 
 	private ArrayList<String> getItemList(ArrayList<String> itemsList, ArrayList<Invoice> invoiceList) {
@@ -406,7 +481,6 @@ public class SalesReports {
 		frame.getContentPane().add(scrollPane);		
 	}
 
-	//TODO - move this function to helper??? - add checkup for first char in the token if its a number then multiply by it.
 	private double sumCosts(String[] tokens) {
 		double sum = 0;
 		for (String token : tokens) {
