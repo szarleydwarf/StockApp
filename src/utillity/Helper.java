@@ -162,6 +162,17 @@ public class Helper {
 		return cal.get(Calendar.MONTH);
 	}
 
+
+	public String getIndexOfMonth(String month) {
+		for(int i = 0; i < fv.MONTHS_NAMES.length; i++){
+			if(fv.MONTHS_NAMES[i].equals(month)){
+				int monthNum = i+1;
+				return "" + monthNum;
+			}
+		}
+		return "";
+	}
+
 	public int getYearNum(){
 		Calendar cal = Calendar.getInstance();
 		return cal.get(Calendar.YEAR);
@@ -309,22 +320,6 @@ public class Helper {
 			return true;
 		}		
 		return false;
-	}
-	
-	public String compareDatesStr(String oldDate, String newDate){
-		char find = '-';
-		int nDD = Integer.parseInt(newDate.substring(0, newDate.indexOf(find)));
-		int nMM = Integer.parseInt(newDate.substring(newDate.indexOf(find)+1, newDate.indexOf(find)+3));
-		int nYYYY = Integer.parseInt(newDate.substring(newDate.indexOf(find)+4));
-
-		int oDD = Integer.parseInt(oldDate.substring(0, oldDate.indexOf(find)));
-		int oMM = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+1, oldDate.indexOf(find)+3));
-		int oYYYY = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+4));
-		
-		if((nYYYY >= oYYYY) && (nMM >= oMM) && (nDD >= oDD)){
-			return oldDate;
-		}		
-		return newDate;
 	}
 
 	public String[] getDaysArray() {

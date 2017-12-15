@@ -173,7 +173,7 @@ public class SalesReports {
 				
 				dateOfReport = day+"-"+month+"-"+year;
 				
-				getVarsForPrint(dateOfReport);
+				printDailyReport(dateOfReport);
 			}			
 		});
 		frame.getContentPane().add(btnPntDailyRep);
@@ -200,6 +200,33 @@ public class SalesReports {
 		btnPntMnthRep.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
 		btnPntMnthRep.setBackground(new Color(135, 206, 235));
 		btnPntMnthRep.setBounds(402, 404, 200, 36);
+		btnPntMnthRep.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String month = "01", year = "2017", dateOfReport = "";
+	
+				if(monthOfReport != ""){
+					month = monthOfReport;
+				}else{
+					int mn = helper.getMonthNum()+1;
+					month = ""+mn;
+				}
+				
+				if(yearOfReport != ""){
+					year = yearOfReport;
+				}else{
+					int y = helper.getYearNum();
+					year = ""+y;
+				}
+
+				if(month.length() == 1)
+					month = "0" + month;
+				
+				dateOfReport = month+"-"+year;
+				
+				printMonthlyReport(dateOfReport);
+			}			
+		});
 		frame.getContentPane().add(btnPntMnthRep);
 		
 		int monthNo = helper.getMonthNum();
@@ -213,6 +240,7 @@ public class SalesReports {
 				if(a.getSource() == cbMonths ){
 					JComboBox cb = (JComboBox) a.getSource();
 					monthOfReport = (cb.getSelectedItem().toString());
+					monthOfReport = helper.getIndexOfMonth(monthOfReport);
 				}		
 			}
 		});
@@ -229,6 +257,7 @@ public class SalesReports {
 				if(a.getSource() == cbMonthDaily ){
 					JComboBox cb = (JComboBox) a.getSource();
 					monthOfReport = (cb.getSelectedItem().toString());
+					monthOfReport = helper.getIndexOfMonth(monthOfReport);
 				}		
 			}
 		});
@@ -292,9 +321,36 @@ public class SalesReports {
 		});
 	}//TODO END OF INITIALIZE
 
-	protected void getVarsForPrint(String date) {
+	protected void printMonthlyReport(String dateOfReport) {
 		ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
-//		String invDate = "07-12-2017";//date;
+		double[][] toPrint = new double[4][3];
+
+		String query = "SELECT * FROM \"" + fv.INVOCE_TABLE + "\" WHERE \"" + fv.INVOCE_TABLE_DATE + "\" LIKE \"%" + dateOfReport + "%\"";
+		invoiceList = DM.getInvoiceList(query);
+	
+		if(invoiceList != null && !invoiceList.isEmpty()){
+			toPrint = populateArrayToPrint(invoiceList);
+			boolean jobDone = false;
+			try {
+				jobDone = stPrinter.printDailyReport(dateOfReport, toPrint);
+			} catch (Exception e) {
+				String msg =  "Wystapil blad zapisu raportu miesiecznego (" + dateOfReport + ")" + e.getMessage() + " - "+e.getStackTrace();
+				JOptionPane.showMessageDialog(frame,msg);
+				this.log.logError(msg);
+				jobDone = false;
+			}
+			
+			if(jobDone)
+				JOptionPane.showMessageDialog(frame, "Raport z miesiaca "+dateOfReport + " wygenerowany pomyslnie.");
+			else
+				JOptionPane.showMessageDialog(frame, "Raport z miesiaca "+dateOfReport + " nie zostal wygenerowany.");
+		}else{
+			JOptionPane.showMessageDialog(frame, "Brak wpisów z daty "+dateOfReport);
+		}
+	}
+
+	protected void printDailyReport(String date) {
+		ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
 		double[][] toPrint = new double[4][3];
 
 		String query = "SELECT * FROM \"" + fv.INVOCE_TABLE + "\" WHERE \"" + fv.INVOCE_TABLE_DATE + "\"=\"" + date + "\"";
@@ -302,12 +358,11 @@ public class SalesReports {
 
 		if(invoiceList != null && !invoiceList.isEmpty()){
 			toPrint = populateArrayToPrint(invoiceList);
-//			//TODO
 			boolean jobDone = false;
 			try {
 				jobDone = stPrinter.printDailyReport(date, toPrint);
 			} catch (Exception e) {
-				String msg =  "Wystapil blad zapisu raportu dziennego "+e.getMessage() + " - "+e.getStackTrace();
+				String msg =  "Wystapil blad zapisu raportu dziennego  (" + date + ")" + e.getMessage() + " - "+e.getStackTrace();
 				JOptionPane.showMessageDialog(frame,msg);
 				this.log.logError(msg);
 				jobDone = false;
@@ -420,19 +475,12 @@ public class SalesReports {
 		String[] itemArray = new String[itemsList.size()];
 		return itemsList.toArray(itemArray);	}
 
-	/*
-	 * 			String[] servArray = getServArray(invoiceList);
-			double sumServicePrices = helper.getSumDouble(servicePrices, servArray);
-System.out.println("\n");
-			double sumServiceCost = helper.getSumDouble(servicesCosts, servArray);
-			System.out.println("\nSR sum: " + sumServiceCost + " - " + sumServicePrices);
-*/
-	private String[] getServArray(ArrayList<Invoice> invoiceList) {
-		ArrayList<String> servicesList = new ArrayList<String>();
-		servicesList = getServiceList(servicesList, invoiceList);
-		String[] servArray = new String[servicesList.size()];
-		return servicesList.toArray(servArray);
-	}
+//	private String[] getServArray(ArrayList<Invoice> invoiceList) {
+//		ArrayList<String> servicesList = new ArrayList<String>();
+//		servicesList = getServiceList(servicesList, invoiceList);
+//		String[] servArray = new String[servicesList.size()];
+//		return servicesList.toArray(servArray);
+//	}
 
 	private ArrayList<String> getItemList(ArrayList<String> itemsList, ArrayList<Invoice> invoiceList) {
 		for(int i = 0; i < invoiceList.size(); i++){

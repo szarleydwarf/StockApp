@@ -549,7 +549,6 @@ public class StockPrinter  {
 	}
 
 	public boolean printDailyReport(String dDate, double[][] toPrint) throws Exception {
-		// TODO Auto-generated method stub
 		String docDate = "";
 		if( helper.compareDates(this.date, dDate)){
 			docDate = date;
@@ -599,14 +598,13 @@ public class StockPrinter  {
 		String path = "";
 		String reportEXT = "_report.pdf";
 		if(!loggerFolderPath.contains(savePath))
-			path = savePath+loggerFolderPath+dDate+reportEXT;
+			path = savePath+loggerFolderPath+docDate+reportEXT;
 		else
-			path = loggerFolderPath+dDate+reportEXT;
-//		System.out.println("Paths: "+ savePath + "\n" + loggerFolderPath  +"\n" + path);
-		dailyReport.save(path);
+			path = loggerFolderPath+docDate+reportEXT;
+			dailyReport.save(path);
 		dailyReport.close();
 		
-//		this.printPDF(path);
+		this.printPDF(path);
 		return true;
 	}
 	public void printPDF(String docPath) throws IOException, Exception{
