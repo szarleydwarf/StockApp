@@ -65,6 +65,7 @@ public class StockPrinter  {
 	private String eightSpaceStr = "        ";
 	private Map<String, String> itemCodeName;
 	private float headerFontSize = 18.0f, stockDocFontSize = 12.0f, lineSpacing = 18.0f;//18/20.5f;
+	private float invoiceReportYOffeset = 440.0f;
 	
 	protected static String loggerFolderPath;
 	private static Logger log;	
@@ -343,7 +344,7 @@ public class StockPrinter  {
 		contentStream.setNonStrokingColor(Color.WHITE);
 		contentStream.setLeading(20.5f);
 		contentStream.setFont(PDType1Font.COURIER_BOLD, 18);
-		contentStream.newLineAtOffset(25, 440);
+		contentStream.newLineAtOffset(25, invoiceReportYOffeset);
 		contentStream.showText(noSt+"    Description         Price        Qnt");
 		contentStream.newLine();
 		contentStream.newLine();
@@ -547,14 +548,66 @@ public class StockPrinter  {
 		contentStream.endText();
 	}
 
-
-
-	public boolean printDailyReport(double sumItemPrices, double sumItemCost, double itemProfit, double carWashPrices,
-			double carWashSumC, double carWashProfit, double otherServPrices, double otherServSumC,
-			double otherProfit) {
+	public boolean printDailyReport(String dDate, double[][] toPrint) throws Exception {
 		// TODO Auto-generated method stub
-		return false;
+		String docDate = "";
+		if( helper.compareDates(this.date, dDate)){
+			docDate = date;
+		} else {
+			docDate = dDate;
+		}
+		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT_5_2); 
+
+		PDDocument dailyReport = new PDDocument();
+		PDPage page = new PDPage();
+		dailyReport.addPage(page);
+		contentStream = new PDPageContentStream(dailyReport, page);
+		this.addLogo(dailyReport);
+		this.fillCompanyDetails();
+
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.white);
+		contentStream.setLeading(lineSpacing );
+		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
+		contentStream.newLineAtOffset(175, invoiceReportYOffeset );
+
+		for(int i = 0; i < fv.SALES_REPORT_COL_HEADINGS.length; i++){
+			this.contentStream.showText(fv.SALES_REPORT_COL_HEADINGS[i] + "     -    ");
+		}
+		contentStream.endText();
+
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.black);
+		contentStream.setLeading(lineSpacing );
+		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
+		contentStream.newLineAtOffset(30, invoiceReportYOffeset );
+		this.contentStream.newLine();
+		this.contentStream.newLine();
+		this.contentStream.newLine();
+
+		for(int i = 0; i < fv.SALES_REPORT_ROW_HEADINGS.length; i++){
+			this.contentStream.showText(fv.SALES_REPORT_ROW_HEADINGS[i]);
+			for(int j = 0; j < toPrint[i].length; j++){
+				this.contentStream.showText(" - € " + df.format(toPrint[i][j]));
+			}
+			this.contentStream.newLine();
+		}
 		
+		
+		contentStream.endText();
+		contentStream.close();
+		String path = "";
+		String reportEXT = "_report.pdf";
+		if(!loggerFolderPath.contains(savePath))
+			path = savePath+loggerFolderPath+dDate+reportEXT;
+		else
+			path = loggerFolderPath+dDate+reportEXT;
+//		System.out.println("Paths: "+ savePath + "\n" + loggerFolderPath  +"\n" + path);
+		dailyReport.save(path);
+		dailyReport.close();
+		
+//		this.printPDF(path);
+		return true;
 	}
 	public void printPDF(String docPath) throws IOException, Exception{
 //		System.out.println("printpdf "+docPath);

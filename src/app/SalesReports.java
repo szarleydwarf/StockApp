@@ -294,32 +294,24 @@ public class SalesReports {
 
 	protected void getVarsForPrint(String date) {
 		ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
-		String invDate = "07-12-2017";//date;
-		double tyreSaleSum = 0, carWashSum = 0, tyreServSum = 0;
+//		String invDate = "07-12-2017";//date;
+		double[][] toPrint = new double[4][3];
 
-		String query = "SELECT * FROM \"" + fv.INVOCE_TABLE + "\" WHERE \"" + fv.INVOCE_TABLE_DATE + "\"=\"" + invDate + "\"";
+		String query = "SELECT * FROM \"" + fv.INVOCE_TABLE + "\" WHERE \"" + fv.INVOCE_TABLE_DATE + "\"=\"" + date + "\"";
 		invoiceList = DM.getInvoiceList(query);
 
 		if(invoiceList != null && !invoiceList.isEmpty()){
-			String[] itemArray = getItemsArray(invoiceList);
-			double sumItemCost = helper.getSumDouble(stocksCosts, itemArray);
-			double sumItemPrices = helper.getSumDouble(stockPrices, itemArray);
-			double itemProfit = sumItemPrices -  sumItemCost;
-			
-			String[] carWashArray = getCarWashArray(invoiceList);
-			double carWashSumC = helper.getSumDouble(servicesCosts, carWashArray);
-			double carWashPrices = helper.getSumDouble(servicePrices, carWashArray);
-			double carWashProfit = carWashPrices - carWashSumC;
-			
-			String[] otherServArray = getOtherServiceArray(invoiceList);
-			double otherServSumC = helper.getSumDouble(servicesCosts, otherServArray);
-			double otherServPrices = helper.getSumDouble(servicePrices, otherServArray);
-			double otherProfit = otherServPrices - otherServSumC;
-//			System.out.println("item "+ sumItemPrices  + " - "+ sumItemCost + " = "+ itemProfit);
-//			System.out.println("cw "+ carWashPrices  + " - "+ carWashSumC + " = "+ carWashProfit);
-//			System.out.println("ot "+ otherServPrices  + " - "+ otherServSumC + " = "+ otherProfit);
+			toPrint = populateArrayToPrint(invoiceList);
 //			//TODO
-			boolean jobDone = stPrinter.printDailyReport(sumItemPrices, sumItemCost, itemProfit,carWashPrices, carWashSumC, carWashProfit,otherServPrices, otherServSumC, otherProfit);
+			boolean jobDone = false;
+			try {
+				jobDone = stPrinter.printDailyReport(date, toPrint);
+			} catch (Exception e) {
+				String msg =  "Wystapil blad zapisu raportu dziennego "+e.getMessage() + " - "+e.getStackTrace();
+				JOptionPane.showMessageDialog(frame,msg);
+				this.log.logError(msg);
+				jobDone = false;
+			}
 			
 			if(jobDone)
 				JOptionPane.showMessageDialog(frame, "Raport z dnia "+date + " wygenerowany pomyslnie.");
@@ -328,6 +320,43 @@ public class SalesReports {
 		}else{
 			JOptionPane.showMessageDialog(frame, "Brak wpisów z dnia "+date);
 		}
+	}
+
+	private double[][] populateArrayToPrint(ArrayList<Invoice> invoiceList) {
+		double[][] toPrint = new double[4][3];
+		String[] itemArray = getItemsArray(invoiceList);
+		double sumItemCost = helper.getSumDouble(stocksCosts, itemArray);
+		double sumItemPrices = helper.getSumDouble(stockPrices, itemArray);
+		double itemProfit = sumItemPrices -  sumItemCost;
+		toPrint[0][0] = sumItemPrices;
+		toPrint[0][1] = sumItemCost;
+		toPrint[0][2] = itemProfit;
+		
+		String[] carWashArray = getCarWashArray(invoiceList);
+		double carWashSumC = helper.getSumDouble(servicesCosts, carWashArray);
+		double carWashPrices = helper.getSumDouble(servicePrices, carWashArray);
+		double carWashProfit = carWashPrices - carWashSumC;
+		toPrint[1][0] = carWashPrices;
+		toPrint[1][1] = carWashSumC;
+		toPrint[1][2] = carWashProfit;
+	
+		String[] otherServArray = getOtherServiceArray(invoiceList);
+		double otherServSumC = helper.getSumDouble(servicesCosts, otherServArray);
+		double otherServPrices = helper.getSumDouble(servicePrices, otherServArray);
+		double otherProfit = otherServPrices - otherServSumC;
+		toPrint[2][0] = otherServPrices;
+		toPrint[2][1] = otherServSumC;
+		toPrint[2][2] = otherProfit;
+		
+		double sumSales = sumItemPrices + carWashPrices + otherServPrices;
+		double sumCosts = sumItemCost + carWashSumC + otherServSumC;
+		double sumProfits = itemProfit+ carWashProfit + otherProfit;
+		
+		toPrint[3][0] = sumSales;
+		toPrint[3][1] = sumCosts;
+		toPrint[3][2] = sumProfits;
+
+		return toPrint;
 	}
 
 	private String[] getOtherServiceArray(ArrayList<Invoice> invoiceList) {

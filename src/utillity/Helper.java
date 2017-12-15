@@ -310,6 +310,22 @@ public class Helper {
 		}		
 		return false;
 	}
+	
+	public String compareDatesStr(String oldDate, String newDate){
+		char find = '-';
+		int nDD = Integer.parseInt(newDate.substring(0, newDate.indexOf(find)));
+		int nMM = Integer.parseInt(newDate.substring(newDate.indexOf(find)+1, newDate.indexOf(find)+3));
+		int nYYYY = Integer.parseInt(newDate.substring(newDate.indexOf(find)+4));
+
+		int oDD = Integer.parseInt(oldDate.substring(0, oldDate.indexOf(find)));
+		int oMM = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+1, oldDate.indexOf(find)+3));
+		int oYYYY = Integer.parseInt(oldDate.substring(oldDate.indexOf(find)+4));
+		
+		if((nYYYY >= oYYYY) && (nMM >= oMM) && (nDD >= oDD)){
+			return oldDate;
+		}		
+		return newDate;
+	}
 
 	public String[] getDaysArray() {
 		int month = getMonthNum();
@@ -347,8 +363,9 @@ public class Helper {
 	public double getSumDouble(HashMap<String, Double> map, String[] tokens) {
 		double sum = 0;
 		for (String token : tokens) {
-			String t = token;
-			int q = Integer.parseInt(token.substring(0, token.indexOf("A")));
+			int q = 1;
+			if(Character.isDigit(token.charAt(0)))
+				q = Integer.parseInt(token.substring(0, token.indexOf("A")));
 			token = token.substring(token.indexOf("A"));
 			double d = 0;
 			if(map.containsKey(token)) {
