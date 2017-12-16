@@ -442,6 +442,42 @@ public class DatabaseManager {
 		return 0;
 	}
 	
+
+	public Map<String, String> getServiceCodesMap(String q) {
+		Map<String, String> toReturn = new HashMap<String, String>();
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		if(conn == null)
+			conn = this.connect();
+		try {
+			pst = conn.prepareStatement(q);
+			rs = pst.executeQuery();		
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();   
+			
+			while(rs.next()) {			
+				for(int i = 0 ; i <= columnsNumber; i++){
+					if(i % 2 != 0){
+						toReturn.put(rs.getString(i), rs.getString(i+1));
+					}
+				}        
+			}
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
+		} finally {
+			try{
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+			} catch (Exception e){
+				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
+			}
+		}
+		return toReturn;
+	}
+
+	
 	public Map<String, Double> getAllCostsPrices(String query){
 		Map<String, Double> toReturn = new HashMap<String, Double>();
 		
@@ -732,7 +768,7 @@ public class DatabaseManager {
 
 	private Invoice createInvoice(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {
 		String  customer_name = "", service_number = "",item_number = "", invoice_date = "", invoice_path_name = "";
-		double total = 0;
+		double total = 0, discount = 0;
 		int invoice_number = 0;
 		for(int i = 1 ; i <= columnsNumber; i++){
 //			System.out.println(i + " "+ rs.getString(i));
@@ -759,10 +795,13 @@ public class DatabaseManager {
 				case 7:
 					invoice_path_name = rs.getString(i);
 					break;
+				case 8:
+					discount= Double.parseDouble(rs.getString(i));
+					break;
 				}
 			}
 		}
-		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, invoice_path_name, loggerFolderPath, total);
+		return new Invoice(invoice_number, customer_name, service_number, item_number, invoice_date, invoice_path_name, loggerFolderPath, total, discount);
 	}
 	
 	public void createTables(String query) {
@@ -836,5 +875,4 @@ public class DatabaseManager {
 			}
 		}
 	}
-
 }

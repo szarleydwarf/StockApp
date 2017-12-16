@@ -13,6 +13,7 @@ import java.awt.event.FocusListener;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
@@ -48,6 +49,8 @@ import hct_speciale.StockItem;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
+import utillity.StockPrinter;
+
 import javax.swing.JComboBox;
 
 public class WyswietlMagazyn {
@@ -80,6 +83,8 @@ public class WyswietlMagazyn {
 
 	private ArrayList<Item> wholeList;
 
+	private ArrayList<String> defaultPaths;
+
 	/**
 	 * Launch the application.
 	 */
@@ -108,9 +113,13 @@ public class WyswietlMagazyn {
 	public WyswietlMagazyn() {
 		DM = new DatabaseManager(loggerFolderPath);
 		this.fv = new FinalVariables();
-		DecimalFormat df;
-		df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-	
+		DecimalFormat df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
+		
+		defaultPaths = new ArrayList<String>();
+		
+		if(this.defaultPaths.isEmpty())
+			defaultPaths = DM.getPaths("SELECT "+this.fv.SETTINGS_TABLE_PATH+" FROM "+this.fv.SETTINGS_TABLE);
+
 		initialize();
 	}
 
@@ -263,6 +272,18 @@ public class WyswietlMagazyn {
 		});
 		frame.getContentPane().add(btnAddToInvoice);
 		
+		JButton btnPrintWhole = new JButton("Drukuj Magazyn");
+		btnPrintWhole.setForeground(Color.WHITE);
+		btnPrintWhole.setFont(new Font("Segoe UI Black", Font.PLAIN, 12));
+		btnPrintWhole.setBackground(Color.MAGENTA);
+		btnPrintWhole.setBounds(463, 47, 124, 24);
+		btnPrintWhole.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				printStock();
+			}
+		});
+		frame.getContentPane().add(btnPrintWhole);
+		
 		tfQnt4Invoice = new JTextField();
 		tfQnt4Invoice.setBounds(544, 103, 60, 20);
 		frame.getContentPane().add(tfQnt4Invoice);
@@ -276,6 +297,30 @@ public class WyswietlMagazyn {
 		frame.getContentPane().add(lblQnt2Invoice);
 
 		getWholeStock();	
+	}
+
+	protected void printStock() {
+		ArrayList<Item> listToPrint = new ArrayList<Item>();
+		listToPrint.addAll(wholeList);
+		
+		Iterator<Item> it = listToPrint.iterator();
+		while(it.hasNext()){
+			if(it.next().getName().contains("Wash")) {
+				it.remove();
+			} 
+		}
+		it = listToPrint.iterator();
+		while(it.hasNext()){
+			if(it.next().getName().contains("*")) {
+				it.remove();
+			} 
+		}
+		StockPrinter sPrinter = new StockPrinter(defaultPaths);
+		try {
+			sPrinter.printStockList(listToPrint);
+		} catch (Exception e) {
+			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+		}
 	}
 
 	private ListSelectionListener createTableListener() {
@@ -484,5 +529,4 @@ public class WyswietlMagazyn {
 		}
 		return str;
 	}
-
 }

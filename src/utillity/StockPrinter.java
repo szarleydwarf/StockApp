@@ -26,6 +26,8 @@ import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.util.Matrix;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
+import hct_speciale.StockItem;
 
 
 public class StockPrinter  { 
@@ -48,7 +50,6 @@ public class StockPrinter  {
 	private DatabaseManager DM;
 	private FinalVariables fv;
 	
-//	private ArrayList<String> stockServicesNumber;
 	private boolean jobDone = false;
 	private String invoiceFileName;
 	private String fileName;
@@ -63,10 +64,12 @@ public class StockPrinter  {
 	private boolean accFolderExist;
 	private String eightSpaceStr = "        ";
 	private Map<String, String> itemCodeName;
+	private float headerFontSize = 18.0f, stockDocFontSize = 12.0f, lineSpacing = 18.0f;//18/20.5f;
+	private float invoiceReportYOffeset = 440.0f;
+	private double sumDiscounted;
 	
 	protected static String loggerFolderPath;
-	private static Logger log;
-	
+	private static Logger log;	
 	
 	public StockPrinter(ArrayList<String> defaultPaths){
 		this.fv = new FinalVariables();
@@ -257,11 +260,13 @@ public class StockPrinter  {
 		if(!servNo.isEmpty())
 			servNo = servNo.substring(0, servNo.lastIndexOf(","));
 		
+		double disc = helper.getDiscount(sum, discount, applyDiscount);
+		
 		int i = 0;
 		while(i<timeout){
 			i++;
 		}
-		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"');";
+		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"','"+disc+"');";
 		
 		boolean succes = DM.addNewRecord(query);
 		if(succes){
@@ -292,7 +297,6 @@ public class StockPrinter  {
 		customerCopyDoc.save(docPath);
 		customerCopyDoc.close();
 	}
-
 	
 	private void addLogo(PDDocument customerCopyDoc) throws IOException {
 		PDImageXObject pdImage = PDImageXObject.createFromFile(this.fv.INVOICE_LOGO_PATH, customerCopyDoc);
@@ -318,7 +322,7 @@ public class StockPrinter  {
 				text6 = "hctballinamore@gmail.com",
 				text7 = "hct-ireland.business.site",
 				text8 = "FB @hct.irl";
-		contentStream.showText(text + "                                       " + date);
+		contentStream.showText(text + "                                           " + date);
 		contentStream.newLine();
 		contentStream.setFont(PDType1Font.COURIER, 12);
 		contentStream.showText(text2);
@@ -343,7 +347,7 @@ public class StockPrinter  {
 		contentStream.setNonStrokingColor(Color.WHITE);
 		contentStream.setLeading(20.5f);
 		contentStream.setFont(PDType1Font.COURIER_BOLD, 18);
-		contentStream.newLineAtOffset(25, 440);
+		contentStream.newLineAtOffset(25, invoiceReportYOffeset);
 		contentStream.showText(noSt+"    Description         Price        Qnt");
 		contentStream.newLine();
 		contentStream.newLine();
@@ -379,7 +383,7 @@ public class StockPrinter  {
 		contentStream.newLine();	
 		contentStream.newLine();	
 		
-		this.sum = this.helper.getSumDiscounted(sum, discount, applyDiscount);
+		this.sumDiscounted = this.helper.getSumDiscounted(sum, discount, applyDiscount);
 
 		contentStream.setFont(PDType1Font.COURIER, 18);
 		
@@ -389,21 +393,23 @@ public class StockPrinter  {
 		
 		contentStream.showText("                         Discount          "+symbol+" "+df.format(this.discount));
 		contentStream.newLine();	
-		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
+		contentStream.showText("                         TOTAL            € "+df.format(this.sumDiscounted));
 				
 		contentStream.newLine();	
 		contentStream.newLine();	
-		contentStream.showText(eightSpaceStr + "Free ");
-		contentStream.newLine();	
-		contentStream.showText(eightSpaceStr );
-		for(int i = 0; i < this.freebies.length; i++){
-			if(this.freebies[i])
-				contentStream.showText(this.fv.FREEBIES_ARRAY[i]+", ");
-	
-			contentStream.newLine();
-			contentStream.showText(eightSpaceStr);
+		if(this.freebies.length > 0){
+			contentStream.showText(eightSpaceStr + "Free ");
+			contentStream.newLine();	
+			contentStream.showText(eightSpaceStr );
+			for(int i = 0; i < this.freebies.length; i++){
+				if(this.freebies[i]){
+					contentStream.showText(this.fv.FREEBIES_ARRAY[i]+", ");
+		
+				contentStream.newLine();
+				contentStream.showText(eightSpaceStr);
+				}
+			}
 		}
-			
 		contentStream.endText();
 	}
 
@@ -488,6 +494,125 @@ public class StockPrinter  {
 		customerCopyDoc.close();
 	}
 
+	public void printStockList(ArrayList<Item> listToPrint) throws Exception {
+		PDDocument stockDoc = new PDDocument();
+		PDPage page = new PDPage();
+		stockDoc.addPage(page);
+		
+		int k = 1;
+		
+		float pageH = page.getMediaBox().getHeight();
+		float th = pageH - (fv.PAGE_MARGIN*3);		
+		
+		if(listToPrint.size()>0){
+			contentStream = new PDPageContentStream(stockDoc, page);
+			addHeader(contentStream);
+			
+			for(int i = 0; i < listToPrint.size(); i++){
+				if(th <= (fv.PAGE_MARGIN*4)) {
+					contentStream.close();
+					page = new PDPage();
+					stockDoc.addPage(page);
+					contentStream = new PDPageContentStream(stockDoc, page);
+					addHeader(contentStream);			
+					th = pageH -(fv.PAGE_MARGIN*3);
+				}
+
+				th = th - stockDocFontSize;
+				contentStream.beginText();
+				contentStream.setNonStrokingColor(Color.black);
+				contentStream.setFont(PDType1Font.COURIER, stockDocFontSize);
+				contentStream.newLineAtOffset(25, th);
+
+				contentStream.showText(k +" - "+listToPrint.get(i).getStockNumber()+" - "+listToPrint.get(i).getName()+" - "+listToPrint.get(i).getCost()+" - "+listToPrint.get(i).getPrice()+" - "+((StockItem) listToPrint.get(i)).getQnt());
+				contentStream.endText();
+				k++;
+			}
+			contentStream.close();
+		}
+
+		String path = savePath+loggerFolderPath+date+"_magazyn.pdf";
+		log.logError("print stock pdf "+path);
+		stockDoc.save(path);
+		stockDoc.close();
+		
+		this.printPDF(path);
+	}
+		
+	private void addHeader(PDPageContentStream contentStream) throws IOException {
+		contentStream.setNonStrokingColor(Color.darkGray);
+		contentStream.addRect(15, 750, 580, 30);
+		contentStream.fill();
+		
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.white);
+		contentStream.setLeading(lineSpacing );
+		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
+		contentStream.newLineAtOffset(25, 760);
+		contentStream.showText(noSt+" - ID - Nazwa -  Koszt - Cena - Qnt");
+		contentStream.endText();
+	}
+
+	public boolean printDailyReport(String dDate, double[][] toPrint) throws Exception {
+		String docDate = "";
+		if( helper.compareDates(this.date, dDate)){
+			docDate = date;
+		} else {
+			docDate = dDate;
+		}
+		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT_5_2); 
+
+		PDDocument dailyReport = new PDDocument();
+		PDPage page = new PDPage();
+		dailyReport.addPage(page);
+		contentStream = new PDPageContentStream(dailyReport, page);
+		this.addLogo(dailyReport);
+		this.fillCompanyDetails();
+
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.white);
+		contentStream.setLeading(lineSpacing );
+		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
+		contentStream.newLineAtOffset(175, invoiceReportYOffeset );
+
+		for(int i = 0; i < fv.SALES_REPORT_COL_HEADINGS.length; i++){
+			this.contentStream.showText(fv.SALES_REPORT_COL_HEADINGS[i] + "     -    ");
+		}
+		contentStream.endText();
+
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.black);
+		contentStream.setLeading(lineSpacing );
+		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
+		contentStream.newLineAtOffset(30, invoiceReportYOffeset );
+		this.contentStream.newLine();
+		this.contentStream.newLine();
+		this.contentStream.newLine();
+
+		for(int i = 0; i < fv.SALES_REPORT_ROW_HEADINGS.length; i++){
+			this.contentStream.showText(fv.SALES_REPORT_ROW_HEADINGS[i]);
+			for(int j = 0; j < toPrint[i].length; j++){
+				this.contentStream.showText(" - € " + df.format(toPrint[i][j]));
+			}
+			this.contentStream.newLine();
+		}
+		
+		
+		contentStream.endText();
+		contentStream.close();
+		String path = "";
+		String reportEXT = "_report.pdf";
+		if(!loggerFolderPath.contains(savePath))
+			path = savePath+loggerFolderPath+docDate+reportEXT;
+		else
+			path = loggerFolderPath+docDate+reportEXT;
+			dailyReport.save(path);
+		dailyReport.close();
+		
+		this.printPDF(path);
+		return true;
+	}
+	
 	public void printPDF(String docPath) throws IOException, Exception{
 //		System.out.println("printpdf "+docPath);
 		PDDocument document = PDDocument.load(new File(docPath));
@@ -517,4 +642,5 @@ public class StockPrinter  {
         }
         return null;
     }
+
 }

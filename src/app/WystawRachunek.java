@@ -231,7 +231,6 @@ public class WystawRachunek {
 		DM = new DatabaseManager(loggerFolderPath);
 		helper = new Helper();
 		fv = new FinalVariables();
-		//TODO: add check for arraylist null?
 		this.defaultPaths = new ArrayList<String>();
 		this.defaultPaths = defaultPaths;
 		this.itemCodeName = new HashMap<String, String>();

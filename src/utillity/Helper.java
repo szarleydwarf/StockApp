@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -60,7 +62,7 @@ public class Helper {
 	}
 		
 	public double getSumDiscounted(double sum, double discount, boolean applyDiscount){
-	
+		
 		if(applyDiscount){
 			return sum - discount;
 		} else if(!applyDiscount){
@@ -68,6 +70,13 @@ public class Helper {
 		} else {
 			return sum;
 		}
+	}
+	
+	public double getDiscount(double sum, double discount, boolean applyDiscount){		
+		if(!applyDiscount){
+			return (sum * (discount/100));
+		} else
+			return discount;
 	}
 		
 	public int checkInteger(String msg1, String msg2, String number){
@@ -148,9 +157,82 @@ public class Helper {
 		SimpleDateFormat df= new SimpleDateFormat(this.fv.DATE_FORMAT);
 		
 		return df.format(today.getTime());
+	}
 
+	public int getDayOfMonthNum(){
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.DAY_OF_MONTH);
+	}
+
+	public int getMonthNum(){
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.MONTH);
+	}
+
+
+	public String getIndexOfMonth(String month) {
+		for(int i = 0; i < fv.MONTHS_NAMES.length; i++){
+			if(fv.MONTHS_NAMES[i].equals(month)){
+				int monthNum = i+1;
+				return "" + monthNum;
+			}
+		}
+		return "";
+	}
+
+	public int getYearNum(){
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.YEAR);
+	}
+
+	public int getYearIndex() {
+		String year = ""+getYearNum();
+		int index = 0;
+		for(int i = 0; i < fv.YEARS_NO_STRING.length; i++){
+			if(fv.YEARS_NO_STRING[i].equals(year)){
+				return i;
+			}
+		}
+		return index;
 	}
 	
+	public boolean isLeapYear(int year){
+        if(year % 4 == 0)
+        {
+            if( year % 100 == 0)
+            {
+                if ( year % 400 == 0)
+                    return true;
+                else
+                	return false;
+            }
+            else
+            	return true;
+        }
+        else {
+        	return false;
+        }
+	}
+	
+	public boolean isLeapYear(){
+		int year = this.getYearNum();
+        if(year % 4 == 0)
+        {
+            if( year % 100 == 0)
+            {
+                if ( year % 400 == 0)
+                    return true;
+                else
+                	return false;
+            }
+            else
+            	return true;
+        }
+        else {
+        	return false;
+        }
+	}
+
 	public boolean createFolderIfNotExist (String path) {
 //		System.out.println("helper Folder path: "+path);
 		
@@ -246,8 +328,71 @@ public class Helper {
 		}		
 		return false;
 	}
+
+	public String[] getDaysArray() {
+		int month = getMonthNum();
+		month++;
+
+		switch(month){
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+			case 8:
+			case 10:
+			case 12:
+				return fv.DAYS_NUM_31;
 	
-	/* Function copied from
+			case 4:
+			case 6:
+			case 9:
+			case 11:
+				return fv.DAYS_NUM_30;
+	
+			case 2:
+				boolean isLeap = isLeapYear();
+				if(isLeap)
+					return fv.DAYS_NUM_29;
+				else
+					return fv.DAYS_NUM_28;
+	
+			default:
+				return fv.DAYS_NUM_31;
+		}
+	}
+
+	
+	public double getSumDouble(HashMap<String, Double> map, String[] tokens) {
+		double sum = 0;
+		for (String token : tokens) {
+			int q = 1;
+			if(Character.isDigit(token.charAt(0)))
+				q = Integer.parseInt(token.substring(0, token.indexOf("A")));
+			token = token.substring(token.indexOf("A"));
+			double d = 0;
+			if(map.containsKey(token)) {
+				d = map.get(token) * q;
+//				System.out.println("helper q: "+(q) + " * " + map.get(token)+" = "+d);
+			} 
+			sum += d;
+		}
+		return sum;
+	}
+
+	
+	public String getSumString(HashMap<String, Double> map, String[] tokens) {
+		DecimalFormat df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
+		double sum = 0;
+		for (String token : tokens) {
+			double d = 0;
+			if(map.containsKey(token)) {
+				d = map.get(token);
+			} 
+			sum += d;
+		}
+		return df.format(sum);
+	}
+/* Function copied from
 	 * https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
 	*/
 	public static void printMap(Map mp) {
@@ -257,5 +402,19 @@ public class Helper {
 	        System.out.println(pair.getKey() + " = " + pair.getValue());
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
+	}
+	
+	
+	public float pt2mmForWeb72dpi(float pt) {
+	   return pt2mm(pt,72);
+	}
+	public float pt2mmForPrint300dpi(float pt) {
+	   return pt2mm(pt,300);
+	}
+	public float pt2mmForPrint600dpi(float pt) {
+	   return pt2mm(pt,600);
+	}
+	public float pt2mm(float pt, float dpi) {
+	   return pt * 25.4f / dpi;
 	}
 }
