@@ -66,6 +66,7 @@ public class StockPrinter  {
 	private Map<String, String> itemCodeName;
 	private float headerFontSize = 18.0f, stockDocFontSize = 12.0f, lineSpacing = 18.0f;//18/20.5f;
 	private float invoiceReportYOffeset = 440.0f;
+	private double sumDiscounted;
 	
 	protected static String loggerFolderPath;
 	private static Logger log;	
@@ -259,11 +260,13 @@ public class StockPrinter  {
 		if(!servNo.isEmpty())
 			servNo = servNo.substring(0, servNo.lastIndexOf(","));
 		
+		double disc = helper.getDiscount(sum, discount, applyDiscount);
+		
 		int i = 0;
 		while(i<timeout){
 			i++;
 		}
-		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"');";
+		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"','"+disc+"');";
 		
 		boolean succes = DM.addNewRecord(query);
 		if(succes){
@@ -380,7 +383,7 @@ public class StockPrinter  {
 		contentStream.newLine();	
 		contentStream.newLine();	
 		
-		this.sum = this.helper.getSumDiscounted(sum, discount, applyDiscount);
+		this.sumDiscounted = this.helper.getSumDiscounted(sum, discount, applyDiscount);
 
 		contentStream.setFont(PDType1Font.COURIER, 18);
 		
@@ -390,21 +393,23 @@ public class StockPrinter  {
 		
 		contentStream.showText("                         Discount          "+symbol+" "+df.format(this.discount));
 		contentStream.newLine();	
-		contentStream.showText("                         TOTAL            € "+df.format(this.sum));
+		contentStream.showText("                         TOTAL            € "+df.format(this.sumDiscounted));
 				
 		contentStream.newLine();	
 		contentStream.newLine();	
-		contentStream.showText(eightSpaceStr + "Free ");
-		contentStream.newLine();	
-		contentStream.showText(eightSpaceStr );
-		for(int i = 0; i < this.freebies.length; i++){
-			if(this.freebies[i])
-				contentStream.showText(this.fv.FREEBIES_ARRAY[i]+", ");
-	
-			contentStream.newLine();
-			contentStream.showText(eightSpaceStr);
+		if(this.freebies.length > 0){
+			contentStream.showText(eightSpaceStr + "Free ");
+			contentStream.newLine();	
+			contentStream.showText(eightSpaceStr );
+			for(int i = 0; i < this.freebies.length; i++){
+				if(this.freebies[i]){
+					contentStream.showText(this.fv.FREEBIES_ARRAY[i]+", ");
+		
+				contentStream.newLine();
+				contentStream.showText(eightSpaceStr);
+				}
+			}
 		}
-			
 		contentStream.endText();
 	}
 
@@ -607,6 +612,7 @@ public class StockPrinter  {
 		this.printPDF(path);
 		return true;
 	}
+	
 	public void printPDF(String docPath) throws IOException, Exception{
 //		System.out.println("printpdf "+docPath);
 		PDDocument document = PDDocument.load(new File(docPath));

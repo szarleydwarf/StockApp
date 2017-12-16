@@ -62,7 +62,7 @@ public class Helper {
 	}
 		
 	public double getSumDiscounted(double sum, double discount, boolean applyDiscount){
-	
+		
 		if(applyDiscount){
 			return sum - discount;
 		} else if(!applyDiscount){
@@ -70,6 +70,13 @@ public class Helper {
 		} else {
 			return sum;
 		}
+	}
+	
+	public double getDiscount(double sum, double discount, boolean applyDiscount){		
+		if(!applyDiscount){
+			return (sum * (discount/100));
+		} else
+			return discount;
 	}
 		
 	public int checkInteger(String msg1, String msg2, String number){

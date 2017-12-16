@@ -24,13 +24,14 @@ public class Invoice {
 	private StockPrinter sPrinter;
 	private FinalVariables fv;
 	private ArrayList<String> defaultPaths = new ArrayList<String>();
+	private double discount;
 	
 	protected static String date;
 	protected static String loggerFolderPath;
 	private static Logger log;
 	private static Helper helper;
 	
-	public Invoice(int p_invoice_number, String p_customer_name, String p_service_number, String p_item_number, String p_invoice_date, String p_file_path_name, String p_loggerFolderPath, double p_total){
+	public Invoice(int p_invoice_number, String p_customer_name, String p_service_number, String p_item_number, String p_invoice_date, String p_file_path_name, String p_loggerFolderPath, double p_total, double p_discount){
 		this.invoiceNumber = p_invoice_number;
 		this.customerName = p_customer_name;
 		this.serviceNumber = p_service_number;
@@ -38,6 +39,7 @@ public class Invoice {
 		this.invoiceDateString = p_invoice_date;
 		this.filePathName = p_file_path_name;
 		this.total = p_total;
+		this.discount = p_discount;
 		
 		ArrayList<String> defaultPaths = new ArrayList<String>();
 		defaultPaths.add(p_loggerFolderPath);
@@ -129,5 +131,9 @@ public class Invoice {
 
 	public void setTotal(double total) {
 		this.total = total;
+	}
+
+	public double getDiscount() {
+		return this.discount;
 	}
 }

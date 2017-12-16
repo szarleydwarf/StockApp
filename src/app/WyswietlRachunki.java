@@ -246,6 +246,7 @@ public class WyswietlRachunki {
 			data[i][4] = ""+listOfInvoices.get(i).getTotal();
 			data[i][5] = ""+listOfInvoices.get(i).getInvoiceDateString();
 			data[i][6] = ""+listOfInvoices.get(i).getFilePathName();
+			data[i][7] = ""+listOfInvoices.get(i).getDiscount();
 			
 		}
 

@@ -21,7 +21,7 @@ public class FinalVariables {
 	//patterns and formats
 	public final String DECIMAL_PATTERN = "^-?([0-9]*)\\.([0-9]*)+$";	
 	public final String INTEGER_PATTERN = "^-?\\d+$";
-	public final String DECIMAL_FORMAT = "#.##";
+	public final String DECIMAL_FORMAT = "000.00";
 	public static final String DECIMAL_FORMAT_5_2 = "00000.00";
 	public final String DATE_FORMAT = "dd-MM-yyyy";//"yyyy-MM-dd" ?? not sure which format is correct for a database entry. so far works
 
@@ -42,7 +42,7 @@ public class FinalVariables {
 	public final String[] DAYS_NUM_29 = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"};
 	public final String[] DAYS_NUM_28 = {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"};
 	public final String[] YEARS_NO_STRING = {"2017", "2018", "2019", "2020"};
-	public final String[] SALES_REPORT_ROW_HEADINGS = {"Tyre Sale", "Car Wash ", "Tyre Serv", "*** TOTAL"};
+	public final String[] SALES_REPORT_ROW_HEADINGS = {"Tyre Sale", "Tyre Serv", "Car Wash ", "Discounts", "*** TOTAL"};
 	public final String[] SALES_REPORT_COL_HEADINGS = {"SALE", "COST", "PROFIT"};
 	public static final float PAGE_MARGIN = 20;
 
@@ -61,9 +61,9 @@ public class FinalVariables {
 	public static final String[] SALES_REPORT_TB_HEADINGS = {"Miesiąc", "Koszty", "Przychód", "Zysk"};
 	public static final String[] STOCK_TB_HEADINGS = {"Towar", "Koszt", "Cena", "Qnt"};
 	public static final String[] STOCK_TB_HEADINGS_NO_COST =  {"Towar", "Cena", "Qnt"};
-	public static final String[] INVOICE_TB_HEADINGS = {"Inv #", "Klient", "Serwis #", "Towar #", "Total", "Data wystawienia", "Nazwa pliku"};
+//	public static final String[] INVOICE_TB_HEADINGS = {"Inv #", "Klient", "Serwis #", "Towar #", "Total", "Data wystawienia", "Nazwa pliku"};
 	public static final String[] CARS_TABLE_HEADER = {"Marka auta"};
-	public static final String[] INVOICE_REPORT_TB_HEADINGS = {"Inv #", "Klient", "Usługi", "Produkty", "Total", "Data faktury", "Ścieżka dostępu"};
+	public static final String[] INVOICE_REPORT_TB_HEADINGS = {"Inv #", "Klient", "Usługi", "Produkty", "Total", "Data faktury", "Ścieżka dostępu", "Discount"};
 	public final String CARS_TB_NAME = "CARS";
 	public final String STOCK_TB_NAME = "STOCK";
 	public final String CHOSEN_TB_NAME = "CHOOSEN";

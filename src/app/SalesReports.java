@@ -378,7 +378,7 @@ public class SalesReports {
 	}
 
 	private double[][] populateArrayToPrint(ArrayList<Invoice> invoiceList) {
-		double[][] toPrint = new double[4][3];
+		double[][] toPrint = new double[5][3];
 		String[] itemArray = getItemsArray(invoiceList);
 		double sumItemCost = helper.getSumDouble(stocksCosts, itemArray);
 		double sumItemPrices = helper.getSumDouble(stockPrices, itemArray);
@@ -403,15 +403,30 @@ public class SalesReports {
 		toPrint[2][1] = otherServSumC;
 		toPrint[2][2] = otherProfit;
 		
-		double sumSales = sumItemPrices + carWashPrices + otherServPrices;
+		double discounts = getDiscountSum(invoiceList);
+		double disCost = 0.00;
+//		double sumProfits = itemProfit+ carWashProfit + otherProfit;		
+		toPrint[3][0] = discounts;
+		toPrint[3][1] = disCost;
+		toPrint[3][2] = discounts;
+
+		double sumSales = sumItemPrices + carWashPrices + otherServPrices - discounts;
 		double sumCosts = sumItemCost + carWashSumC + otherServSumC;
-		double sumProfits = itemProfit+ carWashProfit + otherProfit;
-		
-		toPrint[3][0] = sumSales;
-		toPrint[3][1] = sumCosts;
-		toPrint[3][2] = sumProfits;
+		double sumProfits = itemProfit+ carWashProfit + otherProfit - discounts;		
+		toPrint[4][0] = sumSales;
+		toPrint[4][1] = sumCosts;
+		toPrint[4][2] = sumProfits;
 
 		return toPrint;
+	}
+
+	private double getDiscountSum(ArrayList<Invoice> invoiceList) {
+		double sum = 0.00;
+		for(Invoice i : invoiceList){
+//			System.out.println("SR disc: "+i.getDiscount());
+			sum += i.getDiscount();
+		}
+		return sum;
 	}
 
 	private String[] getOtherServiceArray(ArrayList<Invoice> invoiceList) {
