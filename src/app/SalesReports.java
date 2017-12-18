@@ -332,7 +332,7 @@ public class SalesReports {
 			toPrint = populateArrayToPrint(invoiceList);
 			boolean jobDone = false;
 			try {
-				jobDone = stPrinter.printDailyReport(dateOfReport, toPrint);
+				jobDone = stPrinter.printReport(dateOfReport, toPrint);
 			} catch (Exception e) {
 				String msg =  "Wystapil blad zapisu raportu miesiecznego (" + dateOfReport + ")" + e.getMessage() + " - "+e.getStackTrace();
 				JOptionPane.showMessageDialog(frame,msg);
@@ -360,7 +360,7 @@ public class SalesReports {
 			toPrint = populateArrayToPrint(invoiceList);
 			boolean jobDone = false;
 			try {
-				jobDone = stPrinter.printDailyReport(date, toPrint);
+				jobDone = stPrinter.printReport(date, toPrint);
 			} catch (Exception e) {
 				String msg =  "Wystapil blad zapisu raportu dziennego  (" + date + ")" + e.getMessage() + " - "+e.getStackTrace();
 				JOptionPane.showMessageDialog(frame,msg);
@@ -423,7 +423,6 @@ public class SalesReports {
 	private double getDiscountSum(ArrayList<Invoice> invoiceList) {
 		double sum = 0.00;
 		for(Invoice i : invoiceList){
-//			System.out.println("SR disc: "+i.getDiscount());
 			sum += i.getDiscount();
 		}
 		return sum;

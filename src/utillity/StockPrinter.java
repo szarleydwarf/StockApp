@@ -553,7 +553,7 @@ public class StockPrinter  {
 		contentStream.endText();
 	}
 
-	public boolean printDailyReport(String dDate, double[][] toPrint) throws Exception {
+	public boolean printReport(String dDate, double[][] toPrint) throws Exception {
 		String docDate = "";
 		if( helper.compareDates(this.date, dDate)){
 			docDate = date;

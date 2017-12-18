@@ -671,7 +671,7 @@ public class WystawRachunek {
 		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
-	}// END OF INSTANTIATE
+	}//TODO END OF INSTANTIATE
 	
 
 	private void createChoosenItemsTable() {
@@ -876,6 +876,8 @@ public class WystawRachunek {
 			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
 			if(tfQnt > itemQnt)
 				return;
+			else
+				itemQnt -= tfQnt;
 		}
 		
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
