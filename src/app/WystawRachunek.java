@@ -96,12 +96,13 @@ public class WystawRachunek {
 
 	private ArrayList<String> defaultPaths;
 	private Map<String, String> itemCodeName;
+	private Map<Item,Integer> selectedRowItem;
 	private String stringAddress = "Adres Firmy";
 	private String stringComName = "Nazwa firmy";
 	private String stringVATReg = "VAT / Tax No.";
 	private JTextField tfSearchItem;
 	private JTextField tfSearchCar;
-	private JTable tableCars;
+	private JTable tableCars, tbStock;
 	private TableRowSorter rowSorterStock,rowSorterCars;
 	private JTextField tfCarsSearchBox;
 	private JTextField tfSearch;
@@ -171,6 +172,8 @@ public class WystawRachunek {
 		DM = new DatabaseManager(loggerFolderPath);
 		helper = new Helper();
 		fv = new FinalVariables();
+		this.selectedRowItem = new HashMap<Item, Integer>();
+
 		this.defaultPaths = new ArrayList<String>();
 		this.defaultPaths = defaultPaths;
 		this.itemCodeName = new HashMap<String, String>();
@@ -729,8 +732,9 @@ public class WystawRachunek {
 		rowSorterStock = new TableRowSorter<>(table.getModel());
 		
 		table.setRowSorter(rowSorterStock);
-	
-		JScrollPane spStockList = new JScrollPane(table);
+		this.tbStock = table;
+		
+		JScrollPane spStockList = new JScrollPane(tbStock);
 		spStockList.setBounds(16, 296, 405, 194);
 		frame.getContentPane().add(spStockList);
 		
@@ -808,8 +812,8 @@ public class WystawRachunek {
 				int row = table.getSelectedRow();
 				if(row != -1) {
 					item = getItem(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
-					if(item != null){
-//						System.out.println("Name: "+item.getName());
+					if(item != null && (item instanceof StockItem)){
+						selectedRowItem.put(item,row);
 					}
 				}
 			}
@@ -862,22 +866,33 @@ public class WystawRachunek {
 		
 		int tfQnt = 0;
 		int itemQnt = 0;
-		if(item instanceof StockItem)
+		if(item instanceof StockItem) {
 			itemQnt = ((StockItem) item).getQnt();
-		else
+		} else
 			itemQnt = 1;
+		
+		
 		
 		if(!this.tfQntListed.getText().isEmpty())
 			tfQnt = Integer.parseInt(this.tfQntListed.getText());
 		else
 			tfQnt = 1;
-		
+
 		while(tfQnt > itemQnt && (item instanceof StockItem)){
 			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
 			if(tfQnt > itemQnt)
-				return;
-			else
-				itemQnt -= tfQnt;
+				return;			
+		}
+
+		if(item instanceof StockItem){
+			itemQnt = (itemQnt <= 0) ? 0 : itemQnt - tfQnt;
+			
+//			System.out.println("Instance: " + itemQnt + " / " + tfQnt);
+			if(this.selectedRowItem.containsKey(item)){
+				((StockItem) item).setQnt(itemQnt);
+				int row = this.selectedRowItem.get(item);
+				tbStock.setValueAt(((StockItem) item).getQnt(), row, 2);
+			}				
 		}
 		
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];

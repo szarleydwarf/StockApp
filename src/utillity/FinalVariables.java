@@ -31,6 +31,8 @@ public class FinalVariables {
 	public final String COMPANY_STRING = "C:";
 	public final String MAX_SERVIS_QNT = "9999";
 	public final String[] SORT_BY = {"Nazwa", "Cena", "Qnt"};//, "Rozmiar"
+	public final String WASH = "Wash";
+	public final String STAR = "*";
 
 	public final String STOCK_SORT_BY="item_name";
 	public final String SERVICES_SORT_BY="service_name";

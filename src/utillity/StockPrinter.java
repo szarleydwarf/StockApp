@@ -67,6 +67,7 @@ public class StockPrinter  {
 	private float headerFontSize = 18.0f, stockDocFontSize = 12.0f, lineSpacing = 18.0f;//18/20.5f;
 	private float invoiceReportYOffeset = 440.0f;
 	private double sumDiscounted;
+	private ArrayList<Item> items;
 	
 	protected static String loggerFolderPath;
 	private static Logger log;	
@@ -105,6 +106,8 @@ public class StockPrinter  {
 			this.printerName = this.fv.PRINTER_NAME;
 
 		this.date = helper.getFormatedDate();
+		
+		items = DM.getItemsList("SELECT "+fv.STAR + " FROM " +fv.STOCK_TABLE);
 
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
@@ -172,9 +175,9 @@ public class StockPrinter  {
 		generatePDF();
 
 		printPDF(docPath);
-
 		createAccountancCopy();
 		
+		changeDBStock();		
 		saveEntryToDatabase();
 		return jobDone ;
 	}
@@ -211,11 +214,50 @@ public class StockPrinter  {
 //		System.out.println("save :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
 		
 		generatePDF();
-
 		createAccountancCopy();
-		
+
+		changeDBStock();
 		saveEntryToDatabase();
 		return jobDone ;
+	}
+
+	private void changeDBStock() {
+		int qnt = 0;
+		String itemName = "";	
+        String query = "UPDATE \""+this.fv.STOCK_TABLE+"\" SET "+this.fv.STOCK_TABLE_QNT+"=CASE "+this.fv.STOCK_TABLE_ITEM_NAME;
+        
+        if(this.rowCount > 0){
+        	for(int i = 0; i < this.rowCount; i++){
+    			itemName = this.md.getValueAt(i, 0).toString();
+        		if(!itemName.contains(this.fv.WASH) && !itemName.contains(this.fv.STAR)){
+            		System.out.println("Update "+itemName + " / "+this.md.getValueAt(i, 1) + " / "+this.md.getValueAt(i, 2));
+            		// TODO ????
+            		for(Item it : items){
+            			if(it.getName().equals(itemName)){
+            				Item tI = it;
+              				System.out.println("Update 1: "+((StockItem) it).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
+              				qnt = ((StockItem) it).getQnt() - Integer.parseInt(this.md.getValueAt(i, 2).toString());
+            				items.remove(it);
+            				((StockItem)tI).setQnt(qnt);
+            				items.add(tI);
+            				System.out.println("Update 2: "+((StockItem) tI).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
+                		}
+            		}
+            		
+            		
+            		query += " WHEN '" + this.md.getValueAt(i, 0) + "' THEN '" + qnt +"'";
+        		}
+        	}
+        	query += " ELSE "+this.fv.STOCK_TABLE_QNT+" END;";
+        }
+		System.out.println("Update Q\n"+query);
+
+        
+        boolean updated = true;// this.DM.editRecord(query);
+        if(updated)
+        	JOptionPane.showMessageDialog(null, "Zaktualizowano wpis w bazie danych");
+        else
+        	JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
 	}
 
 	private void saveEntryToDatabase() throws SQLException {
