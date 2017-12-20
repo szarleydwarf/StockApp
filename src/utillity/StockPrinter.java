@@ -217,47 +217,66 @@ public class StockPrinter  {
 		createAccountancCopy();
 
 		changeDBStock();
-		saveEntryToDatabase();
+//		saveEntryToDatabase();
 		return jobDone ;
 	}
 
 	private void changeDBStock() {
+        String query = getQuery();
+        boolean updated = this.DM.editRecord(query);
+        if(updated)
+        	JOptionPane.showMessageDialog(null, "Zaktualizowano wpis w bazie danych");
+        else
+        	JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
+	}
+
+	private String getQuery() {
+		String query = "UPDATE \""+this.fv.STOCK_TABLE+"\" SET "+this.fv.STOCK_TABLE_QNT+"=CASE "+this.fv.STOCK_TABLE_ITEM_NAME;
 		int qnt = 0;
 		String itemName = "";	
-        String query = "UPDATE \""+this.fv.STOCK_TABLE+"\" SET "+this.fv.STOCK_TABLE_QNT+"=CASE "+this.fv.STOCK_TABLE_ITEM_NAME;
-        
+       
         if(this.rowCount > 0){
         	for(int i = 0; i < this.rowCount; i++){
     			itemName = this.md.getValueAt(i, 0).toString();
         		if(!itemName.contains(this.fv.WASH) && !itemName.contains(this.fv.STAR)){
-            		System.out.println("Update "+itemName + " / "+this.md.getValueAt(i, 1) + " / "+this.md.getValueAt(i, 2));
+//            		System.out.println("Update "+itemName + " / "+this.md.getValueAt(i, 1) + " / "+this.md.getValueAt(i, 2));
             		// TODO ????
-            		for(Item it : items){
+            		Iterator<Item> iter = items.iterator();
+            		while(iter.hasNext()){
+            			Item it = iter.next();
             			if(it.getName().equals(itemName)){
-            				Item tI = it;
-              				System.out.println("Update 1: "+((StockItem) it).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
-              				qnt = ((StockItem) it).getQnt() - Integer.parseInt(this.md.getValueAt(i, 2).toString());
-            				items.remove(it);
-            				((StockItem)tI).setQnt(qnt);
-            				items.add(tI);
-            				System.out.println("Update 2: "+((StockItem) tI).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
-                		}
+            				int index = items.indexOf(it);
+//              				System.out.println("Update 1: "+((StockItem) it).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
+//              				iter.remove();
+              				qnt = ((StockItem) it).getQnt() - Integer.parseInt(md.getValueAt(i, 2).toString());
+              				((StockItem) it).setQnt(qnt);
+//              				System.out.println("Update 2: "+((StockItem) it).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
+              				items.set(index, it);
+            			}
             		}
             		
-            		
-            		query += " WHEN '" + this.md.getValueAt(i, 0) + "' THEN '" + qnt +"'";
+            		if(query.contains(itemName)){
+             			String q = query, q2 = "";
+//                   		System.out.println(" else 1 "+q.substring(q.indexOf(itemName)+itemName.length()).length() + " / " + q);
+              			q = q.substring(0, q.indexOf(itemName)+itemName.length()+7);
+              			
+              			if(q.substring(q.indexOf(itemName)+itemName.length()).length() > 0){
+              				q2 = query.substring(query.indexOf(itemName)+itemName.length()+10);
+              			}
+              			
+//                		System.out.println("else 2\n"+q + " \n " + q2);
+              			q +="'" + qnt +"'" + q2;
+//                		System.out.println("else 3\n"+ q);
+                		query = q;
+            		}else {
+               			query += " WHEN '" + itemName + "' THEN '" + qnt +"'";
+            		}
         		}
         	}
         	query += " ELSE "+this.fv.STOCK_TABLE_QNT+" END;";
         }
 		System.out.println("Update Q\n"+query);
-
-        
-        boolean updated = true;// this.DM.editRecord(query);
-        if(updated)
-        	JOptionPane.showMessageDialog(null, "Zaktualizowano wpis w bazie danych");
-        else
-        	JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
+		return query;
 	}
 
 	private void saveEntryToDatabase() throws SQLException {
@@ -642,6 +661,7 @@ public class StockPrinter  {
 		
 		contentStream.endText();
 		contentStream.close();
+		//TODO change to save in the accountancy folder from the date taken.
 		String path = "";
 		String reportEXT = "_report.pdf";
 		if(!loggerFolderPath.contains(savePath))

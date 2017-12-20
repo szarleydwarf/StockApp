@@ -35,7 +35,7 @@ public class DatabaseManager {
 		loggerFolderPath = p_loggerFolderPath;
 		log = new Logger(loggerFolderPath);
 		helper = new Helper();
-		date = helper.getFormatedDate();
+		date = helper.getFormatedDateAndTime();
 	}
 	
 	public Connection connect() {
@@ -676,29 +676,14 @@ public class DatabaseManager {
 	}
 
 	public boolean editRecord(String query) {
-		conn = this.connect();
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		if(this.conn == null)
 			conn = this.connect();
-		try {
-			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
-		} catch (SQLException e) {
-			log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD\t"+e.getMessage());
-		}
 		
 		try {
-			conn.setAutoCommit(false);
-			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			pst = conn.prepareStatement(query);
 			int inserted = pst.executeUpdate();
-			
-			rs = pst.getGeneratedKeys();
-			if(inserted != 1){
-				this.conn.rollback();
-			} 
-			
-			conn.commit();
 			
 			if(inserted != 0)
 				return true;
@@ -728,7 +713,7 @@ public class DatabaseManager {
 			}
 		}
 		return false;
-		}
+	}
 	
 	public ArrayList<Invoice> getInvoiceList(String query) {
 		conn = this.connect();

@@ -24,6 +24,7 @@ public class FinalVariables {
 	public final String DECIMAL_FORMAT = "000.00";
 	public static final String DECIMAL_FORMAT_5_2 = "00000.00";
 	public final String DATE_FORMAT = "dd-MM-yyyy";//"yyyy-MM-dd" ?? not sure which format is correct for a database entry. so far works
+	public final String DATE_TIME_FORMAT = "dd-MM-yyyy @HH:mm:ss";
 
 	//other
 	public final String SEARCH_TEXT_FIELD_FRAZE = "wpisz szukaną nazwę";
