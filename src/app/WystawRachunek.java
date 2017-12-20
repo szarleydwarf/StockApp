@@ -152,7 +152,7 @@ public class WystawRachunek {
 				loggerFolderPath = defaultPaths.get(0)+"\\"+fv.LOGGER_FOLDER_NAME;
 				log = new Logger(loggerFolderPath);
 				helper = new Helper();
-				date = helper.getFormatedDate();
+				date = helper.getFormatedDateAndTime();
 				try {
 					WystawRachunek window = new WystawRachunek(defaultPaths);
 					window.frame.setVisible(true);
@@ -676,7 +676,6 @@ public class WystawRachunek {
 		populateCarTable();
 	}//TODO END OF INSTANTIATE
 	
-
 	private void createChoosenItemsTable() {
 		ArrayList<Item>emptyArray = new ArrayList<Item>();
 		String[][] data = new String [0][this.fv.STOCK_TB_HEADINGS_NO_COST.length];
@@ -953,17 +952,21 @@ public class WystawRachunek {
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
 				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
+				System.out.println("WR Save "+saved);
 				if(saved){
 					this.frame.dispose();
 					MainView.main(null);
 				} else {
-					JOptionPane.showMessageDialog(frame, this.fv.SAVE_ERROR);
+					System.out.println("WR else 1");
+JOptionPane.showMessageDialog(frame, this.fv.SAVE_ERROR);
 				}
 					
 			} else
-				JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
+				System.out.println("WR else 2 ");
+JOptionPane.showMessageDialog(frame, "Wynik nie został poprawnie policzony.");
 		} catch (Exception e) {
-			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
+			System.out.println("WR catch ");
+log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 		}
 	}
 

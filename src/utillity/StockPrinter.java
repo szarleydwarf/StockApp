@@ -215,9 +215,19 @@ public class StockPrinter  {
 		
 		generatePDF();
 		createAccountancCopy();
-
-		changeDBStock();
-//		saveEntryToDatabase();
+		boolean update = false;
+		for(int i = 0; i < this.rowCount; i++){
+			System.out.println("md "+this.md.getValueAt(i, 0));
+			if(!this.md.getValueAt(i, 0).toString().contains(fv.STAR) && !this.md.getValueAt(i, 0).toString().contains(fv.WASH)){
+				update = true;
+				break;
+			}
+		}
+		if(update){
+			changeDBStock();
+		}
+		timeOut();
+		saveEntryToDatabase();
 		return jobDone ;
 	}
 
@@ -239,34 +249,26 @@ public class StockPrinter  {
         	for(int i = 0; i < this.rowCount; i++){
     			itemName = this.md.getValueAt(i, 0).toString();
         		if(!itemName.contains(this.fv.WASH) && !itemName.contains(this.fv.STAR)){
-//            		System.out.println("Update "+itemName + " / "+this.md.getValueAt(i, 1) + " / "+this.md.getValueAt(i, 2));
-            		// TODO ????
             		Iterator<Item> iter = items.iterator();
             		while(iter.hasNext()){
             			Item it = iter.next();
             			if(it.getName().equals(itemName)){
             				int index = items.indexOf(it);
-//              				System.out.println("Update 1: "+((StockItem) it).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
-//              				iter.remove();
               				qnt = ((StockItem) it).getQnt() - Integer.parseInt(md.getValueAt(i, 2).toString());
               				((StockItem) it).setQnt(qnt);
-//              				System.out.println("Update 2: "+((StockItem) it).getQnt() + " - " + qnt + " - " + this.md.getValueAt(i, 2).toString());
               				items.set(index, it);
             			}
             		}
             		
             		if(query.contains(itemName)){
              			String q = query, q2 = "";
-//                   		System.out.println(" else 1 "+q.substring(q.indexOf(itemName)+itemName.length()).length() + " / " + q);
-              			q = q.substring(0, q.indexOf(itemName)+itemName.length()+7);
+             			q = q.substring(0, q.indexOf(itemName)+itemName.length()+7);
               			
               			if(q.substring(q.indexOf(itemName)+itemName.length()).length() > 0){
               				q2 = query.substring(query.indexOf(itemName)+itemName.length()+10);
               			}
               			
-//                		System.out.println("else 2\n"+q + " \n " + q2);
               			q +="'" + qnt +"'" + q2;
-//                		System.out.println("else 3\n"+ q);
                 		query = q;
             		}else {
                			query += " WHEN '" + itemName + "' THEN '" + qnt +"'";
@@ -322,20 +324,27 @@ public class StockPrinter  {
 			servNo = servNo.substring(0, servNo.lastIndexOf(","));
 		
 		double disc = helper.getDiscount(sum, discount, applyDiscount);
+		timeOut();
 		
-		int i = 0;
-		while(i<timeout){
-			i++;
-		}
 		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"','"+disc+"');";
+		System.out.println("sdb b dbs");
 		
 		boolean succes = DM.addNewRecord(query);
+		System.out.println("sdb a  dbs");
+
 		if(succes){
 			JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
 			this.jobDone = true;
 		}else{
 			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
 			this.jobDone = false;
+		}
+	}
+
+	private void timeOut() {
+		int i = 0;
+		while(i<timeout){
+			i++;
 		}
 	}
 

@@ -54,39 +54,47 @@ public class DatabaseManager {
 	public boolean addNewRecord(String query) {// throws SQLException{
 		PreparedStatement pst = null;
 		ResultSet rs = null;
+		System.out.println("db nr 1");
 		if(this.conn == null)
 			conn = this.connect();
-		try {
-			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
-		} catch (SQLException e) {
-			log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e.getMessage());
-		}
+//		try {
+//			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+//		} catch (SQLException e) {
+//			log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e.getMessage());
+//		}
 		
 		try {
-			conn.setAutoCommit(false);
-			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+//			conn.setAutoCommit(false);
+//			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			System.out.println("db nr try\n"+query);
+			pst = conn.prepareStatement(query);
+			System.out.println("db before exec");
 			int inserted = pst.executeUpdate();
+			System.out.println("db nr exec");
 			
-			rs = pst.getGeneratedKeys();
-			if(inserted != 1){
-				this.conn.rollback();
-			} 
-			
-			conn.commit();
-			
+//			rs = pst.getGeneratedKeys();
+//			if(inserted != 1){
+//				this.conn.rollback();
+//				System.out.println("db nr 2");
+//			} 
+//			
+//			conn.commit();
+
 			if(inserted != 0)
 				return true;
 
 		} catch (SQLException e1) {
-			try{
-				if(this.conn != null){
-					this.conn.rollback();
-				}
-			} catch ( SQLException e2){
-				log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e2.getMessage());
-				System.out.println("E2 "+e2.getMessage());
-			}
+			System.out.println("db nr 3");
+//			try{
+//				System.out.println("db nr 4");
+//				if(this.conn != null){
+//					this.conn.rollback();
+//				}
+//			} catch ( SQLException e2){
+//				System.out.println("db nr 5");
+//				log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e2.getMessage());
+//				System.out.println("E2 "+e2.getMessage());
+//			}
 			System.out.println("E1 "+e1.getMessage());
 			log.logError(date+" "+this.getClass().getName()+"\tAdd New Record\t"+e1.getMessage());
 		}	finally {
@@ -442,7 +450,6 @@ public class DatabaseManager {
 		return 0;
 	}
 	
-
 	public Map<String, String> getServiceCodesMap(String q) {
 		Map<String, String> toReturn = new HashMap<String, String>();
 		PreparedStatement pst = null;
@@ -476,7 +483,6 @@ public class DatabaseManager {
 		}
 		return toReturn;
 	}
-
 	
 	public Map<String, Double> getAllCostsPrices(String query){
 		Map<String, Double> toReturn = new HashMap<String, Double>();
