@@ -82,7 +82,7 @@ public class SalesReports {
 		this.DM = new DatabaseManager(this.loggerFolderPath);
 		stocksCosts = new HashMap<String, Double>();
 		servicesCosts = new HashMap<String, Double>();
-		
+	
 		String q = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.COST_COL_NAME+" FROM "+ this.fv.SERVICES_TABLE;
 		this.servicesCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
 
@@ -94,10 +94,9 @@ public class SalesReports {
 		
 		q = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.COST_COL_NAME+" FROM "+ this.fv.STOCK_TABLE;
 		this.stocksCosts = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
-	
+
 		q = "SELECT "+this.fv.STOCK_TABLE_NUMBER+","+this.fv.PRICE_COL_NAME+" FROM "+ this.fv.STOCK_TABLE;
 		this.stockPrices = (HashMap<String, Double>) this.DM.getAllCostsPrices(q);
-//		System.out.println("codeNames");
 //		this.helper.printMap(serviceCodesNames);
 
 		if(this.defaultPaths == null || this.defaultPaths.isEmpty())

@@ -23,7 +23,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.printing.PDFPageable;
-import org.apache.pdfbox.util.Matrix;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
@@ -40,7 +39,6 @@ public class StockPrinter  {
 
 	private TableModel md;
 	private double sum = 0, discount = 0;
-	private long timeout = 50000;
 	private boolean applyDiscount = false;
 
 	private int invNo = 1;
@@ -57,7 +55,6 @@ public class StockPrinter  {
 	private ArrayList<String> m_defaultPaths;
 	private String slash = "\\";
 	private boolean[] freebies;
-	private JTable table;
 	private int rowCount;
 	private int colCount;
 	private boolean folderExist;
@@ -67,8 +64,6 @@ public class StockPrinter  {
 	private float headerFontSize = 18.0f, stockDocFontSize = 12.0f, lineSpacing = 18.0f;//18/20.5f;
 	private float invoiceReportYOffeset = 440.0f;
 	private double sumDiscounted;
-	private ArrayList<Item> items;
-	
 	protected static String loggerFolderPath;
 	private static Logger log;	
 	
@@ -107,8 +102,6 @@ public class StockPrinter  {
 
 		this.date = helper.getFormatedDate();
 		
-		items = DM.getItemsList("SELECT "+fv.STAR + " FROM " +fv.STOCK_TABLE);
-
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
 //		this.stockServicesNumber = new ArrayList<String>();
@@ -153,7 +146,6 @@ public class StockPrinter  {
 		this.itemCodeName = itemCodeName;
 		
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-		this.table = tbChoosen;
 		this.md = tbChoosen.getModel();
 		this.rowCount = this.md.getRowCount();
 		this.colCount = this.md.getColumnCount();
@@ -177,7 +169,6 @@ public class StockPrinter  {
 		printPDF(docPath);
 		createAccountancCopy();
 		
-		changeDBStock();		
 		saveEntryToDatabase();
 		return jobDone ;
 	}
@@ -195,7 +186,6 @@ public class StockPrinter  {
 		this.itemCodeName = itemCodeName;
 
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-		this.table = tbChoosen;
 		this.md = tbChoosen.getModel();
 		this.rowCount = this.md.getRowCount();
 		this.colCount = this.md.getColumnCount();
@@ -215,71 +205,13 @@ public class StockPrinter  {
 		
 		generatePDF();
 		createAccountancCopy();
-		boolean update = false;
-		for(int i = 0; i < this.rowCount; i++){
-			System.out.println("md "+this.md.getValueAt(i, 0));
-			if(!this.md.getValueAt(i, 0).toString().contains(fv.STAR) && !this.md.getValueAt(i, 0).toString().contains(fv.WASH)){
-				update = true;
-				break;
-			}
-		}
-		if(update){
-			changeDBStock();
-		}
-		timeOut();
+
+		helper.timeOut(fv.TIMEOUT);
+
 		saveEntryToDatabase();
 		return jobDone ;
 	}
 
-	private void changeDBStock() {
-        String query = getQuery();
-        boolean updated = this.DM.editRecord(query);
-        if(updated)
-        	JOptionPane.showMessageDialog(null, "Zaktualizowano wpis w bazie danych");
-        else
-        	JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
-	}
-
-	private String getQuery() {
-		String query = "UPDATE \""+this.fv.STOCK_TABLE+"\" SET "+this.fv.STOCK_TABLE_QNT+"=CASE "+this.fv.STOCK_TABLE_ITEM_NAME;
-		int qnt = 0;
-		String itemName = "";	
-       
-        if(this.rowCount > 0){
-        	for(int i = 0; i < this.rowCount; i++){
-    			itemName = this.md.getValueAt(i, 0).toString();
-        		if(!itemName.contains(this.fv.WASH) && !itemName.contains(this.fv.STAR)){
-            		Iterator<Item> iter = items.iterator();
-            		while(iter.hasNext()){
-            			Item it = iter.next();
-            			if(it.getName().equals(itemName)){
-            				int index = items.indexOf(it);
-              				qnt = ((StockItem) it).getQnt() - Integer.parseInt(md.getValueAt(i, 2).toString());
-              				((StockItem) it).setQnt(qnt);
-              				items.set(index, it);
-            			}
-            		}
-            		
-            		if(query.contains(itemName)){
-             			String q = query, q2 = "";
-             			q = q.substring(0, q.indexOf(itemName)+itemName.length()+7);
-              			
-              			if(q.substring(q.indexOf(itemName)+itemName.length()).length() > 0){
-              				q2 = query.substring(query.indexOf(itemName)+itemName.length()+10);
-              			}
-              			
-              			q +="'" + qnt +"'" + q2;
-                		query = q;
-            		}else {
-               			query += " WHEN '" + itemName + "' THEN '" + qnt +"'";
-            		}
-        		}
-        	}
-        	query += " ELSE "+this.fv.STOCK_TABLE_QNT+" END;";
-        }
-		System.out.println("Update Q\n"+query);
-		return query;
-	}
 
 	private void saveEntryToDatabase() throws SQLException {
 		String servNo = "", itemNo = "";
@@ -324,13 +256,11 @@ public class StockPrinter  {
 			servNo = servNo.substring(0, servNo.lastIndexOf(","));
 		
 		double disc = helper.getDiscount(sum, discount, applyDiscount);
-		timeOut();
+		helper.timeOut(fv.TIMEOUT);
 		
 		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"','"+disc+"');";
-		System.out.println("sdb b dbs");
 		
 		boolean succes = DM.addNewRecord(query);
-		System.out.println("sdb a  dbs");
 
 		if(succes){
 			JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
@@ -338,13 +268,6 @@ public class StockPrinter  {
 		}else{
 			JOptionPane.showMessageDialog(null, "Wystapil blad zapisu w bazie danych");
 			this.jobDone = false;
-		}
-	}
-
-	private void timeOut() {
-		int i = 0;
-		while(i<timeout){
-			i++;
 		}
 	}
 

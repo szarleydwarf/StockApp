@@ -49,6 +49,8 @@ public class FinalVariables {
 	public final String[] SALES_REPORT_COL_HEADINGS = {"SALE", "COST", "PROFIT"};
 	public static final float PAGE_MARGIN = 20;
 
+	public final long TIMEOUT = 50000;
+
 	
 	//Database related
 	public final String DELETING_ERROR = "Usuwanie rekordu z bazy danych nie powiodło się";

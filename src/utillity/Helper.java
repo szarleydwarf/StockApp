@@ -240,6 +240,14 @@ public class Helper {
         }
 	}
 
+
+	public void timeOut(long timeout) {
+		int i = 0;
+		while(i < timeout){
+			i++;
+		}
+	}
+
 	public boolean createFolderIfNotExist (String path) {
 //		System.out.println("helper Folder path: "+path);
 		
