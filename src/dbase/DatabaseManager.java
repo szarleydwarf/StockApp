@@ -35,7 +35,7 @@ public class DatabaseManager {
 		loggerFolderPath = p_loggerFolderPath;
 		log = new Logger(loggerFolderPath);
 		helper = new Helper();
-		date = helper.getFormatedDate();
+		date = helper.getFormatedDateAndTime();
 	}
 	
 	public Connection connect() {
@@ -257,6 +257,8 @@ public class DatabaseManager {
                 if (pst != null) {
                     pst.close();
                 }
+//                if(conn != null)
+//                	conn.close();
 			} catch (Exception e2){
 				log.logError(date+" "+this.getClass().getName()+"\tGET ITEMS LIST\tE2 "+e2.getMessage());
 			}
@@ -326,15 +328,12 @@ public class DatabaseManager {
 				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e1.getMessage());
 			}	finally {
 				try{
-		               if (rs != null) {
-		                    rs.close();
-		                }
-		                if (pst != null) {
-		                    pst.close();
-		                }
-		                if (conn != null) {
-		                    conn.close();
-		                }
+					if(rs != null)
+						rs.close();
+					if(pst != null)
+						pst.close();
+	                if (conn != null)
+	                    conn.close();
 				} catch (Exception e3){
 					log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e3.getMessage());
 				}
@@ -377,15 +376,12 @@ public class DatabaseManager {
 				log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e1.getMessage());
 			}	finally {
 				try{
-		               if (rs != null) {
-		                    rs.close();
-		                }
-		                if (pst != null) {
-		                    pst.close();
-		                }
-		                if (conn != null) {
-		                    conn.close();
-		                }
+					if(rs != null)
+						rs.close();
+					if(pst != null)
+						pst.close();
+	                if (conn != null)
+	                    conn.close();
 				} catch (Exception e3){
 					log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e3.getMessage());
 				}
@@ -426,15 +422,12 @@ public class DatabaseManager {
 				log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e1.getMessage());
 			}	finally {
 				try{
-		               if (rs != null) {
-		                    rs.close();
-		                }
-		                if (pst != null) {
-		                    pst.close();
-		                }
-		                if (conn != null) {
-		                    conn.close();
-		                }
+					if(rs != null)
+						rs.close();
+					if(pst != null)
+						pst.close();
+	                if (conn != null)
+	                    conn.close();
 				} catch (Exception e3){
 					log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e3.getMessage());
 				}
@@ -442,7 +435,6 @@ public class DatabaseManager {
 		return 0;
 	}
 	
-
 	public Map<String, String> getServiceCodesMap(String q) {
 		Map<String, String> toReturn = new HashMap<String, String>();
 		PreparedStatement pst = null;
@@ -470,13 +462,13 @@ public class DatabaseManager {
 					rs.close();
 				if(pst != null)
 					pst.close();
+
 			} catch (Exception e){
 				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
 			}
 		}
 		return toReturn;
 	}
-
 	
 	public Map<String, Double> getAllCostsPrices(String query){
 		Map<String, Double> toReturn = new HashMap<String, Double>();
@@ -507,6 +499,7 @@ public class DatabaseManager {
 					rs.close();
 				if(pst != null)
 					pst.close();
+
 			} catch (Exception e){
 				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
 			}
@@ -544,12 +537,12 @@ public class DatabaseManager {
 			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD e1\t"+e1.getMessage());
 		}	finally {
 			try{
-//                if (pst != null) {
-//                    pst.close();
-//                }
-//                if (conn != null) {
-//                    conn.close();
-//                }
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+                if (conn != null)
+                    conn.close();
 			} catch (Exception e3){
 				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD e3\t"+e3.getMessage());
 			}
@@ -579,8 +572,12 @@ public class DatabaseManager {
 			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD ARRAY LIST\t"+e.getMessage());
 		} finally {
 			try{
-				rs.close();
-				pst.close();
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+                if (conn != null)
+                    conn.close();
 			} catch (Exception e){
 				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD ARRAY LIST\t"+e.getMessage());				
 			}
@@ -629,8 +626,12 @@ public class DatabaseManager {
 			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
 		} finally {
 			try{
-				rs.close();
-				pst.close();
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+                if (conn != null)
+                    conn.close();
 			} catch (Exception e){
 				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD MAP\t"+e.getMessage());
 			}
@@ -666,8 +667,12 @@ public class DatabaseManager {
 			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD WITH SQL\t"+e.getMessage());
 		} finally {
 			try{
-				rs.close();
-				pst.close();
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+                if (conn != null)
+                    conn.close();
 			} catch (Exception e){
 				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORD WITH SQL\t"+e.getMessage());
 			}
@@ -678,7 +683,6 @@ public class DatabaseManager {
 	public boolean editRecord(String query) {
 		conn = this.connect();
 		PreparedStatement pst = null;
-		ResultSet rs = null;
 		if(this.conn == null)
 			conn = this.connect();
 		try {
@@ -690,14 +694,14 @@ public class DatabaseManager {
 		try {
 			conn.setAutoCommit(false);
 			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			pst = conn.prepareStatement(query);//, Statement.RETURN_GENERATED_KEYS);
 			int inserted = pst.executeUpdate();
-			
-			rs = pst.getGeneratedKeys();
-			if(inserted != 1){
-				this.conn.rollback();
-			} 
-			
+		
+//			rs = pst.getGeneratedKeys();
+//			if(inserted != 1){
+//				this.conn.rollback();
+//			} 
+//			
 			conn.commit();
 			
 			if(inserted != 0)
@@ -710,25 +714,24 @@ public class DatabaseManager {
 				}
 			} catch ( SQLException e2){
 				log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD E2\t"+e2.getMessage());
+				e2.printStackTrace();
 			}
+			e1.printStackTrace();
 			log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD E1\t"+e1.getMessage());
 		}	finally {
 			try{
-	               if (rs != null) {
-	                    rs.close();
-	                }
-	                if (pst != null) {
-	                    pst.close();
-	                }
-	                if (conn != null) {
-	                    conn.close();
-	                }
+                if (pst != null) {
+                    pst.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
 			} catch (Exception e3){
 				log.logError(date+" "+this.getClass().getName()+"\tEDIT RECORD E3\t"+e3.getMessage());
 			}
 		}
 		return false;
-		}
+	}
 	
 	public ArrayList<Invoice> getInvoiceList(String query) {
 		conn = this.connect();
@@ -757,6 +760,8 @@ public class DatabaseManager {
                 if (pst != null) {
                     pst.close();
                 }
+                if (conn != null)
+                    conn.close();
 
 			} catch (Exception e2){
 				log.logError(date+" "+this.getClass().getName()+"\tGET INVOICE LIST E2\t"+e2.getMessage()+"\n\t"+e2.getLocalizedMessage());

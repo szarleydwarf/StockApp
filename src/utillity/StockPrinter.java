@@ -23,7 +23,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.printing.PDFPageable;
-import org.apache.pdfbox.util.Matrix;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
@@ -40,7 +39,6 @@ public class StockPrinter  {
 
 	private TableModel md;
 	private double sum = 0, discount = 0;
-	private long timeout = 50000;
 	private boolean applyDiscount = false;
 
 	private int invNo = 1;
@@ -57,7 +55,6 @@ public class StockPrinter  {
 	private ArrayList<String> m_defaultPaths;
 	private String slash = "\\";
 	private boolean[] freebies;
-	private JTable table;
 	private int rowCount;
 	private int colCount;
 	private boolean folderExist;
@@ -67,7 +64,6 @@ public class StockPrinter  {
 	private float headerFontSize = 18.0f, stockDocFontSize = 12.0f, lineSpacing = 18.0f;//18/20.5f;
 	private float invoiceReportYOffeset = 440.0f;
 	private double sumDiscounted;
-	
 	protected static String loggerFolderPath;
 	private static Logger log;	
 	
@@ -105,7 +101,7 @@ public class StockPrinter  {
 			this.printerName = this.fv.PRINTER_NAME;
 
 		this.date = helper.getFormatedDate();
-
+		
 //		this.savePath;
 //		log.logError("log "+this.loggerFolderPath+"\t savepath "+this.savePath);
 //		this.stockServicesNumber = new ArrayList<String>();
@@ -150,7 +146,6 @@ public class StockPrinter  {
 		this.itemCodeName = itemCodeName;
 		
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-		this.table = tbChoosen;
 		this.md = tbChoosen.getModel();
 		this.rowCount = this.md.getRowCount();
 		this.colCount = this.md.getColumnCount();
@@ -172,7 +167,6 @@ public class StockPrinter  {
 		generatePDF();
 
 		printPDF(docPath);
-
 		createAccountancCopy();
 		
 		saveEntryToDatabase();
@@ -192,7 +186,6 @@ public class StockPrinter  {
 		this.itemCodeName = itemCodeName;
 
 		this.df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-		this.table = tbChoosen;
 		this.md = tbChoosen.getModel();
 		this.rowCount = this.md.getRowCount();
 		this.colCount = this.md.getColumnCount();
@@ -211,12 +204,14 @@ public class StockPrinter  {
 //		System.out.println("save :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
 		
 		generatePDF();
-
 		createAccountancCopy();
-		
+
+		helper.timeOut(fv.TIMEOUT);
+
 		saveEntryToDatabase();
 		return jobDone ;
 	}
+
 
 	private void saveEntryToDatabase() throws SQLException {
 		String servNo = "", itemNo = "";
@@ -261,14 +256,12 @@ public class StockPrinter  {
 			servNo = servNo.substring(0, servNo.lastIndexOf(","));
 		
 		double disc = helper.getDiscount(sum, discount, applyDiscount);
+		helper.timeOut(fv.TIMEOUT);
 		
-		int i = 0;
-		while(i<timeout){
-			i++;
-		}
 		String query = "INSERT INTO \""+this.fv.INVOCE_TABLE+"\"  VALUES ("+this.invNo+",'"+this.carManufacturer+" / " +this.carRegistration+"','"+servNo+"','"+itemNo +"',"+sum +", '"+this.date+"', '"+this.invoiceFileName    +"','"+disc+"');";
 		
 		boolean succes = DM.addNewRecord(query);
+
 		if(succes){
 			JOptionPane.showMessageDialog(null, "Zapisano w bazie danych");
 			this.jobDone = true;
@@ -553,7 +546,7 @@ public class StockPrinter  {
 		contentStream.endText();
 	}
 
-	public boolean printDailyReport(String dDate, double[][] toPrint) throws Exception {
+	public boolean printReport(String dDate, double[][] toPrint) throws Exception {
 		String docDate = "";
 		if( helper.compareDates(this.date, dDate)){
 			docDate = date;
@@ -600,6 +593,7 @@ public class StockPrinter  {
 		
 		contentStream.endText();
 		contentStream.close();
+		//TODO change to save in the accountancy folder from the date taken.
 		String path = "";
 		String reportEXT = "_report.pdf";
 		if(!loggerFolderPath.contains(savePath))

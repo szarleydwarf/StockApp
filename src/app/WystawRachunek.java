@@ -120,12 +120,13 @@ public class WystawRachunek {
 
 	private ArrayList<String> defaultPaths;
 	private Map<String, String> itemCodeName;
+	private Map<Item,Integer> selectedRowItem;
 	private String stringAddress = "Adres Firmy";
 	private String stringComName = "Nazwa firmy";
 	private String stringVATReg = "VAT / Tax No.";
 	private JTextField tfSearchItem;
 	private JTextField tfSearchCar;
-	private JTable tableCars;
+	private JTable tableCars, tbStock;
 	private TableRowSorter rowSorterStock,rowSorterCars;
 	private JTextField tfCarsSearchBox;
 	private JTextField tfSearch;
@@ -198,6 +199,10 @@ public class WystawRachunek {
 	private boolean[] freebies;
 	private JCheckBox chbAirfreshener;
 	private JCheckBox chbFreeCarWash;
+<<<<<<< HEAD
+>>>>>>> try_item_class
+=======
+	private ArrayList<Item> items;
 >>>>>>> try_item_class
 
 
@@ -211,7 +216,7 @@ public class WystawRachunek {
 				loggerFolderPath = defaultPaths.get(0)+"\\"+fv.LOGGER_FOLDER_NAME;
 				log = new Logger(loggerFolderPath);
 				helper = new Helper();
-				date = helper.getFormatedDate();
+				date = helper.getFormatedDateAndTime();
 				try {
 					WystawRachunek window = new WystawRachunek(defaultPaths);
 					window.frame.setVisible(true);
@@ -231,13 +236,19 @@ public class WystawRachunek {
 		DM = new DatabaseManager(loggerFolderPath);
 		helper = new Helper();
 		fv = new FinalVariables();
+		items = DM.getItemsList("SELECT "+fv.STAR + " FROM " +fv.STOCK_TABLE);
+
+		this.selectedRowItem = new HashMap<Item, Integer>();
+
 		this.defaultPaths = new ArrayList<String>();
 		this.defaultPaths = defaultPaths;
 		this.itemCodeName = new HashMap<String, String>();
-		
+
 		invoiceNum = DM.getLastInvoiceNumber();
 //		if(invoiceNum == 0)
-			invoiceNum++;
+//		System.out.println("item list "+invoiceNum);
+
+		invoiceNum++;
 
 		try {
 			initialize();
@@ -426,6 +437,13 @@ public class WystawRachunek {
 		btnPrint.setBounds(620, 520, 160, 30);
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				boolean update = isUpdateRequred();
+				
+				helper.timeOut(fv.TIMEOUT);
+				if(update){
+					changeDBStock();
+				}
+				helper.timeOut(fv.TIMEOUT);
 				printDocument();
 			}
 		});
@@ -434,6 +452,14 @@ public class WystawRachunek {
 		JButton btnZapisz = new JButton("ZAPISZ");
 		btnZapisz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				boolean update = isUpdateRequred();
+				
+				helper.timeOut(fv.TIMEOUT);
+				if(update){
+					changeDBStock();
+				}
+				helper.timeOut(fv.TIMEOUT);
+
 				savePDFtoHDD();
 			}
 		});
@@ -1153,8 +1179,17 @@ public class WystawRachunek {
 		createChoosenItemsTable();
 		populateStockTable();
 		populateCarTable();
-	}// END OF INSTANTIATE
+	}//TODO END OF INSTANTIATE
 	
+	protected boolean isUpdateRequred() {
+		for(int i = 0; i < modTBchosen.getRowCount(); i++){
+//			System.out.println("md "+modTBchosen.getValueAt(i, 0));
+			if(!modTBchosen.getValueAt(i, 0).toString().contains(fv.STAR) && !modTBchosen.getValueAt(i, 0).toString().contains(fv.WASH)){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private void createChoosenItemsTable() {
 		ArrayList<Item>emptyArray = new ArrayList<Item>();
@@ -1332,8 +1367,9 @@ public class WystawRachunek {
 		rowSorterStock = new TableRowSorter<>(table.getModel());
 		
 		table.setRowSorter(rowSorterStock);
-	
-		JScrollPane spStockList = new JScrollPane(table);
+		this.tbStock = table;
+		
+		JScrollPane spStockList = new JScrollPane(tbStock);
 		spStockList.setBounds(16, 296, 405, 194);
 		frame.getContentPane().add(spStockList);
 		
@@ -1466,8 +1502,8 @@ public class WystawRachunek {
 				int row = table.getSelectedRow();
 				if(row != -1) {
 					item = getItem(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
-					if(item != null){
-//						System.out.println("Name: "+item.getName());
+					if(item != null && (item instanceof StockItem)){
+						selectedRowItem.put(item,row);
 					}
 				}
 			}
@@ -1521,20 +1557,33 @@ public class WystawRachunek {
 		
 		int tfQnt = 0;
 		int itemQnt = 0;
-		if(item instanceof StockItem)
+		if(item instanceof StockItem) {
 			itemQnt = ((StockItem) item).getQnt();
-		else
+		} else
 			itemQnt = 1;
+		
+		
 		
 		if(!this.tfQntListed.getText().isEmpty())
 			tfQnt = Integer.parseInt(this.tfQntListed.getText());
 		else
 			tfQnt = 1;
-		
+
 		while(tfQnt > itemQnt && (item instanceof StockItem)){
 			JOptionPane.showMessageDialog(frame, "Dostępnych "+itemQnt+"szt.");
 			if(tfQnt > itemQnt)
-				return;
+				return;			
+		}
+
+		if(item instanceof StockItem){
+			itemQnt = (itemQnt <= 0) ? 0 : itemQnt - tfQnt;
+			
+//			System.out.println("Instance: " + itemQnt + " / " + tfQnt);
+			if(this.selectedRowItem.containsKey(item)){
+				((StockItem) item).setQnt(itemQnt);
+				int row = this.selectedRowItem.get(item);
+				tbStock.setValueAt(((StockItem) item).getQnt(), row, 2);
+			}				
 		}
 		
 		String[] rowData = new String[this.fv.STOCK_TB_HEADINGS_NO_COST.length];
@@ -1678,6 +1727,57 @@ public class WystawRachunek {
 			log.logError(date+" "+this.getClass().getName()+"\t"+e.getMessage());
 		}
 	}
+	
+	private void changeDBStock() {
+        String query = getQuery();
+        boolean updated = this.DM.editRecord(query);
+        if(updated)
+        	JOptionPane.showMessageDialog(null, "Zaktualizowano wpis w bazie danych");
+        else
+        	JOptionPane.showMessageDialog(null, "Wystapil blad aktualizacji wpisu w bazie danych");
+	}
+
+	private String getQuery() {
+		String query = "UPDATE \""+this.fv.STOCK_TABLE+"\" SET "+this.fv.STOCK_TABLE_QNT+"=CASE "+this.fv.STOCK_TABLE_ITEM_NAME;
+		int qnt = 0;
+		String itemName = "";	
+       
+        if(modTBchosen.getRowCount() > 0){
+        	for(int i = 0; i < modTBchosen.getRowCount(); i++){
+    			itemName = modTBchosen.getValueAt(i, 0).toString();
+        		if(!itemName.contains(this.fv.WASH) && !itemName.contains(this.fv.STAR)){
+            		Iterator<Item> iter = items.iterator();
+            		while(iter.hasNext()){
+            			Item it = iter.next();
+            			if(it.getName().equals(itemName)){
+            				int index = items.indexOf(it);
+              				qnt = ((StockItem) it).getQnt() - Integer.parseInt(modTBchosen.getValueAt(i, 2).toString());
+              				((StockItem) it).setQnt(qnt);
+              				items.set(index, it);
+            			}
+            		}
+            		
+            		if(query.contains(itemName)){
+             			String q = query, q2 = "";
+             			q = q.substring(0, q.indexOf(itemName)+itemName.length()+7);
+              			
+              			if(q.substring(q.indexOf(itemName)+itemName.length()).length() > 0){
+              				q2 = query.substring(query.indexOf(itemName)+itemName.length()+10);
+              			}
+              			
+              			q +="'" + qnt +"'" + q2;
+                		query = q;
+            		}else {
+               			query += " WHEN '" + itemName + "' THEN '" + qnt +"'";
+            		}
+        		}
+        	}
+        	query += " ELSE "+this.fv.STOCK_TABLE_QNT+" END;";
+        }
+//		System.out.println("Update Q\n"+query);
+		return query;
+	}
+
 
 	private void printDocument(){
 		sPrinter = new StockPrinter(defaultPaths);

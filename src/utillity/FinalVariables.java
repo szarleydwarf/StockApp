@@ -24,6 +24,7 @@ public class FinalVariables {
 	public final String DECIMAL_FORMAT = "000.00";
 	public static final String DECIMAL_FORMAT_5_2 = "00000.00";
 	public final String DATE_FORMAT = "dd-MM-yyyy";//"yyyy-MM-dd" ?? not sure which format is correct for a database entry. so far works
+	public final String DATE_TIME_FORMAT = "dd-MM-yyyy @HH:mm:ss";
 
 	//other
 	public final String SEARCH_TEXT_FIELD_FRAZE = "wpisz szukaną nazwę";
@@ -31,6 +32,8 @@ public class FinalVariables {
 	public final String COMPANY_STRING = "C:";
 	public final String MAX_SERVIS_QNT = "9999";
 	public final String[] SORT_BY = {"Nazwa", "Cena", "Qnt"};//, "Rozmiar"
+	public final String WASH = "Wash";
+	public final String STAR = "*";
 
 	public final String STOCK_SORT_BY="item_name";
 	public final String SERVICES_SORT_BY="service_name";
@@ -45,6 +48,8 @@ public class FinalVariables {
 	public final String[] SALES_REPORT_ROW_HEADINGS = {"Tyre Sale", "Tyre Serv", "Car Wash ", "Discounts", "*** TOTAL"};
 	public final String[] SALES_REPORT_COL_HEADINGS = {"SALE", "COST", "PROFIT"};
 	public static final float PAGE_MARGIN = 20;
+
+	public final long TIMEOUT = 50000;
 
 	
 	//Database related

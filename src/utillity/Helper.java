@@ -159,6 +159,13 @@ public class Helper {
 		return df.format(today.getTime());
 	}
 
+	public String getFormatedDateAndTime() {
+		Calendar today = Calendar.getInstance();
+		SimpleDateFormat df= new SimpleDateFormat(this.fv.DATE_TIME_FORMAT);
+		
+		return df.format(today.getTime());
+	}
+
 	public int getDayOfMonthNum(){
 		Calendar cal = Calendar.getInstance();
 		return cal.get(Calendar.DAY_OF_MONTH);
@@ -231,6 +238,14 @@ public class Helper {
         else {
         	return false;
         }
+	}
+
+
+	public void timeOut(long timeout) {
+		int i = 0;
+		while(i < timeout){
+			i++;
+		}
 	}
 
 	public boolean createFolderIfNotExist (String path) {

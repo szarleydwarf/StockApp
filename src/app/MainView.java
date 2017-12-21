@@ -164,7 +164,7 @@ public class MainView {
 				WyswietlMagazyn.main(loggerFolderPath);
 			}
 		});
-		stockBtn.setBounds(60, 52, 200, 36);
+		stockBtn.setBounds(358, 52, 200, 36);
 		frame.getContentPane().add(stockBtn);
 		
 		JButton invoiceBtn = new JButton("Wyswietl rachunki");
@@ -181,7 +181,7 @@ public class MainView {
 
 
 		JButton nowyRachunekBtn = new JButton("Wystaw rachunek");
-		nowyRachunekBtn.setBackground(new Color(135, 206, 235));
+		nowyRachunekBtn.setBackground(new Color(0, 255, 102));
 		nowyRachunekBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		nowyRachunekBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -189,11 +189,11 @@ public class MainView {
 				WystawRachunek.main(defaultPaths);
 			}
 		});
-		nowyRachunekBtn.setBounds(358, 52, 200, 36);
+		nowyRachunekBtn.setBounds(60, 52, 200, 36);
 		frame.getContentPane().add(nowyRachunekBtn);
 		
 		JButton nowyTowarBtn = new JButton("Dodaj towar");
-		nowyTowarBtn.setBackground(new Color(135, 206, 235));
+		nowyTowarBtn.setBackground(new Color(0, 255, 153));
 		nowyTowarBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		nowyTowarBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -205,7 +205,7 @@ public class MainView {
 		frame.getContentPane().add(nowyTowarBtn);
 		
 		JButton nowaUslugaBtn = new JButton("Dodaj usluge");
-		nowaUslugaBtn.setBackground(new Color(135, 206, 235));
+		nowaUslugaBtn.setBackground(new Color(0, 255, 153));
 		nowaUslugaBtn.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		nowaUslugaBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -243,12 +243,13 @@ public class MainView {
 		
 		Icon testPageImg = new ImageIcon("resources/img/testpageico.png");
 		JButton btnTestPage = new JButton("Strona testowa", testPageImg);
+		btnTestPage.setIconTextGap(-15);
 		btnTestPage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				printTestPage(true);
 			}
 		});
-		btnTestPage.setBackground(new Color(255, 255, 153));
+		btnTestPage.setBackground(new Color(255, 255, 255));
 		btnTestPage.setBounds(606, 121, 52, 52);
 		frame.getContentPane().add(btnTestPage);
 	}
