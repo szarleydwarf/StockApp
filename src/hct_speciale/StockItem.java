@@ -9,6 +9,10 @@ public class StockItem extends Item{
 		super(p_stock_number, p_name, p_cost, p_price);
 		this.qnt = p_qnt;
 	}
+	public StockItem() {
+		super("", "", 0.00, 0.00);
+		// TODO Auto-generated constructor stub
+	}
 	public int getQnt() {
 		return qnt;
 	}

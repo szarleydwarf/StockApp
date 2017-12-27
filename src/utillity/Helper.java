@@ -10,11 +10,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +25,8 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
+import hct_speciale.StockItem;
 
 public class Helper {
 	public final String PIRELLI_ST = "Pirelli";
@@ -407,7 +411,7 @@ public class Helper {
 		}
 		return df.format(sum);
 	}
-/* Function copied from
+	/* Function copied from
 	 * https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
 	*/
 	public static void printMap(Map mp) {
@@ -418,7 +422,20 @@ public class Helper {
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
 	}
-	
+
+	public int compareItemKeyMap(Item item, Map<Item, Integer> map) {
+		// TODO Auto-generated method stub
+		Set<Item> items = map.keySet();
+		for(Item i : items){
+			if(item.getName().equals(i.getName())){
+					System.out.println("i: "+i.getName() + " / "+ map.get(i) + " / " + ((StockItem) item).getQnt());
+					return map.get(i);
+			}
+		}
+
+		return 0;
+	}
+
 	
 	public float pt2mmForWeb72dpi(float pt) {
 	   return pt2mm(pt,72);
@@ -432,4 +449,5 @@ public class Helper {
 	public float pt2mm(float pt, float dpi) {
 	   return pt * 25.4f / dpi;
 	}
+
 }
