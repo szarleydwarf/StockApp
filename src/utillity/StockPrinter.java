@@ -596,11 +596,14 @@ public class StockPrinter  {
 		//TODO change to save in the accountancy folder from the date taken.
 		String path = "";
 		String reportEXT = "_report.pdf";
-		if(!loggerFolderPath.contains(savePath))
-			path = savePath+loggerFolderPath+docDate+reportEXT;
-		else
-			path = loggerFolderPath+docDate+reportEXT;
-			dailyReport.save(path);
+		path = savePath+date+slash+ "_accountacy copy"+slash+docDate+"_"+reportEXT;
+
+//		if(!loggerFolderPath.contains(savePath))
+//			path = savePath+loggerFolderPath+docDate+reportEXT;
+//		else
+//			path = loggerFolderPath+docDate+reportEXT;
+		
+		dailyReport.save(path);
 		dailyReport.close();
 		
 		this.printPDF(path);

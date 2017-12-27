@@ -435,6 +435,7 @@ public class WystawRachunek {
 		btnRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(item != null && tbChoosen.getSelectedRow() != -1){
+//					\\TODO add removed item qnt to the stock table
 					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
 					model.removeRow(tbChoosen.getSelectedRow());
 				}
@@ -758,6 +759,7 @@ public class WystawRachunek {
 
 		JTable table = new JTable();
 		table = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, fv.STOCK_TB_NAME, 240);
+		table.setName(fv.STOCK_TABLE);
 		rowSorterStock = new TableRowSorter<>(table.getModel());
 		
 		table.setRowSorter(rowSorterStock);
@@ -841,7 +843,7 @@ public class WystawRachunek {
 				int row = table.getSelectedRow();
 				if(row != -1) {
 					item = getItem(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
-					if(item != null && (item instanceof StockItem)){
+					if(item != null && (item instanceof StockItem) && table.getName().equals(fv.STOCK_TABLE)){
 						selectedRowItem.put(item,row);
 					}
 				}
@@ -915,8 +917,8 @@ public class WystawRachunek {
 
 		if(item instanceof StockItem){
 			itemQnt = (itemQnt <= 0) ? 0 : itemQnt - tfQnt;
-			
-//			System.out.println("Instance: " + itemQnt + " / " + tfQnt);
+			//TODO
+			System.out.println("Instance: " + selectedRowItem.get(item));
 			if(this.selectedRowItem.containsKey(item)){
 				((StockItem) item).setQnt(itemQnt);
 				int row = this.selectedRowItem.get(item);
