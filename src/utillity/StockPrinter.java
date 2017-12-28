@@ -596,8 +596,13 @@ public class StockPrinter  {
 		//TODO change to save in the accountancy folder from the date taken.
 		String path = "";
 		String reportEXT = "_report.pdf";
-		path = savePath+date+slash+ "_accountacy copy"+slash+docDate+"_"+reportEXT;
-		helper.createFolderIfNotExist(path);
+		path = savePath+date;
+		if(!folderExist)
+			folderExist = helper.createFolderIfNotExist(path);
+		path = path + slash+ "_accountacy copy";
+		folderExist = helper.createFolderIfNotExist(path);
+		path = path+slash+docDate+"_"+reportEXT;
+
 //		if(!loggerFolderPath.contains(savePath))
 //			path = savePath+loggerFolderPath+docDate+reportEXT;
 //		else
