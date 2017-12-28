@@ -597,7 +597,7 @@ public class StockPrinter  {
 		String path = "";
 		String reportEXT = "_report.pdf";
 		path = savePath+date+slash+ "_accountacy copy"+slash+docDate+"_"+reportEXT;
-
+		helper.createFolderIfNotExist(path);
 //		if(!loggerFolderPath.contains(savePath))
 //			path = savePath+loggerFolderPath+docDate+reportEXT;
 //		else
@@ -625,7 +625,7 @@ public class StockPrinter  {
         job.setPrintService(myPrintService);
 
         //TODO /Uncomment bellow before export to app
-//        job.print();
+        job.print();
         
         document.close();
    }
