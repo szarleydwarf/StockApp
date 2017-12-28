@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import dbase.DatabaseManager;
 import hct_speciale.Item;
@@ -253,8 +255,6 @@ public class Helper {
 	}
 
 	public boolean createFolderIfNotExist (String path) {
-//		System.out.println("helper Folder path: "+path);
-		
 		File dir = new File(path);
 		if(!dir.exists()){
 			return dir.mkdir();
@@ -263,7 +263,6 @@ public class Helper {
 	}
 	
 	public boolean createFileIfNotExist(String fileName){
-//		System.out.println("Filename: "+fileName);
 		File file = new File(fileName);
 	    if (!file.exists()) {
 	    	try {
@@ -302,7 +301,6 @@ public class Helper {
 
 	public boolean databaseBackUp(String source, String dest) throws IOException{
 		try {
-//            System.out.println("Reading..." + source+"\n"+dest);
             File sourceFile = new File(source);
             File destinationFile = new File(dest);
             InputStream in = new FileInputStream(sourceFile);
@@ -316,7 +314,6 @@ public class Helper {
             in.close();
             out.close();
             return true;
-//            System.out.println("Copied: " + source);
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
@@ -391,7 +388,6 @@ public class Helper {
 			double d = 0;
 			if(map.containsKey(token)) {
 				d = map.get(token) * q;
-//				System.out.println("helper q: "+(q) + " * " + map.get(token)+" = "+d);
 			} 
 			sum += d;
 		}
@@ -418,24 +414,48 @@ public class Helper {
 	    Iterator it = mp.entrySet().iterator();
 	    while (it.hasNext()) {
 	        Map.Entry pair = (Map.Entry)it.next();
-	        System.out.println(pair.getKey() + " = " + pair.getValue());
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
 	}
 
 	public int compareItemKeyMap(Item item, Map<Item, Integer> map) {
-		// TODO Auto-generated method stub
 		Set<Item> items = map.keySet();
 		for(Item i : items){
 			if(item.getName().equals(i.getName())){
-					System.out.println("i: "+i.getName() + " / "+ map.get(i) + " / " + ((StockItem) item).getQnt());
-					return map.get(i);
+				return map.get(i);
 			}
 		}
-
-		return 0;
+		return -1;
 	}
 
+	public int getSelectedItemRow(DefaultTableModel dtm, String string) {
+	    int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
+	    String temp;
+	    for (int i = 0 ; i < nRow ; i++){
+	        for (int j = 0 ; j < nCol ; j++){
+	        	temp = dtm.getValueAt(i, j).toString();
+	        	if(temp.equals(string) && !temp.contains(fv.STAR) && !temp.contains(fv.WASH))
+	        		return i;
+	        }
+	    }       
+		return -1;
+	}
+
+	public ArrayList<String> getTableDataToStringArray (JTable table) {
+	    DefaultTableModel dtm = (DefaultTableModel) table.getModel();
+	    int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
+	    ArrayList<String> items = new ArrayList<String>();
+	    String temp;
+	    
+	    for (int i = 0 ; i < nRow ; i++){
+	        for (int j = 0 ; j < nCol ; j++){
+	        	temp = dtm.getValueAt(i, j).toString();
+	            if(j == 0)//&& !items.contains(temp))
+	            	items.add(temp);
+	        }
+	    }
+	    return items;
+	}
 	
 	public float pt2mmForWeb72dpi(float pt) {
 	   return pt2mm(pt,72);

@@ -437,7 +437,8 @@ public class WystawRachunek {
 				if(item != null && tbChoosen.getSelectedRow() != -1){
 					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
 					int choosenRow = tbChoosen.getSelectedRow();
-					updateStockTableQnt(model, choosenRow);
+					int row = helper.compareItemKeyMap(item, selectedRowItem);
+					updateStockTableQnt(model, choosenRow, row);
 					model.removeRow(tbChoosen.getSelectedRow());
 				}
 			}
@@ -452,12 +453,15 @@ public class WystawRachunek {
 		btnClearAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+				DefaultTableModel dtm = (DefaultTableModel) tbStock.getModel();
 //				\\TODO add removed item qnt to the stock table
-				ArrayList<StockItem> its =  getTableData(tbChoosen);
+				ArrayList<String> its = helper.getTableDataToStringArray(tbChoosen);
+				int chosenRow, stRow;
 				for(int j = 0; j < its.size(); j++){
-//					tbChoosen.get
-					System.out.println("In list "+its.get(j).getName());
-//					updateStockTableQnt(model, j);
+					chosenRow = helper.getSelectedItemRow(model, its.get(j));
+					stRow = helper.getSelectedItemRow(dtm, its.get(j));
+					if(chosenRow != -1)
+						updateStockTableQnt(model, chosenRow, stRow);
 				}
 				
 				model.setRowCount(0);
@@ -706,43 +710,19 @@ public class WystawRachunek {
 		populateCarTable();
 	}//TODO END OF INSTANTIATE
 	
-	protected void updateStockTableQnt(DefaultTableModel model, int choosenRow) {
-		int row = helper.compareItemKeyMap(item, selectedRowItem);
-
-		if(row != 0){
-			int qnt = Integer.parseInt(model.getValueAt(choosenRow, 2).toString());//((StockItem) item).getQnt();
+	protected void updateStockTableQnt(DefaultTableModel model, int choosenRow, int stockTbRow) {
+		if(stockTbRow != -1){
+			int qnt = Integer.parseInt(model.getValueAt(choosenRow, 2).toString());
 			if(qnt <= 0)
 				qnt = 1;
-			int actualQnt = Integer.parseInt(tbStock.getValueAt(row, 2).toString());
+			int actualQnt = Integer.parseInt(tbStock.getValueAt(stockTbRow, 2).toString());
 			qnt = actualQnt + qnt;
-			tbStock.setValueAt(qnt, row, 2);
+			tbStock.setValueAt(qnt, stockTbRow, 2);
 		}
-	}
-
-	public ArrayList<StockItem> getTableData (JTable table) {
-	    DefaultTableModel dtm = (DefaultTableModel) table.getModel();
-	    int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
-	    ArrayList<StockItem> items = new ArrayList<StockItem>();
-	    StockItem it = new StockItem();
-	    for (int i = 0 ; i < nRow ; i++){
-	        for (int j = 0 ; j < nCol ; j++){
-	            System.out.println("table data i: "+ i + " j " + j + " - "+dtm.getValueAt(i,j).toString());
-	            if(j == 0)
-	            	it.setName(dtm.getValueAt(i,j).toString());
-	            if(j == 1)
-	            	it.setPrice(Double.parseDouble(dtm.getValueAt(i,j).toString()));
-	            if(j == 2)
-	            	((StockItem) it).setQnt(Integer.parseInt(dtm.getValueAt(i,j).toString()));
-	            	
-	        }
-	        items.add(i, it);
-	    }
-	    return items;
 	}
 
 	protected boolean isUpdateRequred() {
 		for(int i = 0; i < modTBchosen.getRowCount(); i++){
-//			System.out.println("md "+modTBchosen.getValueAt(i, 0));
 			if(!modTBchosen.getValueAt(i, 0).toString().contains(fv.STAR) && !modTBchosen.getValueAt(i, 0).toString().contains(fv.WASH)){
 				return true;
 			}
