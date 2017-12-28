@@ -10,19 +10,25 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import dbase.DatabaseManager;
+import hct_speciale.Item;
+import hct_speciale.StockItem;
 
 public class Helper {
 	public final String PIRELLI_ST = "Pirelli";
@@ -249,8 +255,6 @@ public class Helper {
 	}
 
 	public boolean createFolderIfNotExist (String path) {
-//		System.out.println("helper Folder path: "+path);
-		
 		File dir = new File(path);
 		if(!dir.exists()){
 			return dir.mkdir();
@@ -259,7 +263,6 @@ public class Helper {
 	}
 	
 	public boolean createFileIfNotExist(String fileName){
-//		System.out.println("Filename: "+fileName);
 		File file = new File(fileName);
 	    if (!file.exists()) {
 	    	try {
@@ -298,7 +301,6 @@ public class Helper {
 
 	public boolean databaseBackUp(String source, String dest) throws IOException{
 		try {
-//            System.out.println("Reading..." + source+"\n"+dest);
             File sourceFile = new File(source);
             File destinationFile = new File(dest);
             InputStream in = new FileInputStream(sourceFile);
@@ -312,7 +314,6 @@ public class Helper {
             in.close();
             out.close();
             return true;
-//            System.out.println("Copied: " + source);
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
@@ -387,7 +388,6 @@ public class Helper {
 			double d = 0;
 			if(map.containsKey(token)) {
 				d = map.get(token) * q;
-//				System.out.println("helper q: "+(q) + " * " + map.get(token)+" = "+d);
 			} 
 			sum += d;
 		}
@@ -407,18 +407,55 @@ public class Helper {
 		}
 		return df.format(sum);
 	}
-/* Function copied from
+	/* Function copied from
 	 * https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
 	*/
 	public static void printMap(Map mp) {
 	    Iterator it = mp.entrySet().iterator();
 	    while (it.hasNext()) {
 	        Map.Entry pair = (Map.Entry)it.next();
-	        System.out.println(pair.getKey() + " = " + pair.getValue());
 	        it.remove(); // avoids a ConcurrentModificationException
 	    }
 	}
-	
+
+	public int compareItemKeyMap(Item item, Map<Item, Integer> map) {
+		Set<Item> items = map.keySet();
+		for(Item i : items){
+			if(item.getName().equals(i.getName())){
+				return map.get(i);
+			}
+		}
+		return -1;
+	}
+
+	public int getSelectedItemRow(DefaultTableModel dtm, String string) {
+	    int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
+	    String temp;
+	    for (int i = 0 ; i < nRow ; i++){
+	        for (int j = 0 ; j < nCol ; j++){
+	        	temp = dtm.getValueAt(i, j).toString();
+	        	if(temp.equals(string) && !temp.contains(fv.STAR) && !temp.contains(fv.WASH))
+	        		return i;
+	        }
+	    }       
+		return -1;
+	}
+
+	public ArrayList<String> getTableDataToStringArray (JTable table) {
+	    DefaultTableModel dtm = (DefaultTableModel) table.getModel();
+	    int nRow = dtm.getRowCount(), nCol = dtm.getColumnCount();
+	    ArrayList<String> items = new ArrayList<String>();
+	    String temp;
+	    
+	    for (int i = 0 ; i < nRow ; i++){
+	        for (int j = 0 ; j < nCol ; j++){
+	        	temp = dtm.getValueAt(i, j).toString();
+	            if(j == 0)//&& !items.contains(temp))
+	            	items.add(temp);
+	        }
+	    }
+	    return items;
+	}
 	
 	public float pt2mmForWeb72dpi(float pt) {
 	   return pt2mm(pt,72);
@@ -432,4 +469,5 @@ public class Helper {
 	public float pt2mm(float pt, float dpi) {
 	   return pt * 25.4f / dpi;
 	}
+
 }

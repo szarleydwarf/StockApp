@@ -124,6 +124,7 @@ public class MainView {
 		frame = new JFrame();
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 //		frmHctMagazyn.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setBackground(Color.CYAN);
 >>>>>>> try_item_class
@@ -134,6 +135,10 @@ public class MainView {
 =======
 //		frame.getContentPane().setBackground(new Color(255, 51, 0));
 		frame.getContentPane().setBackground(Color.CYAN);
+>>>>>>> try_item_class
+=======
+		frame.getContentPane().setBackground(new Color(255, 51, 0));
+//		frame.getContentPane().setBackground(Color.CYAN);
 >>>>>>> try_item_class
 		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));

@@ -559,6 +559,9 @@ public class WystawRachunek {
 			public void actionPerformed(ActionEvent arg0) {
 				if(item != null && tbChoosen.getSelectedRow() != -1){
 					DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+					int choosenRow = tbChoosen.getSelectedRow();
+					int row = helper.compareItemKeyMap(item, selectedRowItem);
+					updateStockTableQnt(model, choosenRow, row);
 					model.removeRow(tbChoosen.getSelectedRow());
 				}
 			}
@@ -610,6 +613,17 @@ public class WystawRachunek {
 		btnClearAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
+				DefaultTableModel dtm = (DefaultTableModel) tbStock.getModel();
+//				\\TODO add removed item qnt to the stock table
+				ArrayList<String> its = helper.getTableDataToStringArray(tbChoosen);
+				int chosenRow, stRow;
+				for(int j = 0; j < its.size(); j++){
+					chosenRow = helper.getSelectedItemRow(model, its.get(j));
+					stRow = helper.getSelectedItemRow(dtm, its.get(j));
+					if(chosenRow != -1)
+						updateStockTableQnt(model, chosenRow, stRow);
+				}
+				
 				model.setRowCount(0);
 			}
 		});
@@ -1181,9 +1195,19 @@ public class WystawRachunek {
 		populateCarTable();
 	}//TODO END OF INSTANTIATE
 	
+	protected void updateStockTableQnt(DefaultTableModel model, int choosenRow, int stockTbRow) {
+		if(stockTbRow != -1){
+			int qnt = Integer.parseInt(model.getValueAt(choosenRow, 2).toString());
+			if(qnt <= 0)
+				qnt = 1;
+			int actualQnt = Integer.parseInt(tbStock.getValueAt(stockTbRow, 2).toString());
+			qnt = actualQnt + qnt;
+			tbStock.setValueAt(qnt, stockTbRow, 2);
+		}
+	}
+
 	protected boolean isUpdateRequred() {
 		for(int i = 0; i < modTBchosen.getRowCount(); i++){
-//			System.out.println("md "+modTBchosen.getValueAt(i, 0));
 			if(!modTBchosen.getValueAt(i, 0).toString().contains(fv.STAR) && !modTBchosen.getValueAt(i, 0).toString().contains(fv.WASH)){
 				return true;
 			}
@@ -1364,6 +1388,7 @@ public class WystawRachunek {
 
 		JTable table = new JTable();
 		table = createTable(data, this.fv.STOCK_TB_HEADINGS_NO_COST, fv.STOCK_TB_NAME, 240);
+		table.setName(fv.STOCK_TABLE);
 		rowSorterStock = new TableRowSorter<>(table.getModel());
 		
 		table.setRowSorter(rowSorterStock);
@@ -1502,7 +1527,7 @@ public class WystawRachunek {
 				int row = table.getSelectedRow();
 				if(row != -1) {
 					item = getItem(table.getModel().getValueAt(table.convertRowIndexToModel(row), 0).toString());
-					if(item != null && (item instanceof StockItem)){
+					if(item != null && (item instanceof StockItem) && table.getName().equals(fv.STOCK_TABLE)){
 						selectedRowItem.put(item,row);
 					}
 				}
@@ -1577,8 +1602,6 @@ public class WystawRachunek {
 
 		if(item instanceof StockItem){
 			itemQnt = (itemQnt <= 0) ? 0 : itemQnt - tfQnt;
-			
-//			System.out.println("Instance: " + itemQnt + " / " + tfQnt);
 			if(this.selectedRowItem.containsKey(item)){
 				((StockItem) item).setQnt(itemQnt);
 				int row = this.selectedRowItem.get(item);
