@@ -13,6 +13,7 @@ import java.sql.Statement;
 
 import javax.swing.JOptionPane;
 
+import hct_speciale.Customer;
 import hct_speciale.Invoice;
 import hct_speciale.Item;
 import hct_speciale.StockItem;
@@ -769,6 +770,71 @@ public class DatabaseManager {
 			}
 		}
 		return list;
+	}
+
+	public ArrayList<Customer> getCustomerList(String query) {
+		conn = this.connect();
+		ArrayList<Customer> list = new ArrayList<Customer>();
+
+//		System.out.println(query);
+		try {
+			PreparedStatement pst = conn.prepareStatement(query);		
+			
+			ResultSet rs = pst.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnsNumber = rsmd.getColumnCount();
+//			System.out.println(columnsNumber);
+			while (rs.next()){
+				Customer i = null;
+				i = createCustomer(rs, columnsNumber);
+				i.print();
+				list.add(i);
+			}
+		} catch (SQLException e1) {
+			log.logError(date+" "+this.getClass().getName()+"\tGET Customer LIST E1\t"+e1.getMessage());
+		} finally {
+			try{
+				if (rs != null) {
+                    rs.close();
+                }
+                if (pst != null) {
+                    pst.close();
+                }
+                if (conn != null)
+                    conn.close();
+
+			} catch (Exception e2){
+				log.logError(date+" "+this.getClass().getName()+"\tGET Customer LIST E2\t"+e2.getMessage()+"\n\t"+e2.getLocalizedMessage());
+				e2.printStackTrace();
+			}
+		}
+		return list;
+	}
+
+	private Customer createCustomer(ResultSet rs, int columnsNumber) throws SQLException {
+		String id = "", carId = "", details = "";
+		boolean isBusiness = false;
+//		System.out.println("dm cr cust"+rs.getString(1));
+		for(int i = 1 ; i <= columnsNumber; i++){
+//			System.out.println(i + " "+ rs.getString(i));
+			if(!rs.getString(i).isEmpty()) {
+				switch(i){
+				case 1:
+					id = rs.getString(i);
+					break;
+				case 2:
+					carId = rs.getString(i);
+					break;
+				case 3:
+					details = rs.getString(i);
+					break;
+				case 4:
+					isBusiness = rs.getBoolean(i);
+					break;
+				}
+			}
+		}
+		return new Customer(id, carId, details, isBusiness);
 	}
 
 	private Invoice createInvoice(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {

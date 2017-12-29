@@ -46,6 +46,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import dbase.DatabaseManager;
+import hct_speciale.Customer;
 import hct_speciale.Item;
 import hct_speciale.StockItem;
 import utillity.FinalVariables;
@@ -141,6 +142,7 @@ public class WystawRachunek {
 	private JCheckBox chbAirfreshener;
 	private JCheckBox chbFreeCarWash;
 	private ArrayList<Item> items;
+	private ArrayList<Customer> listOfCustomers;
 
 
 	/**
@@ -174,6 +176,7 @@ public class WystawRachunek {
 		helper = new Helper();
 		fv = new FinalVariables();
 		items = DM.getItemsList("SELECT "+fv.STAR + " FROM " +fv.STOCK_TABLE);
+		listOfCustomers = DM.getCustomerList(fv.CUSTOMER_QUERY);
 
 		this.selectedRowItem = new HashMap<Item, Integer>();
 
@@ -182,9 +185,6 @@ public class WystawRachunek {
 		this.itemCodeName = new HashMap<String, String>();
 
 		invoiceNum = DM.getLastInvoiceNumber();
-//		if(invoiceNum == 0)
-//		System.out.println("item list "+invoiceNum);
-
 		invoiceNum++;
 
 		try {
@@ -316,6 +316,10 @@ public class WystawRachunek {
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean update = isUpdateRequred();
+//				TODO check for customer add new
+				boolean customerExists = checkIfCustomerExists();
+				if(!customerExists)
+					addNewCustomer();
 				
 				helper.timeOut(fv.TIMEOUT);
 				if(update){
@@ -331,6 +335,10 @@ public class WystawRachunek {
 		btnZapisz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean update = isUpdateRequred();
+//				TODO check for customer add new
+				boolean customerExists = checkIfCustomerExists();
+				if(!customerExists)
+					addNewCustomer();
 				
 				helper.timeOut(fv.TIMEOUT);
 				if(update){
@@ -454,7 +462,6 @@ public class WystawRachunek {
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
 				DefaultTableModel dtm = (DefaultTableModel) tbStock.getModel();
-//				\\TODO add removed item qnt to the stock table
 				ArrayList<String> its = helper.getTableDataToStringArray(tbChoosen);
 				int chosenRow, stRow;
 				for(int j = 0; j < its.size(); j++){
@@ -710,6 +717,18 @@ public class WystawRachunek {
 		populateCarTable();
 	}//TODO END OF INSTANTIATE
 	
+	protected void addNewCustomer() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected boolean checkIfCustomerExists() {
+		for(int i = 0; i < this.listOfCustomers.size(); i++) {
+			
+		}
+		return false;
+	}
+
 	protected void updateStockTableQnt(DefaultTableModel model, int choosenRow, int stockTbRow) {
 		if(stockTbRow != -1){
 			int qnt = Integer.parseInt(model.getValueAt(choosenRow, 2).toString());

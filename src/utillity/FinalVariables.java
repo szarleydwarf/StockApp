@@ -66,12 +66,15 @@ public class FinalVariables {
 	public static final String[] SALES_REPORT_TB_HEADINGS = {"Miesiąc", "Koszty", "Przychód", "Zysk"};
 	public static final String[] STOCK_TB_HEADINGS = {"Towar", "Koszt", "Cena", "Qnt"};
 	public static final String[] STOCK_TB_HEADINGS_NO_COST =  {"Towar", "Cena", "Qnt"};
-//	public static final String[] INVOICE_TB_HEADINGS = {"Inv #", "Klient", "Serwis #", "Towar #", "Total", "Data wystawienia", "Nazwa pliku"};
 	public static final String[] CARS_TABLE_HEADER = {"Marka auta"};
 	public static final String[] INVOICE_REPORT_TB_HEADINGS = {"Inv #", "Klient", "Usługi", "Produkty", "Total", "Data faktury", "Ścieżka dostępu", "Discount"};
 	public final String CARS_TB_NAME = "CARS";
 	public final String STOCK_TB_NAME = "STOCK";
 	public final String CHOSEN_TB_NAME = "CHOOSEN";
+	public static final String CUSTOMER_TABLE = "customers";
+	public static final String CUSTOMER_ID = "id";
+	public static final String[] CUSTOMER_TB_HEADINGS = {"ID", "CAR", "DETAILS", "BUSINESS"};
+	public static final String CUSTOMER_QUERY = "SELECT * from "+CUSTOMER_TABLE+" ORDER BY "+CUSTOMER_ID+" ASC";
 
 	//Database table names
 	public static final String TOTAL = "total";

@@ -575,6 +575,7 @@ public class StockPrinter  {
 
 		contentStream.beginText();
 		contentStream.setNonStrokingColor(Color.black);
+		lineSpacing +=3.5;
 		contentStream.setLeading(lineSpacing );
 		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
 		contentStream.newLineAtOffset(30, invoiceReportYOffeset );
@@ -630,7 +631,7 @@ public class StockPrinter  {
         job.setPrintService(myPrintService);
 
         //TODO /Uncomment bellow before export to app
-        job.print();
+//        job.print();
         
         document.close();
    }
