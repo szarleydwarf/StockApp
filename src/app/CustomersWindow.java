@@ -232,11 +232,13 @@ public class CustomersWindow {
 		for(int i = 0; i < listOfCustomers.size(); i++){
 			data[i][0] = ""+listOfCustomers.get(i).getId();
 			data[i][1] = ""+listOfCustomers.get(i).getCarId();
-			data[i][2] = ""+listOfCustomers.get(i).getDetails();
+			data[i][2] = ""+listOfCustomers.get(i).getCarRegistration();
+			data[i][3] = ""+listOfCustomers.get(i).getDetails();
 			if(listOfCustomers.get(i).isBusiness())
-				data[i][3] = "YES";
+				data[i][4] = "YES";
 			else
-				data[i][3] = "NO";
+				data[i][4] = "NO";
+			data[i][5] = ""+listOfCustomers.get(i).getNumVisits();
 		}
 
 

@@ -783,11 +783,11 @@ public class DatabaseManager {
 			ResultSet rs = pst.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnsNumber = rsmd.getColumnCount();
-//			System.out.println(columnsNumber);
+//			System.out.println("c# "+columnsNumber);
 			while (rs.next()){
 				Customer i = null;
 				i = createCustomer(rs, columnsNumber);
-				i.print();
+//				i.print();
 				list.add(i);
 			}
 		} catch (SQLException e1) {
@@ -808,12 +808,14 @@ public class DatabaseManager {
 				e2.printStackTrace();
 			}
 		}
+//		System.out.println("dbm size "+list.size());
 		return list;
 	}
 
 	private Customer createCustomer(ResultSet rs, int columnsNumber) throws SQLException {
-		String id = "", carId = "", details = "";
+		String id = "", carId = "", carRegistration = "", details = "";
 		boolean isBusiness = false;
+		int numVisits = 0;
 //		System.out.println("dm cr cust"+rs.getString(1));
 		for(int i = 1 ; i <= columnsNumber; i++){
 //			System.out.println(i + " "+ rs.getString(i));
@@ -826,15 +828,22 @@ public class DatabaseManager {
 					carId = rs.getString(i);
 					break;
 				case 3:
-					details = rs.getString(i);
+					carRegistration = rs.getString(i);
 					break;
 				case 4:
+					details = rs.getString(i);
+					break;
+				case 5:
 					isBusiness = rs.getBoolean(i);
 					break;
+				case 6:
+					numVisits = rs.getInt(i);
+					break;
+
 				}
 			}
 		}
-		return new Customer(id, carId, details, isBusiness);
+		return new Customer(id, carId, carRegistration, details, isBusiness, numVisits);
 	}
 
 	private Invoice createInvoice(ResultSet rs, int columnsNumber) throws NumberFormatException, SQLException {

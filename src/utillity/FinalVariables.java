@@ -73,7 +73,7 @@ public class FinalVariables {
 	public final String CHOSEN_TB_NAME = "CHOOSEN";
 	public static final String CUSTOMER_TABLE = "customers";
 	public static final String CUSTOMER_ID = "id";
-	public static final String[] CUSTOMER_TB_HEADINGS = {"ID", "CAR", "DETAILS", "BUSINESS"};
+	public static final String[] CUSTOMER_TB_HEADINGS = {"ID", "CAR", "REGISTRATION", "DETAILS", "BUSINESS", "# VISITS"};
 	public static final String CUSTOMER_QUERY = "SELECT * from "+CUSTOMER_TABLE+" ORDER BY "+CUSTOMER_ID+" ASC";
 
 	//Database table names
@@ -81,7 +81,7 @@ public class FinalVariables {
 	public static final String COST_COL_NAME = "cost";
 	public final String PRICE_COL_NAME = "price";
 	public final String INVOCE_TABLE = "invoice_list";
-	public final String MANUFACTURER_LIST_TABLE = "manufacturers";
+	public final String MANUFACTURER_TABLE = "manufacturers";
 	public final String SERVICES_TABLE = "services";
 	public final String STOCK_TABLE = "stock";
 	public final String USERS_TABLE = "users";

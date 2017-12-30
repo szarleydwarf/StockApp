@@ -143,6 +143,7 @@ public class WystawRachunek {
 	private JCheckBox chbFreeCarWash;
 	private ArrayList<Item> items;
 	private ArrayList<Customer> listOfCustomers;
+	private Map<String, String> carsIdBrand;
 
 
 	/**
@@ -176,9 +177,12 @@ public class WystawRachunek {
 		helper = new Helper();
 		fv = new FinalVariables();
 		items = DM.getItemsList("SELECT "+fv.STAR + " FROM " +fv.STOCK_TABLE);
-		listOfCustomers = DM.getCustomerList(fv.CUSTOMER_QUERY);
 
+		helper.timeOut(fv.TIMEOUT);
 		this.selectedRowItem = new HashMap<Item, Integer>();
+		this.carsIdBrand = new HashMap<String, String>();
+		this.carsIdBrand = DM.getServiceCodesMap("SELECT * FROM '"+fv.MANUFACTURER_TABLE+"'");
+		helper.printMap(this.carsIdBrand);
 
 		this.defaultPaths = new ArrayList<String>();
 		this.defaultPaths = defaultPaths;
@@ -186,6 +190,10 @@ public class WystawRachunek {
 
 		invoiceNum = DM.getLastInvoiceNumber();
 		invoiceNum++;
+
+		this.listOfCustomers = new ArrayList<Customer>();
+		listOfCustomers = DM.getCustomerList(fv.CUSTOMER_QUERY);
+//		System.out.println("wr "+this.listOfCustomers.size());
 
 		try {
 			initialize();
@@ -316,11 +324,15 @@ public class WystawRachunek {
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean update = isUpdateRequred();
+				collectDataForInvoice();
 //				TODO check for customer add new
-				boolean customerExists = checkIfCustomerExists();
-				if(!customerExists)
-					addNewCustomer();
-				
+				String vatRegNum, compName, compAddress, carReg; 
+				boolean isBusiness;
+//				boolean customerExists = checkIfCustomerExists(vatRegNum, compName, compAddress, carReg, isBusiness);
+//				if(!customerExists)
+//					addNewCustomer(vatRegNum, compName, compAddress, carReg, isBusiness);
+			
+
 				helper.timeOut(fv.TIMEOUT);
 				if(update){
 					changeDBStock();
@@ -335,11 +347,25 @@ public class WystawRachunek {
 		btnZapisz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean update = isUpdateRequred();
+				collectDataForInvoice();
 //				TODO check for customer add new
-				boolean customerExists = checkIfCustomerExists();
-				if(!customerExists)
-					addNewCustomer();
+				String vatRegNum = "", compName = "", compAddress = "", carReg = ""; 
+				if(!tfVATRegNum.getText().isEmpty() && !tfVATRegNum.getText().equals(stringVATReg))
+					vatRegNum = tfVATRegNum.getText();
+				if(!tfCompanyName.getText().isEmpty() && !tfCompanyName.getText().equals(stringComName))
+					compName = tfCompanyName.getText();
+				if(!tfCompanyAddress.getText().isEmpty() && !tfCompanyAddress.getText().equals(stringAddress))
+					compAddress = tfCompanyAddress.getText();
+				if(!tfRegistration.getText().isEmpty())
+					carReg = tfRegistration.getText();
+				System.out.println("exist '"+vatRegNum + "' '" + compName + "' '" + compAddress + "' '" + carReg + "'");
 				
+				boolean customerExists = checkIfCustomerExists(vatRegNum, compName, compAddress, carReg);
+				System.out.println("exist "+customerExists);
+
+				if(!customerExists)
+					addNewCustomer(vatRegNum, compName, compAddress, carReg);
+			
 				helper.timeOut(fv.TIMEOUT);
 				if(update){
 					changeDBStock();
@@ -349,6 +375,7 @@ public class WystawRachunek {
 				savePDFtoHDD();
 			}
 		});
+		
 		btnZapisz.setForeground(new Color(0, 0, 102));
 		btnZapisz.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		btnZapisz.setBackground(new Color(102, 204, 0));
@@ -717,16 +744,61 @@ public class WystawRachunek {
 		populateCarTable();
 	}//TODO END OF INSTANTIATE
 	
-	protected void addNewCustomer() {
+	protected void addNewCustomer(String vatRegNum, String compName, String compAddress, String carReg) {
 		// TODO Auto-generated method stub
+		String details = compName + "; " + compAddress + "; " + vatRegNum;
+		String carID = getCarId();
+		String isBusiness = checkIfBusiness(details);
 		
+		String query = "INSERT INTO \""+this.fv.CUSTOMER_TABLE+"\"  VALUES ('"+carID+"','"+carReg+"','"+details+"',"+isBusiness +",";//+numOfVisits+");";
+		System.out.println("adding new customer\n"+query);
 	}
 
-	protected boolean checkIfCustomerExists() {
+	private String checkIfBusiness(String details) {
+		String t = "";
+		
+		return t;
+	}
+
+	private String getCarId() {
+		String carId = "";
+		//TODO search in map by value
+		System.out.println("cars: "+this.carsIdBrand.size() + "' "+carManufacturer + this.carsIdBrand.get(carManufacturer));
+		if(this.carsIdBrand.containsKey(carManufacturer))
+			carId = this.carsIdBrand.get(carManufacturer);
+		System.out.println("carId '"+carId);
+		return carId;
+	}
+
+	protected boolean checkIfCustomerExists(String vatRegNum, String compName, String compAddress, String carReg) {
+		boolean isNameVat = false;
 		for(int i = 0; i < this.listOfCustomers.size(); i++) {
-			
+			isNameVat = false;
+			if(this.listOfCustomers.get(i).getCarRegistration().contains(carReg)) {
+				System.out.println("tfRegistration "+carReg);
+				isNameVat = true;
+				if(this.listOfCustomers.get(i).isBusiness()){
+					isNameVat = false;
+					if(!vatRegNum.isEmpty() && this.listOfCustomers.get(i).getDetails().contains(vatRegNum)){
+						System.out.println("tfVATRegNum "+vatRegNum);
+						isNameVat = true;
+					}
+				
+					if(isNameVat){
+						isNameVat = false;
+						if(!compName.isEmpty() && this.listOfCustomers.get(i).getDetails().contains(compName)){
+							System.out.println("tfCompanyName "+compName);
+							isNameVat = true;
+						}
+					}
+				}				
+				System.out.println("tfCompanyAddress "+compAddress + " - " + isNameVat + " - " + this.listOfCustomers.get(i).isBusiness());
+				
+				if(isNameVat)
+					break;
+			}
 		}
-		return false;
+		return isNameVat;
 	}
 
 	protected void updateStockTableQnt(DefaultTableModel model, int choosenRow, int stockTbRow) {
@@ -814,7 +886,7 @@ public class WystawRachunek {
 	}
 
 	private void populateCarTable() {
-		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_LIST_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
+		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
 		ArrayList<String> listOfCars = new ArrayList<String>();
 		listOfCars = DM.selectRecordArrayList(queryCars);
 	
@@ -1020,7 +1092,7 @@ public class WystawRachunek {
 
 	protected void savePDFtoHDD() {
 		sPrinter = new StockPrinter(defaultPaths);
-		collectDataForInvoice();
+//		collectDataForInvoice();
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
 				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
@@ -1088,10 +1160,9 @@ public class WystawRachunek {
 		return query;
 	}
 
-
 	private void printDocument(){
 		sPrinter = new StockPrinter(defaultPaths);
-		collectDataForInvoice();
+//		collectDataForInvoice();
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
 				boolean printed = sPrinter.printDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
