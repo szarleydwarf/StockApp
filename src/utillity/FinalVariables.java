@@ -62,6 +62,7 @@ public class FinalVariables {
 
 	//Other tables
 	public static final String[] MONTHS_2017 = {"01-2017", "02-2017", "03-2017", "04-2017", "05-2017", "06-2017", "07-2017", "08-2017", "09-2017", "10-2017", "11-2017", "12-2017"};
+	public static final int MONTHS_NUM = 12;
 	public static final String[] MONTHS_NAMES = {"Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"};
 	public static final String[] SALES_REPORT_TB_HEADINGS = {"Miesiąc", "Koszty", "Przychód", "Zysk"};
 	public static final String[] STOCK_TB_HEADINGS = {"Towar", "Koszt", "Cena", "Qnt"};

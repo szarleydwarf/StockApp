@@ -509,52 +509,81 @@ public class SalesReports {
 		return itemsList;
 	}
 
-	private ArrayList<String> getServiceList(ArrayList<String> servicesList, ArrayList<Invoice> invoiceList) {
-		for(int i = 0; i < invoiceList.size(); i++){
-			if(!invoiceList.get(i).getServiceNumber().equals("") && !invoiceList.get(i).getServiceNumber().isEmpty()) {
-				String[] tokens = invoiceList.get(i).getServiceNumber().split(",", -1);
-				if(tokens.length > 0){
-					for(String s : tokens){
-						servicesList.add(s);
-					}
-				}
-			}
-		}
-		return servicesList;
-	}
+//	private ArrayList<String> getServiceList(ArrayList<String> servicesList, ArrayList<Invoice> invoiceList) {
+//		for(int i = 0; i < invoiceList.size(); i++){
+//			if(!invoiceList.get(i).getServiceNumber().equals("") && !invoiceList.get(i).getServiceNumber().isEmpty()) {
+//				String[] tokens = invoiceList.get(i).getServiceNumber().split(",", -1);
+//				if(tokens.length > 0){
+//					for(String s : tokens){
+//						servicesList.add(s);
+//					}
+//				}
+//			}
+//		}
+//		return servicesList;
+//	}
 
 	private void populateTable() {
 		DecimalFormat df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
-		String query = "";
-		String[][] data = new String [this.fv.MONTHS_2017.length][this.fv.SALES_REPORT_TB_HEADINGS.length];
-
-		for(int j = 0; j < this.fv.MONTHS_2017.length; j++) {
-			query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.STOCK_TABLE_NUMBER+","+this.fv.TOTAL+" FROM "+this.fv.INVOCE_TABLE+" WHERE "+this.fv.INVOCE_TABLE_DATE+" LIKE '%"+this.fv.MONTHS_2017[j]+"%'";
+		String query = "", dateMMYYYY = "";
+		String[][] data = new String [this.fv.MONTHS_NUM][this.fv.SALES_REPORT_TB_HEADINGS.length];
+		int monthNo = helper.getMonthNum()+1;
+		int yearNo = helper.getYearNum();
+		
+		for(int j = 0; j < this.fv.MONTHS_NUM; j++) {
+			dateMMYYYY = ""+monthNo+"-"+yearNo;
+			query = "SELECT "+this.fv.SERVICE_TABLE_NUMBER+","+this.fv.STOCK_TABLE_NUMBER+","+this.fv.TOTAL+" FROM "+this.fv.INVOCE_TABLE+" WHERE "+this.fv.INVOCE_TABLE_DATE+" LIKE '%"+dateMMYYYY+"%'";
 			ArrayList<String> list = new ArrayList<String>();
 			list = this.DM.selectRecordArrayList(query);
-			data[j][0] = this.fv.MONTHS_2017[j];
+			data[j][0] = dateMMYYYY;
+//			System.out.println("DATA: "+dateMMYYYY);
 			if(list.isEmpty()){
-				data[j][1] = ""+0;
-				data[j][2] = ""+0;
-				data[j][3] = ""+0;			
+				data[j][1] = "€ "+ df.format(0);
+				data[j][2] =  "€ "+ df.format(0);
+				data[j][3] =  "€ "+ df.format(0);			
 			} else {
-				double dCost = 0;
-				double  incomeSum = 0;
+				double dCost = 0, dPrices = 0,incomeSum = 0;
+//				TODO calc sums for data
 				for(int i = 0; i < list.size(); i++) {
-					if(!list.get(i).equals("") && ((i != 2) && (i != 5) && (i != 8) && (i != 11))) {
-						String[] tokens = list.get(i).split(",", -1);
-						dCost  += sumCosts(tokens);
-					}else if(!list.get(i).equals("")){
-						incomeSum += Double.parseDouble(list.get(i));		
-					}
+					if(!list.get(i).equals("")){
+						if(list.get(i).contains(fv.AAA)){
+							String[] tokens = list.get(i).split(",", -1);
+							
+							dCost += helper.getSumDouble(stocksCosts, tokens);
+//							System.err.println("cost stock: "+dCost);
+							
+							dPrices += helper.getSumDouble(this.stockPrices, tokens);
+//							System.err.println("prices stock: "+dPrices);
+						} else if(list.get(i).contains(fv.AAS)){
+							String[] tokens = list.get(i).split(",", -1);
+							
+							dCost += helper.getSumDouble(this.servicesCosts, tokens);
+//							System.err.println("cost serv: "+dCost);
+							
+							dPrices += helper.getSumDouble(this.servicePrices, tokens);
+//							System.err.println("prices serv: "+dPrices);
+						} else {
+//							System.out.println("inc: "+incomeSum);
+							incomeSum += Double.parseDouble(list.get(i));
+						}
+
+//						System.err.println("cost 1: "+dCost);
+//						System.err.println("prices 1: "+dPrices);
+//						System.out.println("inc 1: "+incomeSum);
+						}
 				}
 				data[j][1] = "€ "+ df.format(dCost);
 				data[j][2] = "€ "+ df.format(incomeSum);
 				double dDiff = incomeSum - dCost;
 				data[j][3] = "€ "+ df.format(dDiff);
 			}
-			
+			if(monthNo == 1){
+				yearNo--;
+				monthNo = 13;
+			}
+			monthNo--;
 		}
+		
 		table = new JTable(data, this.fv.SALES_REPORT_TB_HEADINGS);
 		table.setBounds(42, 87, 560, 288);
 		table.setPreferredScrollableViewportSize(new Dimension(500, 150));
@@ -573,6 +602,9 @@ public class SalesReports {
 
 	private double sumCosts(String[] tokens) {
 		double sum = 0;
+		//TODO Improve calculation of costs
+		//(remember that some tokens could have number in front indicating number of items)
+		//add sum of prices/total
 		for (String token : tokens) {
 			double d = 0;
 			if(this.servicesCosts.containsKey(token)) {

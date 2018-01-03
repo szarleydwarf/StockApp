@@ -164,7 +164,7 @@ public class StockPrinter  {
 		this.invNo = invoiceNum;
 //		System.out.println("print :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
 		
-		generatePDF();
+		generateInvoicePDF();
 
 		printPDF(docPath);
 		createAccountancCopy();
@@ -203,7 +203,7 @@ public class StockPrinter  {
 		this.invNo = invoiceNum;
 //		System.out.println("save :" + discount+" "+applyDiscount+" "+carManufacturer+" "+registration+" "+invoiceNum);
 		
-		generatePDF();
+		generateInvoicePDF();
 		createAccountancCopy();
 
 		helper.timeOut(fv.TIMEOUT);
@@ -271,7 +271,7 @@ public class StockPrinter  {
 		}
 	}
 
-	private void generatePDF()  throws IOException{
+	private void generateInvoicePDF()  throws IOException{
 		PDDocument customerCopyDoc = new PDDocument();
 		PDPage page = new PDPage();
 		customerCopyDoc.addPage(page);
@@ -561,13 +561,21 @@ public class StockPrinter  {
 		contentStream = new PDPageContentStream(dailyReport, page);
 		this.addLogo(dailyReport);
 		this.fillCompanyDetails();
+		
+		contentStream.beginText();
+		contentStream.setNonStrokingColor(Color.black);
+		contentStream.setLeading(lineSpacing );
+		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
+		contentStream.newLineAtOffset(125, 485);
+		contentStream.showText("Sale report from - " + docDate);
+		contentStream.endText();
 
 		contentStream.beginText();
 		contentStream.setNonStrokingColor(Color.white);
 		contentStream.setLeading(lineSpacing );
 		contentStream.setFont(PDType1Font.COURIER_BOLD, headerFontSize );
 		contentStream.newLineAtOffset(175, invoiceReportYOffeset );
-
+		
 		for(int i = 0; i < fv.SALES_REPORT_COL_HEADINGS.length; i++){
 			this.contentStream.showText(fv.SALES_REPORT_COL_HEADINGS[i] + "     -    ");
 		}
