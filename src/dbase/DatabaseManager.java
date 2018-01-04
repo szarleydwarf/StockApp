@@ -55,8 +55,13 @@ public class DatabaseManager {
 	public boolean addNewRecord(String query) {// throws SQLException{
 		PreparedStatement pst = null;
 		ResultSet rs = null;
-		if(this.conn == null)
-			conn = this.connect();
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tAdd New Record\t"+e.getMessage());
+		}
+		
 		try {
 			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 		} catch (SQLException e) {
@@ -112,30 +117,35 @@ public class DatabaseManager {
 	public boolean deleteRecord(String query) throws SQLException{
 		PreparedStatement pst = null;
 		ResultSet rs = null;
-		if(this.conn == null)
-			conn = this.connect();
-			try {
-				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
-			} catch (SQLException e) {
-				System.out.println("Delete Record E "+e.getMessage());
-				log.logError(date+" "+this.getClass().getName()+"\tDelete Record\t"+e.getMessage());
-			}
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tDelete Record\t"+e.getMessage());
+		}
+
+		try {
+			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+		} catch (SQLException e) {
+			System.out.println("Delete Record E "+e.getMessage());
+			log.logError(date+" "+this.getClass().getName()+"\tDelete Record\t"+e.getMessage());
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		
+			int inserted = pst.executeUpdate();
 			
-			try {
-				conn.setAutoCommit(false);
-				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			
-				int inserted = pst.executeUpdate();
-				
-				rs = pst.getGeneratedKeys();
-				if(inserted != 1){
-					this.conn.rollback();
-				} 
-				conn.commit();
-						
-				if(inserted != 0)
-					return true;
+			rs = pst.getGeneratedKeys();
+			if(inserted != 1){
+				this.conn.rollback();
+			} 
+			conn.commit();
+					
+			if(inserted != 0)
+				return true;
 			
 		} catch (SQLException e1) {
 			try{
@@ -300,45 +310,50 @@ public class DatabaseManager {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		
-		if(this.conn == null)
-			conn = this.connect();
-			try {
-				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
-			} catch (SQLException e) {
-				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e.getMessage());
-			}
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tGET ONE FIELD\t"+e.getMessage());
+		}
+
+		try {
+			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e.getMessage());
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		
+			rs = pst.executeQuery();
 			
-			try {
-				conn.setAutoCommit(false);
-				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			
-				rs = pst.executeQuery();
-				
-				while(rs.next()){
-					return rs.getString(1);
-				}
-			} catch (SQLException e1) {
-				try{
-					if(this.conn != null){
-						this.conn.rollback();
-					}
-				} catch ( SQLException e2){
-					log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e2.getMessage());
-				}
-				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e1.getMessage());
-			}	finally {
-				try{
-					if(rs != null)
-						rs.close();
-					if(pst != null)
-						pst.close();
-	                if (conn != null)
-	                    conn.close();
-				} catch (Exception e3){
-					log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e3.getMessage());
-				}
+			while(rs.next()){
+				return rs.getString(1);
 			}
+		} catch (SQLException e1) {
+			try{
+				if(this.conn != null){
+					this.conn.rollback();
+				}
+			} catch ( SQLException e2){
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e2.getMessage());
+			}
+			log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e1.getMessage());
+		}	finally {
+			try{
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+                if (conn != null)
+                    conn.close();
+			} catch (Exception e3){
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATH\t"+e3.getMessage());
+			}
+		}
 		return "";
 	}
 	
@@ -347,46 +362,51 @@ public class DatabaseManager {
 		ResultSet rs = null;
 		ArrayList<String> list = new ArrayList<String>();
 		
-		if(this.conn == null)
-			conn = this.connect();
-			try {
-				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
-			} catch (SQLException e) {
-				log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e.getMessage());
-			}
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tGET PATHS\t"+e.getMessage());
+		}
+
+		try {
+			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e.getMessage());
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		
+			rs = pst.executeQuery();
 			
-			try {
-				conn.setAutoCommit(false);
-				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			
-				rs = pst.executeQuery();
-				
-				while(rs.next()){
-					list.add(rs.getString(1));
-				}
-				return list;
-			} catch (SQLException e1) {
-				try{
-					if(this.conn != null){
-						this.conn.rollback();
-					}
-				} catch ( SQLException e2){
-					log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e2.getMessage());
-				}
-				log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e1.getMessage());
-			}	finally {
-				try{
-					if(rs != null)
-						rs.close();
-					if(pst != null)
-						pst.close();
-	                if (conn != null)
-	                    conn.close();
-				} catch (Exception e3){
-					log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e3.getMessage());
-				}
+			while(rs.next()){
+				list.add(rs.getString(1));
 			}
+			return list;
+		} catch (SQLException e1) {
+			try{
+				if(this.conn != null){
+					this.conn.rollback();
+				}
+			} catch ( SQLException e2){
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e2.getMessage());
+			}
+			log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e1.getMessage());
+		}	finally {
+			try{
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+                if (conn != null)
+                    conn.close();
+			} catch (Exception e3){
+				log.logError(date+" "+this.getClass().getName()+"\tGET PATHS\t"+e3.getMessage());
+			}
+		}
 		return null;
 	}
 	
@@ -394,45 +414,50 @@ public class DatabaseManager {
 		String query = "SELECT "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" from "+this.fv.INVOCE_TABLE+" ORDER BY "+this.fv.INVOCE_TABLE_INVOICE_NUMBER+" DESC LIMIT 1";
 		PreparedStatement pst = null;
 		ResultSet rs = null;
-		if(this.conn == null)
-			conn = this.connect();
-			try {
-				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
-			} catch (SQLException e) {
-				log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e.getMessage());
-			}
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e.getMessage());
+		}
+
+		try {
+			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e.getMessage());
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		
+			rs = pst.executeQuery();
 			
-			try {
-				conn.setAutoCommit(false);
-				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			
-				rs = pst.executeQuery();
-				
-				while(rs.next()){
-					return rs.getInt(1);
-				}
-			} catch (SQLException e1) {
-				try{
-					if(this.conn != null){
-						this.conn.rollback();
-					}
-				} catch ( SQLException e2){
-					log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e2.getMessage());
-				}
-				log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e1.getMessage());
-			}	finally {
-				try{
-					if(rs != null)
-						rs.close();
-					if(pst != null)
-						pst.close();
-	                if (conn != null)
-	                    conn.close();
-				} catch (Exception e3){
-					log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e3.getMessage());
-				}
+			while(rs.next()){
+				return rs.getInt(1);
 			}
+		} catch (SQLException e1) {
+			try{
+				if(this.conn != null){
+					this.conn.rollback();
+				}
+			} catch ( SQLException e2){
+				log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e2.getMessage());
+			}
+			log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e1.getMessage());
+		}	finally {
+			try{
+				if(rs != null)
+					rs.close();
+				if(pst != null)
+					pst.close();
+                if (conn != null)
+                    conn.close();
+			} catch (Exception e3){
+				log.logError(date+" "+this.getClass().getName()+"\tGET LAST INVOICE NUMBER\t"+e3.getMessage());
+			}
+		}
 		return 0;
 	}
 	
@@ -440,8 +465,13 @@ public class DatabaseManager {
 		Map<String, String> toReturn = new HashMap<String, String>();
 		PreparedStatement pst = null;
 		ResultSet rs = null;
-		if(conn == null)
-			conn = this.connect();
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tGET SERVICE CODES MAP\t"+e.getMessage());
+		}
+
 		try {
 			pst = conn.prepareStatement(q);
 			rs = pst.executeQuery();		
@@ -476,8 +506,13 @@ public class DatabaseManager {
 		
 		PreparedStatement pst = null;
 		ResultSet rs = null;
-		if(conn == null)
-			conn = this.connect();
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tGET ALL COST PRICES\t"+e.getMessage());
+		}
+
 		try {
 			pst = conn.prepareStatement(query);
 			rs = pst.executeQuery();		
@@ -512,20 +547,25 @@ public class DatabaseManager {
 	public ResultSet selectRecord(String query) throws SQLException{
 		PreparedStatement pst = null;
 		ResultSet rs = null;
-		if(this.conn == null)
-			conn = this.connect();
-			try {
-				conn.createStatement().execute("PRAGMA locking_mode = PENDING");
-			} catch (SQLException e) {
-				log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORDe \t"+e.getMessage());
-			}
-			
-			try {
-				conn.setAutoCommit(false);
-				conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
-				pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-			
-				return pst.executeQuery();
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tSELECT RECORD\t"+e.getMessage());
+		}
+
+		try {
+			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
+		} catch (SQLException e) {
+			log.logError(date+" "+this.getClass().getName()+"\tSELECT RECORDe \t"+e.getMessage());
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			conn.createStatement().execute("PRAGMA locking_mode = EXCLUSIVE");
+			pst = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		
+			return pst.executeQuery();
 			
 		} catch (SQLException e1) {
 			try{
@@ -888,8 +928,13 @@ public class DatabaseManager {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		
-		if(this.conn == null)
-			conn = this.connect();
+		try {
+			if(this.conn == null || conn.isClosed())
+				conn = this.connect();
+		} catch (SQLException e) {
+			log.logError(date+" 1st "+this.getClass().getName()+"\tCREATE TABLE\t"+e.getMessage());
+		}
+
 		try {
 			conn.createStatement().execute("PRAGMA locking_mode = PENDING");
 		} catch (SQLException e) {
