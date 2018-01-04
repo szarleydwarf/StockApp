@@ -181,8 +181,9 @@ public class WystawRachunek {
 		helper.timeOut(fv.TIMEOUT);
 		this.selectedRowItem = new HashMap<Item, Integer>();
 		this.carsIdBrand = new HashMap<String, String>();
-		this.carsIdBrand = DM.getServiceCodesMap("SELECT * FROM '"+fv.MANUFACTURER_TABLE+"'");
-		helper.printMap(this.carsIdBrand);
+		this.carsIdBrand = DM.getServiceCodesMap("SELECT "+fv.MANUFACTURER_TABLE_BRAND + ", "+fv.MANUFACTURER_TABLE_CAR_ID + " FROM '"+fv.MANUFACTURER_TABLE+"'");
+//		System.out.println("size: "+this.carsIdBrand.size() + " - " + this.carsIdBrand.get("35"));
+//		helper.printMap(this.carsIdBrand);
 
 		this.defaultPaths = new ArrayList<String>();
 		this.defaultPaths = defaultPaths;
@@ -358,6 +359,7 @@ public class WystawRachunek {
 					compAddress = tfCompanyAddress.getText();
 				if(!tfRegistration.getText().isEmpty())
 					carReg = tfRegistration.getText();
+				
 				System.out.println("exist '"+vatRegNum + "' '" + compName + "' '" + compAddress + "' '" + carReg + "'");
 				
 				boolean customerExists = checkIfCustomerExists(vatRegNum, compName, compAddress, carReg);
@@ -763,10 +765,10 @@ public class WystawRachunek {
 	private String getCarId() {
 		String carId = "";
 		//TODO search in map by value
-		System.out.println("cars: "+this.carsIdBrand.size() + "' "+carManufacturer + this.carsIdBrand.get(carManufacturer));
+//		System.out.println("cars: "+this.carsIdBrand.size() + "' "+carManufacturer + " - " + this.carsIdBrand.get(carManufacturer));
 		if(this.carsIdBrand.containsKey(carManufacturer))
 			carId = this.carsIdBrand.get(carManufacturer);
-		System.out.println("carId '"+carId);
+//		System.out.println("carId '"+carId);
 		return carId;
 	}
 
