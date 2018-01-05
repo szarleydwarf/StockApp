@@ -352,12 +352,12 @@ public class WystawRachunek {
 //				TODO check for customer add new
 				String vatRegNum = "", compName = "", compAddress = "", carReg = ""; 
 				if(!tfVATRegNum.getText().isEmpty() && !tfVATRegNum.getText().equals(stringVATReg))
-					vatRegNum = tfVATRegNum.getText();
+					vatRegNum = tfVATRegNum.getText().replace(fv.COMPANY_STRING, "");
 				if(!tfCompanyName.getText().isEmpty() && !tfCompanyName.getText().equals(stringComName))
-					compName = tfCompanyName.getText();
+					compName = tfCompanyName.getText().replace(fv.COMPANY_STRING, "");
 				if(!tfCompanyAddress.getText().isEmpty() && !tfCompanyAddress.getText().equals(stringAddress))
-					compAddress = tfCompanyAddress.getText();
-				if(!tfRegistration.getText().isEmpty())
+					compAddress = tfCompanyAddress.getText().replace(fv.COMPANY_STRING, "");
+				if(!tfRegistration.getText().isEmpty() && !tfRegistration.getText().equals(defRegistrationString))
 					carReg = tfRegistration.getText();
 				
 				System.out.println("exist '"+vatRegNum + "' '" + compName + "' '" + compAddress + "' '" + carReg + "'");
@@ -753,7 +753,7 @@ public class WystawRachunek {
 		String isBusiness = checkIfBusiness(details);
 		
 		String query = "INSERT INTO \""+this.fv.CUSTOMER_TABLE+"\"  VALUES ('"+carID+"','"+carReg+"','"+details+"',"+isBusiness +",";//+numOfVisits+");";
-		System.out.println("adding new customer\n"+query);
+//		System.out.println("adding new customer\n"+query);
 	}
 
 	private String checkIfBusiness(String details) {
@@ -764,8 +764,6 @@ public class WystawRachunek {
 
 	private String getCarId() {
 		String carId = "";
-		//TODO search in map by value
-//		System.out.println("cars: "+this.carsIdBrand.size() + "' "+carManufacturer + " - " + this.carsIdBrand.get(carManufacturer));
 		if(this.carsIdBrand.containsKey(carManufacturer))
 			carId = this.carsIdBrand.get(carManufacturer);
 //		System.out.println("carId '"+carId);
@@ -773,34 +771,30 @@ public class WystawRachunek {
 	}
 
 	protected boolean checkIfCustomerExists(String vatRegNum, String compName, String compAddress, String carReg) {
-		boolean isNameVat = false;
+		boolean isExistVat = false, isExistCarReg = false;
+//TODO check if that check is enough for existing customer		
 		for(int i = 0; i < this.listOfCustomers.size(); i++) {
-			isNameVat = false;
+			isExistVat = false;
 			if(this.listOfCustomers.get(i).getCarRegistration().contains(carReg)) {
 				System.out.println("tfRegistration "+carReg);
-				isNameVat = true;
-				if(this.listOfCustomers.get(i).isBusiness()){
-					isNameVat = false;
-					if(!vatRegNum.isEmpty() && this.listOfCustomers.get(i).getDetails().contains(vatRegNum)){
-						System.out.println("tfVATRegNum "+vatRegNum);
-						isNameVat = true;
-					}
-				
-					if(isNameVat){
-						isNameVat = false;
-						if(!compName.isEmpty() && this.listOfCustomers.get(i).getDetails().contains(compName)){
-							System.out.println("tfCompanyName "+compName);
-							isNameVat = true;
-						}
-					}
-				}				
-				System.out.println("tfCompanyAddress "+compAddress + " - " + isNameVat + " - " + this.listOfCustomers.get(i).isBusiness());
-				
-				if(isNameVat)
-					break;
+				isExistCarReg = true;
+			}
+			System.out.println("boolean  "+vatRegNum.isEmpty()+" - "+this.listOfCustomers.get(i).isBusiness() + " + " + this.listOfCustomers.get(i).getDetails().contains(vatRegNum)+"\n"+this.listOfCustomers.get(i).getDetails());
+			
+			if(!vatRegNum.isEmpty()&& this.listOfCustomers.get(i).isBusiness()){//  && this.listOfCustomers.get(i).getDetails().contains(vatRegNum)) {
+				System.out.println("tfVATRegNum "+vatRegNum);
+					isExistVat = true;
+			}
+			System.out.println("e "+isExistCarReg +" + "+ isExistVat);
+			
+			if(isExistCarReg || isExistVat){
+				System.out.println("last if");
+				isExistVat = true;
+				break;
 			}
 		}
-		return isNameVat;
+
+		return isExistVat;
 	}
 
 	protected void updateStockTableQnt(DefaultTableModel model, int choosenRow, int stockTbRow) {

@@ -639,7 +639,7 @@ public class StockPrinter  {
         job.setPrintService(myPrintService);
 
         //TODO /Uncomment bellow before export to app
-//        job.print();
+        job.print();
         
         document.close();
    }
