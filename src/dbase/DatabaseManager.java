@@ -774,6 +774,30 @@ public class DatabaseManager {
 		return false;
 	}
 	
+	public String[] getStringArray(String query) {
+		conn = this.connect();
+		ArrayList<String> t = new ArrayList<String>();
+		String[] list = null;;
+		try {
+			PreparedStatement pst = conn.prepareStatement(query);		
+			
+			ResultSet rs = pst.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+						
+			while (rs.next()){
+				if(!rs.getString(1).isEmpty())
+					t.add(rs.getString(1));
+			}
+			list = new String[t.size()];
+			list = t.toArray(list);
+		} catch (SQLException e1) {
+			log.logError(date+" "+this.getClass().getName()+"\tGET STRING ARRAY E1\t"+e1.getMessage());
+		} finally {
+			this.close();
+		}
+		return list;
+	}
+		
 	public ArrayList<Invoice> getInvoiceList(String query) {
 		conn = this.connect();
 		ArrayList<Invoice> list = new ArrayList<Invoice>();
@@ -980,24 +1004,20 @@ public class DatabaseManager {
 	}
 	
 	public void close() {
-		try {
-			conn.close();
-		} catch (SQLException e) {
-			log.logError(date+" "+this.getClass().getName()+"\tCLOSE E\t"+e.getMessage());
-		}finally {
-			try{
-	               if (rs != null) {
-	                    rs.close();
-	                }
-	                if (pst != null) {
-	                    pst.close();
-	                }
-	                if (conn != null) {
-	                    conn.close();
-	                }
-			} catch (Exception e3){
-				log.logError(date+" "+this.getClass().getName()+"\tCLOSE E3\t"+e3.getMessage());
-			}
+		try{
+            if (rs != null) {
+                 rs.close();
+             }
+             if (pst != null) {
+                 pst.close();
+             }
+             if (conn != null) {
+                 conn.close();
+             }
+		} catch (Exception e3){
+			log.logError(date+" "+this.getClass().getName()+"\tCLOSE E3\t"+e3.getMessage());
 		}
 	}
+
+
 }

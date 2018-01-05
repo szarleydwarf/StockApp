@@ -602,7 +602,7 @@ public class StockPrinter  {
 		
 		contentStream.endText();
 		contentStream.close();
-		//TODO change to save in the accountancy folder from the date taken.
+		
 		String path = "";
 		String reportEXT = "_report.pdf";
 		path = savePath+date;
@@ -639,7 +639,7 @@ public class StockPrinter  {
         job.setPrintService(myPrintService);
 
         //TODO /Uncomment bellow before export to app
-        job.print();
+//        job.print();
         
         document.close();
    }

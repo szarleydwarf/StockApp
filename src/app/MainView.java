@@ -119,8 +119,8 @@ public class MainView {
 	private void initialize() {
 //		if(this.frmHctMagazyn == null)
 		frame = new JFrame();
-		frame.getContentPane().setBackground(new Color(255, 51, 0));
-//		frame.getContentPane().setBackground(Color.CYAN);
+//		frame.getContentPane().setBackground(new Color(255, 51, 0));
+		frame.getContentPane().setBackground(Color.CYAN);
 		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setTitle("HCT MAGAZYN");

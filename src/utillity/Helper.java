@@ -212,8 +212,7 @@ public class Helper {
 	public boolean isLeapYear(int year){
         if(year % 4 == 0)
         {
-            if( year % 100 == 0)
-            {
+            if( year % 100 == 0) {
                 if ( year % 400 == 0)
                     return true;
                 else
@@ -231,8 +230,7 @@ public class Helper {
 		int year = this.getYearNum();
         if(year % 4 == 0)
         {
-            if( year % 100 == 0)
-            {
+            if( year % 100 == 0) {
                 if ( year % 400 == 0)
                     return true;
                 else
@@ -393,7 +391,6 @@ public class Helper {
 		}
 		return sum;
 	}
-
 	
 	public String getSumString(HashMap<String, Double> map, String[] tokens) {
 		DecimalFormat df = new DecimalFormat(this.fv.DECIMAL_FORMAT); 
@@ -407,6 +404,7 @@ public class Helper {
 		}
 		return df.format(sum);
 	}
+	
 	/* Function copied from
 	 * https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
 	*/
@@ -470,5 +468,4 @@ public class Helper {
 	public float pt2mm(float pt, float dpi) {
 	   return pt * 25.4f / dpi;
 	}
-
 }

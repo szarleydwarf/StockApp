@@ -204,7 +204,8 @@ public class CustomersWindow {
 		btnNew.setBounds(541, 56, 89, 23);
 		btnNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			//TODO
+				frame.dispose();
+				AddNewCustomer.main(defaultPaths);
 			}
 		});
 
