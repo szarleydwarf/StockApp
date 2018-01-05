@@ -237,7 +237,7 @@ public class DodajTowar {
 
 	private void zapiszNowyProdukt() {
 		boolean saved = dm.addNewRecord("INSERT INTO \""+this.fv.STOCK_TABLE+"\"  VALUES ('"+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt+");");
-//		System.out.println("zapisuje "+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt);
+//		System.out.println("zapisuje "+stockNum+"','"+this.productName+"',"+this.dCost+","+this.dPrice+","+this.iQnt + " - - " + saved);
 		if(saved){
 			JOptionPane.showMessageDialog(null, "Dodano nowy towar");
 			this.frame.dispose();

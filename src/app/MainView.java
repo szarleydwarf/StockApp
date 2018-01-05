@@ -9,17 +9,21 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 import dbase.DatabaseManager;
 import utillity.FinalVariables;
 import utillity.Helper;
 import utillity.Logger;
 import utillity.StockPrinter;
+import javax.swing.JLabel;
 
 public class MainView {
 
@@ -27,8 +31,6 @@ public class MainView {
 	
 	private DatabaseManager DM;
 	private int invoiceNum;
-	private String invoiceFolderPath = "";
-
 	private FinalVariables fv;
 	private Logger logger;
 
@@ -143,7 +145,7 @@ public class MainView {
 		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(this.fv.ICON_PATH));
 		frame.setTitle("HCT MAGAZYN");
-		frame.setBounds(10, 10, 704, 270);
+		frame.setBounds(10, 10, 704, 334);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
@@ -257,5 +259,38 @@ public class MainView {
 		btnTestPage.setBackground(new Color(255, 255, 255));
 		btnTestPage.setBounds(606, 121, 52, 52);
 		frame.getContentPane().add(btnTestPage);
+		
+		JButton btnCustomers = new JButton("Klienci");
+		btnCustomers.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		btnCustomers.setBackground(new Color(204, 255, 255));
+		btnCustomers.setBounds(60, 236, 200, 36);
+		btnCustomers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frame.dispose();
+				CustomersWindow.main(defaultPaths);
+			}
+		});
+		frame.getContentPane().add(btnCustomers);
+		
+		JButton btnRepakReport = new JButton("Repak");
+		btnRepakReport.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
+		btnRepakReport.setBackground(new Color(204, 255, 255));
+		btnRepakReport.setBounds(358, 236, 200, 36);
+		btnRepakReport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(frame, "W trakcie tworzenia");
+//				frame.dispose();
+//				Repak.main(defaultPaths);
+			}
+		});
+
+		frame.getContentPane().add(btnRepakReport);
+		
+		Border b = BorderFactory.createLineBorder(Color.black);
+		TitledBorder border = BorderFactory.createTitledBorder(b, "");
+		JLabel line = new JLabel("");
+		line.setBounds(10, 220, 670, 1);
+		line.setBorder(border);
+		frame.getContentPane().add(line);
 	}
 }

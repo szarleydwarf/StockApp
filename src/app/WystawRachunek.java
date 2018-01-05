@@ -51,6 +51,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import dbase.DatabaseManager;
+import hct_speciale.Customer;
 import hct_speciale.Item;
 import hct_speciale.StockItem;
 import utillity.FinalVariables;
@@ -203,6 +204,11 @@ public class WystawRachunek {
 >>>>>>> try_item_class
 =======
 	private ArrayList<Item> items;
+<<<<<<< HEAD
+>>>>>>> try_item_class
+=======
+	private ArrayList<Customer> listOfCustomers;
+	private Map<String, String> carsIdBrand;
 >>>>>>> try_item_class
 
 
@@ -238,17 +244,23 @@ public class WystawRachunek {
 		fv = new FinalVariables();
 		items = DM.getItemsList("SELECT "+fv.STAR + " FROM " +fv.STOCK_TABLE);
 
+		helper.timeOut(fv.TIMEOUT);
 		this.selectedRowItem = new HashMap<Item, Integer>();
+		this.carsIdBrand = new HashMap<String, String>();
+		this.carsIdBrand = DM.getServiceCodesMap("SELECT "+fv.MANUFACTURER_TABLE_BRAND + ", "+fv.MANUFACTURER_TABLE_CAR_ID + " FROM '"+fv.MANUFACTURER_TABLE+"'");
+//		System.out.println("size: "+this.carsIdBrand.size() + " - " + this.carsIdBrand.get("35"));
+//		helper.printMap(this.carsIdBrand);
 
 		this.defaultPaths = new ArrayList<String>();
 		this.defaultPaths = defaultPaths;
 		this.itemCodeName = new HashMap<String, String>();
 
 		invoiceNum = DM.getLastInvoiceNumber();
-//		if(invoiceNum == 0)
-//		System.out.println("item list "+invoiceNum);
-
 		invoiceNum++;
+
+		this.listOfCustomers = new ArrayList<Customer>();
+		listOfCustomers = DM.getCustomerList(fv.CUSTOMER_QUERY);
+//		System.out.println("wr "+this.listOfCustomers.size());
 
 		try {
 			initialize();
@@ -438,7 +450,15 @@ public class WystawRachunek {
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean update = isUpdateRequred();
-				
+				collectDataForInvoice();
+//				TODO check for customer add new
+				String vatRegNum, compName, compAddress, carReg; 
+				boolean isBusiness;
+//				boolean customerExists = checkIfCustomerExists(vatRegNum, compName, compAddress, carReg, isBusiness);
+//				if(!customerExists)
+//					addNewCustomer(vatRegNum, compName, compAddress, carReg, isBusiness);
+			
+
 				helper.timeOut(fv.TIMEOUT);
 				if(update){
 					changeDBStock();
@@ -453,7 +473,26 @@ public class WystawRachunek {
 		btnZapisz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean update = isUpdateRequred();
+				collectDataForInvoice();
+//				TODO check for customer add new
+				String vatRegNum = "", compName = "", compAddress = "", carReg = ""; 
+				if(!tfVATRegNum.getText().isEmpty() && !tfVATRegNum.getText().equals(stringVATReg))
+					vatRegNum = tfVATRegNum.getText().replace(fv.COMPANY_STRING, "");
+				if(!tfCompanyName.getText().isEmpty() && !tfCompanyName.getText().equals(stringComName))
+					compName = tfCompanyName.getText().replace(fv.COMPANY_STRING, "");
+				if(!tfCompanyAddress.getText().isEmpty() && !tfCompanyAddress.getText().equals(stringAddress))
+					compAddress = tfCompanyAddress.getText().replace(fv.COMPANY_STRING, "");
+				if(!tfRegistration.getText().isEmpty() && !tfRegistration.getText().equals(defRegistrationString))
+					carReg = tfRegistration.getText();
 				
+				System.out.println("exist '"+vatRegNum + "' '" + compName + "' '" + compAddress + "' '" + carReg + "'");
+				
+				boolean customerExists = checkIfCustomerExists(vatRegNum, compName, compAddress, carReg);
+				System.out.println("exist "+customerExists);
+
+				if(!customerExists)
+					addNewCustomer(vatRegNum, compName, compAddress, carReg);
+			
 				helper.timeOut(fv.TIMEOUT);
 				if(update){
 					changeDBStock();
@@ -463,6 +502,7 @@ public class WystawRachunek {
 				savePDFtoHDD();
 			}
 		});
+		
 		btnZapisz.setForeground(new Color(0, 0, 102));
 		btnZapisz.setFont(new Font("Segoe UI Black", Font.PLAIN, 14));
 		btnZapisz.setBackground(new Color(102, 204, 0));
@@ -614,7 +654,6 @@ public class WystawRachunek {
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultTableModel model = (DefaultTableModel) tbChoosen.getModel();
 				DefaultTableModel dtm = (DefaultTableModel) tbStock.getModel();
-//				\\TODO add removed item qnt to the stock table
 				ArrayList<String> its = helper.getTableDataToStringArray(tbChoosen);
 				int chosenRow, stRow;
 				for(int j = 0; j < its.size(); j++){
@@ -1195,6 +1234,57 @@ public class WystawRachunek {
 		populateCarTable();
 	}//TODO END OF INSTANTIATE
 	
+	protected void addNewCustomer(String vatRegNum, String compName, String compAddress, String carReg) {
+		// TODO Auto-generated method stub
+		String details = compName + "; " + compAddress + "; " + vatRegNum;
+		String carID = getCarId();
+		String isBusiness = checkIfBusiness(details);
+		
+		String query = "INSERT INTO \""+this.fv.CUSTOMER_TABLE+"\"  VALUES ('"+carID+"','"+carReg+"','"+details+"',"+isBusiness +",";//+numOfVisits+");";
+//		System.out.println("adding new customer\n"+query);
+	}
+
+	private String checkIfBusiness(String details) {
+		String t = "";
+		
+		return t;
+	}
+
+	private String getCarId() {
+		String carId = "";
+		if(this.carsIdBrand.containsKey(carManufacturer))
+			carId = this.carsIdBrand.get(carManufacturer);
+//		System.out.println("carId '"+carId);
+		return carId;
+	}
+
+	protected boolean checkIfCustomerExists(String vatRegNum, String compName, String compAddress, String carReg) {
+		boolean isExistVat = false, isExistCarReg = false;
+//TODO check if that check is enough for existing customer		
+		for(int i = 0; i < this.listOfCustomers.size(); i++) {
+			isExistVat = false;
+			if(this.listOfCustomers.get(i).getCarRegistration().contains(carReg)) {
+				System.out.println("tfRegistration "+carReg);
+				isExistCarReg = true;
+			}
+			System.out.println("boolean  "+vatRegNum.isEmpty()+" - "+this.listOfCustomers.get(i).isBusiness() + " + " + this.listOfCustomers.get(i).getDetails().contains(vatRegNum)+"\n"+this.listOfCustomers.get(i).getDetails());
+			
+			if(!vatRegNum.isEmpty()&& this.listOfCustomers.get(i).isBusiness()){//  && this.listOfCustomers.get(i).getDetails().contains(vatRegNum)) {
+				System.out.println("tfVATRegNum "+vatRegNum);
+					isExistVat = true;
+			}
+			System.out.println("e "+isExistCarReg +" + "+ isExistVat);
+			
+			if(isExistCarReg || isExistVat){
+				System.out.println("last if");
+				isExistVat = true;
+				break;
+			}
+		}
+
+		return isExistVat;
+	}
+
 	protected void updateStockTableQnt(DefaultTableModel model, int choosenRow, int stockTbRow) {
 		if(stockTbRow != -1){
 			int qnt = Integer.parseInt(model.getValueAt(choosenRow, 2).toString());
@@ -1401,7 +1491,7 @@ public class WystawRachunek {
 	}
 
 	private void populateCarTable() {
-		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_LIST_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
+		String queryCars = "SELECT "+this.fv.MANUFACTURER_TABLE_NAME+" FROM "+this.fv.MANUFACTURER_TABLE+" ORDER BY "+this.fv.MANUFACTURER_TABLE_NAME+" ASC";
 		ArrayList<String> listOfCars = new ArrayList<String>();
 		listOfCars = DM.selectRecordArrayList(queryCars);
 	
@@ -1733,7 +1823,7 @@ public class WystawRachunek {
 
 	protected void savePDFtoHDD() {
 		sPrinter = new StockPrinter(defaultPaths);
-		collectDataForInvoice();
+//		collectDataForInvoice();
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
 				boolean saved = sPrinter.saveDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);
@@ -1801,10 +1891,9 @@ public class WystawRachunek {
 		return query;
 	}
 
-
 	private void printDocument(){
 		sPrinter = new StockPrinter(defaultPaths);
-		collectDataForInvoice();
+//		collectDataForInvoice();
 		try {
 			if(!lblTotal.getText().equals(lblTotalSt)){
 				boolean printed = sPrinter.printDoc(tbChoosen, itemCodeName, freebies, discount, isDiscount, carManufacturer, registration, invoiceNum);			
