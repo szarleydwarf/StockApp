@@ -42,7 +42,6 @@ public class AddNewCustomer {
 	private JTextField tfCompanyName;
 	private JTextField tfVatTax;
 	private JTextField tfAddress;
-	protected boolean varEmpty;
 	private String[] carsList;
 	protected String selectedCar;
 	private Map<String, String> carMap;
@@ -193,8 +192,8 @@ public class AddNewCustomer {
 		btnZapisz.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
-				varEmpty = getVariableForQuery();
-				if(!varEmpty)
+				boolean varEmpty = getVariableForQuery();
+				if(varEmpty)
 					zapiszKlienta();
 			}
 		});	
@@ -211,8 +210,9 @@ public class AddNewCustomer {
 	}
 
 	protected boolean getVariableForQuery() {
-		// TODO Auto-generated method stub
-		return false;
+		boolean allGood = true;
+		
+		return allGood;
 	}
 
 	protected void zapiszKlienta() {
